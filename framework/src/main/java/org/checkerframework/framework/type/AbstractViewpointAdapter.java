@@ -29,7 +29,7 @@ import org.checkerframework.javacutil.Pair;
  * Abstract utility class for performing viewpoint adaptation.
  *
  * <p>This class contains the common logic for extracting and inserting viewpoint adapted
- * annotations into the coresponding types for member/field access, constructor and method
+ * annotations into the corresponding types for member/field access, constructor and method
  * invocations, and type parameter bound instantiations.
  *
  * <p>Subclasses implement the computation of the precise viewpoint adapted type given a receiver
@@ -232,7 +232,7 @@ public abstract class AbstractViewpointAdapter implements ViewpointAdapter {
 
     /**
      * Sub-procedure to combine receiver qualifiers with declared types. qualifiers are extracted
-     * from declared types to furthur perform viewpoint adaptation only between two qualifiers.
+     * from declared types to further perform viewpoint adaptation only between two qualifiers.
      *
      * @param receiverAnnotation receiver qualifier
      * @param declared declared type
