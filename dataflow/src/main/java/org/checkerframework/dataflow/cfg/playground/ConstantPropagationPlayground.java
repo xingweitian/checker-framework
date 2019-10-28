@@ -1,6 +1,7 @@
 package org.checkerframework.dataflow.cfg.playground;
 
-import org.checkerframework.dataflow.analysis.Analysis;
+import org.checkerframework.dataflow.analysis.ForwardAnalysis;
+import org.checkerframework.dataflow.analysis.ForwardAnalysisImpl;
 import org.checkerframework.dataflow.cfg.JavaSource2CFGDOT;
 import org.checkerframework.dataflow.constantpropagation.Constant;
 import org.checkerframework.dataflow.constantpropagation.ConstantPropagationStore;
@@ -19,9 +20,9 @@ public class ConstantPropagationPlayground {
 
         // run the analysis and create a PDF file
         ConstantPropagationTransfer transfer = new ConstantPropagationTransfer();
-        // TODO: correct processing environment
-        Analysis<Constant, ConstantPropagationStore, ConstantPropagationTransfer> analysis =
-                new Analysis<>(transfer, null);
-        JavaSource2CFGDOT.generateDOTofCFG(inputFile, outputDir, method, clazz, true, analysis);
+        ForwardAnalysis<Constant, ConstantPropagationStore, ConstantPropagationTransfer>
+                forwardAnalysis = new ForwardAnalysisImpl<>(transfer);
+        JavaSource2CFGDOT.generateDOTofCFG(
+                inputFile, outputDir, method, clazz, true, forwardAnalysis);
     }
 }

@@ -1,5 +1,7 @@
 package org.checkerframework.dataflow.cfg.block;
 
+import java.util.Set;
+
 /** Represents a basic block in a control flow graph. */
 public interface Block {
 
@@ -24,4 +26,7 @@ public interface Block {
 
     /** @return the unique identifier of this block */
     long getId();
+
+    /** @return the predecessors of this block */
+    Set<Block> getPredecessors();
 }

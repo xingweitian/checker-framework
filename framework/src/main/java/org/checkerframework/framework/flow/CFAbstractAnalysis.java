@@ -2,13 +2,15 @@ package org.checkerframework.framework.flow;
 
 import java.util.List;
 import java.util.Set;
+import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
+import javax.lang.model.util.Types;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.basetype.BaseTypeChecker;
-import org.checkerframework.dataflow.analysis.Analysis;
+import org.checkerframework.dataflow.analysis.ForwardAnalysisImpl;
 import org.checkerframework.dataflow.cfg.ControlFlowGraph;
 import org.checkerframework.framework.source.SourceChecker;
 import org.checkerframework.framework.type.AnnotatedTypeFactory;
@@ -36,7 +38,7 @@ public abstract class CFAbstractAnalysis<
                 V extends CFAbstractValue<V>,
                 S extends CFAbstractStore<V, S>,
                 T extends CFAbstractTransfer<V, S, T>>
-        extends Analysis<V, S, T> {
+        extends ForwardAnalysisImpl<V, S, T> {
     /** The qualifier hierarchy for which to track annotations. */
     protected final QualifierHierarchy qualifierHierarchy;
 
@@ -58,15 +60,23 @@ public abstract class CFAbstractAnalysis<
     /** Initial abstract types for fields. */
     protected final List<Pair<VariableElement, V>> fieldValues;
 
+    /** The associated processing environment. */
+    private final ProcessingEnvironment env;
+
+    /** The type utilities. */
+    private final Types types;
+
     public CFAbstractAnalysis(
             BaseTypeChecker checker,
             GenericAnnotatedTypeFactory<V, S, T, ? extends CFAbstractAnalysis<V, S, T>> factory,
             List<Pair<VariableElement, V>> fieldValues,
             int maxCountBeforeWidening) {
-        super(null, maxCountBeforeWidening, checker.getProcessingEnvironment());
+        super(maxCountBeforeWidening);
         qualifierHierarchy = factory.getQualifierHierarchy();
         typeHierarchy = factory.getTypeHierarchy();
         dependentTypesHelper = factory.getDependentTypesHelper();
+        this.env = checker.getProcessingEnvironment();
+        this.types = env.getTypeUtils();
         this.atypeFactory = factory;
         this.checker = checker;
         this.transferFunction = createTransferFunction();
@@ -140,6 +150,14 @@ public abstract class CFAbstractAnalysis<
             return null;
         }
         return new CFValue(analysis, annotations, underlyingType);
+    }
+
+    public ProcessingEnvironment getEnv() {
+        return env;
+    }
+
+    public Types getTypes() {
+        return types;
     }
 
     public TypeHierarchy getTypeHierarchy() {

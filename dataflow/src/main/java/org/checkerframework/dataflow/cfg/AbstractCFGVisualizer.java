@@ -14,6 +14,7 @@ import javax.lang.model.type.TypeMirror;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.analysis.AbstractValue;
 import org.checkerframework.dataflow.analysis.Analysis;
+import org.checkerframework.dataflow.analysis.Analysis.Direction;
 import org.checkerframework.dataflow.analysis.Store;
 import org.checkerframework.dataflow.analysis.TransferFunction;
 import org.checkerframework.dataflow.analysis.TransferInput;
@@ -24,6 +25,7 @@ import org.checkerframework.dataflow.cfg.block.RegularBlock;
 import org.checkerframework.dataflow.cfg.block.SingleSuccessorBlock;
 import org.checkerframework.dataflow.cfg.block.SpecialBlock;
 import org.checkerframework.dataflow.cfg.node.Node;
+import org.checkerframework.javacutil.BugInCF;
 
 /**
  * This abstract class makes implementing a {@link CFGVisualizer} easier. Some of the methods in
@@ -190,20 +192,12 @@ public abstract class AbstractCFGVisualizer<
 
         // Visualize transfer input if necessary.
         if (analysis != null) {
-            // The transfer input before this block is added before the block content.
-            sbBlock.insert(0, visualizeBlockTransferInput(bb, analysis));
+            sbBlock.insert(0, visualizeBlockTransferInputBefore(bb, analysis));
             if (verbose) {
-                Node lastNode = getLastNode(bb);
-                if (lastNode != null) {
-                    StringBuilder sbStore = new StringBuilder();
-                    sbStore.append(escapeString).append("~~~~~~~~~").append(escapeString);
-                    sbStore.append("After: ");
-                    sbStore.append(visualizeStore(analysis.getResult().getStoreAfter(lastNode)));
-                    sbBlock.append(sbStore);
-                }
+                sbBlock.append(visualizeBlockTransferInputAfter(bb, analysis));
             }
         }
-        if (!centered) {
+        if (!centered || verbose) {
             sbBlock.append(escapeString);
         }
         return sbBlock.toString();
@@ -241,7 +235,6 @@ public abstract class AbstractCFGVisualizer<
             case EXCEPTION_BLOCK:
                 return Collections.singletonList(((ExceptionBlock) bb).getNode());
             case CONDITIONAL_BLOCK:
-                return Collections.emptyList();
             case SPECIAL_BLOCK:
                 return Collections.emptyList();
             default:
@@ -250,7 +243,7 @@ public abstract class AbstractCFGVisualizer<
     }
 
     /**
-     * Visualize the transfer input of a block.
+     * Visualize the transfer input before the block.
      *
      * @param bb the block
      * @param analysis the current analysis
@@ -259,30 +252,93 @@ public abstract class AbstractCFGVisualizer<
      *     StringCFGVisualizer} to simply add a new line
      * @return the String representation of the transfer input of the block
      */
-    protected String visualizeBlockTransferInputHelper(
+    protected String visualizeBlockTransferInputBeforeHelper(
             Block bb, Analysis<A, S, T> analysis, String escapeString) {
-        assert analysis != null
-                : "analysis should be non-null when visualizing the transfer input of a block.";
 
-        TransferInput<A, S> input = analysis.getInput(bb);
-        assert input != null;
+        if (analysis == null) {
+            throw new BugInCF(
+                    "analysis should be non-null when visualizing the transfer input of a block.");
+        }
+
+        S regularStore;
+        S thenStore = null;
+        S elseStore = null;
+        boolean isTwoStores = false;
 
         StringBuilder sbStore = new StringBuilder();
-
-        // Split input representation to two lines.
         sbStore.append("Before: ");
-        if (!input.containsTwoStores()) {
-            S regularStore = input.getRegularStore();
+
+        Direction analysisDirection = analysis.getDirection();
+
+        if (analysisDirection == Direction.FORWARD) {
+            TransferInput<A, S> input = analysis.getInput(bb);
+            isTwoStores = input.containsTwoStores();
+            regularStore = input.getRegularStore();
+            thenStore = input.getThenStore();
+            elseStore = input.getElseStore();
+        } else {
+            regularStore = analysis.getResult().getStoreBefore(bb);
+        }
+
+        if (!isTwoStores) {
             sbStore.append(visualizeStore(regularStore));
         } else {
-            S thenStore = input.getThenStore();
             sbStore.append("then=");
             sbStore.append(visualizeStore(thenStore));
-            S elseStore = input.getElseStore();
             sbStore.append(", else=");
             sbStore.append(visualizeStore(elseStore));
         }
         sbStore.append(escapeString).append("~~~~~~~~~").append(escapeString);
+        return sbStore.toString();
+    }
+
+    /**
+     * Visualize the transfer input after the block.
+     *
+     * @param bb the block
+     * @param analysis the current analysis
+     * @param escapeString the escape String for the special need of visualization, e.g., "\\l" for
+     *     {@link DOTCFGVisualizer} to keep line left-justification, "\n" for {@link
+     *     StringCFGVisualizer} to simply add a new line
+     * @return the String representation of the transfer input of the block
+     */
+    protected String visualizeBlockTransferInputAfterHelper(
+            Block bb, Analysis<A, S, T> analysis, String escapeString) {
+
+        if (analysis == null) {
+            throw new BugInCF(
+                    "analysis should be non-null when visualizing the transfer input of a block.");
+        }
+
+        S regularStore;
+        S thenStore = null;
+        S elseStore = null;
+        boolean isTwoStores = false;
+
+        StringBuilder sbStore = new StringBuilder();
+        sbStore.append("After: ");
+
+        Direction analysisDirection = analysis.getDirection();
+
+        if (analysisDirection == Direction.FORWARD) {
+            regularStore = analysis.getResult().getStoreAfter(bb);
+        } else {
+            TransferInput<A, S> input = analysis.getInput(bb);
+            isTwoStores = input.containsTwoStores();
+            regularStore = input.getRegularStore();
+            thenStore = input.getThenStore();
+            elseStore = input.getElseStore();
+        }
+
+        if (!isTwoStores) {
+            sbStore.append(visualizeStore(regularStore));
+        } else {
+            sbStore.append("then=");
+            sbStore.append(visualizeStore(thenStore));
+            sbStore.append(", else=");
+            sbStore.append(visualizeStore(elseStore));
+        }
+        sbStore.insert(0, escapeString + "~~~~~~~~~" + escapeString);
         return sbStore.toString();
     }
 
@@ -303,24 +359,6 @@ public abstract class AbstractCFGVisualizer<
                 return "<exceptional-exit>" + separator;
             default:
                 return "";
-        }
-    }
-
-    /**
-     * Returns the last node of a block, or null if none.
-     *
-     * @param bb the block
-     * @return the last node of this block or {@code null}
-     */
-    protected Node getLastNode(Block bb) {
-        switch (bb.getType()) {
-            case REGULAR_BLOCK:
-                List<Node> blockContents = ((RegularBlock) bb).getContents();
-                return blockContents.get(blockContents.size() - 1);
-            case EXCEPTION_BLOCK:
-                return ((ExceptionBlock) bb).getNode();
-            default:
-                return null;
         }
     }
 

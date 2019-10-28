@@ -159,13 +159,22 @@ public interface CFGVisualizer<
     String visualizeSpecialBlock(SpecialBlock sbb);
 
     /**
-     * Visualize the transferInput of a Block based on the analysis.
+     * Visualize the transferInput before a Block based on the analysis.
      *
      * @param bb the block
      * @param analysis the current analysis
-     * @return the String representation of the transferInput of the given block
+     * @return the String representations of the transferInput before the given block
      */
-    String visualizeBlockTransferInput(Block bb, Analysis<A, S, T> analysis);
+    String visualizeBlockTransferInputBefore(Block bb, Analysis<A, S, T> analysis);
+
+    /**
+     * Visualize the transferInput after a Block based on the analysis.
+     *
+     * @param bb the block
+     * @param analysis the current analysis
+     * @return the String representations of the transferInput after the given block
+     */
+    String visualizeBlockTransferInputAfter(Block bb, Analysis<A, S, T> analysis);
 
     /**
      * Visualize a Node based on the analysis.

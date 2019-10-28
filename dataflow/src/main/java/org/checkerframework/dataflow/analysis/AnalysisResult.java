@@ -4,6 +4,7 @@ import com.sun.source.tree.Tree;
 import com.sun.source.tree.UnaryTree;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -14,6 +15,7 @@ import org.checkerframework.dataflow.cfg.block.ExceptionBlock;
 import org.checkerframework.dataflow.cfg.block.RegularBlock;
 import org.checkerframework.dataflow.cfg.node.AssignmentNode;
 import org.checkerframework.dataflow.cfg.node.Node;
+import org.checkerframework.javacutil.BugInCF;
 
 /**
  * An {@link AnalysisResult} represents the result of a org.checkerframework.dataflow analysis by
@@ -202,6 +204,83 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
         return runAnalysisFor(node, true);
     }
 
+    /** @return the regular store immediately before a given {@link Block} */
+    public S getStoreBefore(Block bb) {
+        TransferInput<A, S> transferInput = stores.get(bb);
+        AbstractAnalysis<A, S, ?> analysis = transferInput.analysis;
+        switch (analysis.getDirection()) {
+            case FORWARD:
+                {
+                    return transferInput.getRegularStore();
+                }
+            case BACKWARD:
+                {
+                    Node firstNode;
+                    switch (bb.getType()) {
+                        case REGULAR_BLOCK:
+                            firstNode = ((RegularBlock) bb).getContents().get(0);
+                            break;
+                        case EXCEPTION_BLOCK:
+                            firstNode = ((ExceptionBlock) bb).getNode();
+                            break;
+                        default:
+                            firstNode = null;
+                    }
+                    if (firstNode == null) {
+                        // This block doesn't contains any node, return store in transfer input
+                        return transferInput.getRegularStore();
+                    }
+                    return analysis.runAnalysisFor(
+                            firstNode, true, transferInput, nodeValues, analysisCaches);
+                }
+            default:
+                {
+                    throw new BugInCF(
+                            "AnalysisResult::getStoreAfter: unknown direction: "
+                                    + analysis.getDirection());
+                }
+        }
+    }
+
+    /** @return the regular store immediately after a given {@link Block} */
+    public S getStoreAfter(Block bb) {
+        TransferInput<A, S> transferInput = stores.get(bb);
+        AbstractAnalysis<A, S, ?> analysis = transferInput.analysis;
+        switch (analysis.getDirection()) {
+            case FORWARD:
+                {
+                    Node lastNode;
+                    switch (bb.getType()) {
+                        case REGULAR_BLOCK:
+                            List<Node> blockContents = ((RegularBlock) bb).getContents();
+                            lastNode = blockContents.get(blockContents.size() - 1);
+                            break;
+                        case EXCEPTION_BLOCK:
+                            lastNode = ((ExceptionBlock) bb).getNode();
+                            break;
+                        default:
+                            lastNode = null;
+                    }
+                    if (lastNode == null) {
+                        // This block doesn't contains any node, return store in transfer input
+                        return transferInput.getRegularStore();
+                    }
+                    return analysis.runAnalysisFor(
+                            lastNode, false, transferInput, nodeValues, analysisCaches);
+                }
+            case BACKWARD:
+                {
+                    return transferInput.getRegularStore();
+                }
+            default:
+                {
+                    throw new BugInCF(
+                            "AnalysisResult::getStoreAfter: unknown direction: "
+                                    + analysis.getDirection());
+                }
+        }
+    }
+
     /** @return the store immediately after a given {@link Tree}. */
     public S getStoreAfter(Tree tree) {
         Set<Node> nodes = getNodesForTree(tree);
@@ -258,89 +337,10 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
             TransferInput<A, S> transferInput,
             IdentityHashMap<Node, A> nodeValues,
             Map<TransferInput<A, S>, IdentityHashMap<Node, TransferResult<A, S>>> analysisCaches) {
-        assert node != null;
-        Block block = node.getBlock();
-        assert transferInput != null;
-        Analysis<A, S, ?> analysis = transferInput.analysis;
-        Node oldCurrentNode = analysis.currentNode;
-
-        // Prepare cache
-        IdentityHashMap<Node, TransferResult<A, S>> cache;
-        if (analysisCaches != null) {
-            cache = analysisCaches.get(transferInput);
-            if (cache == null) {
-                cache = new IdentityHashMap<>();
-                analysisCaches.put(transferInput, cache);
-            }
-        } else {
-            cache = null;
+        if (transferInput.analysis == null) {
+            throw new BugInCF("transferInput contains null analysis!");
         }
-
-        if (analysis.isRunning) {
-            return analysis.currentInput.getRegularStore();
-        }
-        analysis.setNodeValues(nodeValues);
-        analysis.isRunning = true;
-        try {
-            switch (block.getType()) {
-                case REGULAR_BLOCK:
-                    {
-                        RegularBlock rb = (RegularBlock) block;
-
-                        // Apply transfer function to contents until we found the node we are
-                        // looking for.
-                        TransferInput<A, S> store = transferInput;
-                        TransferResult<A, S> transferResult = null;
-                        for (Node n : rb.getContents()) {
-                            analysis.currentNode = n;
-                            if (n == node && before) {
-                                return store.getRegularStore();
-                            }
-                            if (cache != null && cache.containsKey(n)) {
-                                transferResult = cache.get(n);
-                            } else {
-                                // Copy the store not to change the state in the cache
-                                transferResult = analysis.callTransferFunction(n, store.copy());
-                                if (cache != null) {
-                                    cache.put(n, transferResult);
-                                }
-                            }
-                            if (n == node) {
-                                return transferResult.getRegularStore();
-                            }
-                            store = new TransferInput<>(n, analysis, transferResult);
-                        }
-                        // This point should never be reached. If the block of 'node' is
-                        // 'block', then 'node' must be part of the contents of 'block'.
-                        assert false;
-                        return null;
-                    }
-
-                case EXCEPTION_BLOCK:
-                    {
-                        ExceptionBlock eb = (ExceptionBlock) block;
-
-                        // apply transfer function to content
-                        assert eb.getNode() == node;
-                        if (before) {
-                            return transferInput.getRegularStore();
-                        }
-                        analysis.currentNode = node;
-                        TransferResult<A, S> transferResult =
-                                analysis.callTransferFunction(node, transferInput);
-                        return transferResult.getRegularStore();
-                    }
-
-                default:
-                    // Only regular blocks and exceptional blocks can hold nodes.
-                    assert false;
-                    break;
-            }
-
-            return null;
-        } finally {
-            analysis.currentNode = oldCurrentNode;
-            analysis.isRunning = false;
-        }
+        return transferInput.analysis.runAnalysisFor(
+                node, before, transferInput, nodeValues, analysisCaches);
     }
 }
