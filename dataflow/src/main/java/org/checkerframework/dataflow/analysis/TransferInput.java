@@ -6,8 +6,8 @@ import org.checkerframework.dataflow.cfg.node.Node;
 
 /**
  * {@code TransferInput} is used as the input type of the individual transfer functions of a {@link
- * ForwardTransferFunction}. It also contains a reference to the node for which the transfer
- * function will be applied.
+ * ForwardTransferFunction} or a {@link BackwardTransferFunction}. It also contains a reference to
+ * the node for which the transfer function will be applied.
  *
  * <p>A {@code TransferInput} contains one or two stores. If two stores are present, one belongs to
  * 'then', and the other to 'else'.
@@ -17,15 +17,16 @@ import org.checkerframework.dataflow.cfg.node.Node;
 public class TransferInput<A extends AbstractValue<A>, S extends Store<S>> {
 
     /** The corresponding node. */
+    // TODO: explain when the node is changed.
     protected Node node;
 
     /**
      * The regular result store (or {@code null} if none is present). The following invariant is
      * maintained:
      *
-     * <pre>
-     * store == null &lt;==&gt; thenStore != null &amp;&amp; elseStore != null
-     * </pre>
+     * <pre>{@code
+     * store == null &hArr; thenStore != null &amp;&amp; elseStore != null
+     * }</pre>
      */
     protected final @Nullable S store;
 
@@ -33,9 +34,9 @@ public class TransferInput<A extends AbstractValue<A>, S extends Store<S>> {
      * The 'then' result store (or {@code null} if none is present). The following invariant is
      * maintained:
      *
-     * <pre>
-     * store == null &lt;==&gt; thenStore != null &amp;&amp; elseStore != null
-     * </pre>
+     * <pre>{@code
+     * store == null &hArr; thenStore != null &amp;&amp; elseStore != null
+     * }</pre>
      */
     protected final @Nullable S thenStore;
 
@@ -43,9 +44,9 @@ public class TransferInput<A extends AbstractValue<A>, S extends Store<S>> {
      * The 'else' result store (or {@code null} if none is present). The following invariant is
      * maintained:
      *
-     * <pre>
-     * store == null &lt;==&gt; thenStore != null &amp;&amp; elseStore != null
-     * </pre>
+     * <pre>{@code
+     * store == null &hArr; thenStore != null &amp;&amp; elseStore != null
+     * }</pre>
      */
     protected final @Nullable S elseStore;
 
@@ -56,7 +57,7 @@ public class TransferInput<A extends AbstractValue<A>, S extends Store<S>> {
      * Create a {@link TransferInput}, given a {@link TransferResult} and a node-value mapping.
      *
      * <p><em>Aliasing</em>: The stores returned by any methods of {@code to} will be stored
-     * internally and are not allowed to be used elsewhere. Full control of them is transferred to
+     * internally and are not allowed to be used elsewhere. Full control of them is transfered to
      * this object.
      *
      * <p>The node-value mapping {@code nodeValues} is provided by the analysis and is only read
@@ -79,7 +80,7 @@ public class TransferInput<A extends AbstractValue<A>, S extends Store<S>> {
      * Create a {@link TransferInput}, given a store and a node-value mapping.
      *
      * <p><em>Aliasing</em>: The store {@code s} will be stored internally and is not allowed to be
-     * used elsewhere. Full control over {@code s} is transferred to this object.
+     * used elsewhere. Full control over {@code s} is transfered to this object.
      *
      * <p>The node-value mapping {@code nodeValues} is provided by the analysis and is only read
      * from within this {@link TransferInput}.
@@ -95,7 +96,7 @@ public class TransferInput<A extends AbstractValue<A>, S extends Store<S>> {
      * Create a {@link TransferInput}, given two stores and a node-value mapping.
      *
      * <p><em>Aliasing</em>: The two stores {@code s1} and {@code s2} will be stored internally and
-     * are not allowed to be used elsewhere. Full control of them is transferred to this object.
+     * are not allowed to be used elsewhere. Full control of them is transfered to this object.
      */
     public TransferInput(Node n, AbstractAnalysis<A, S, ?> analysis, S s1, S s2) {
         node = n;
