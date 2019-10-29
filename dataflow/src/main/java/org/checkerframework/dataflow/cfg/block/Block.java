@@ -28,5 +28,5 @@ public interface Block {
     long getId();
 
     /** @return the predecessors of this block */
-    Set<Block> getPredecessors();
+    Set<BlockImpl> getPredecessors();
 }

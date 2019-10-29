@@ -8,6 +8,7 @@ import org.checkerframework.dataflow.analysis.Store.FlowRule;
 import org.checkerframework.dataflow.cfg.ControlFlowGraph;
 import org.checkerframework.dataflow.cfg.UnderlyingAST;
 import org.checkerframework.dataflow.cfg.block.Block;
+import org.checkerframework.dataflow.cfg.block.BlockImpl;
 import org.checkerframework.dataflow.cfg.block.ConditionalBlock;
 import org.checkerframework.dataflow.cfg.block.ExceptionBlock;
 import org.checkerframework.dataflow.cfg.block.RegularBlock;
@@ -81,7 +82,7 @@ public class BackwardAnalysisImpl<
                         }
 
                         // Propagate store to predecessors
-                        for (Block pred : rBlock.getPredecessors()) {
+                        for (BlockImpl pred : rBlock.getPredecessors()) {
                             propagateStoresTo(
                                     pred,
                                     firstNode,
@@ -112,7 +113,7 @@ public class BackwardAnalysisImpl<
                                                 .leastUpperBound(exceptionStore)
                                         : transferResult.getRegularStore();
 
-                        for (Block pred : eBlock.getPredecessors()) {
+                        for (BlockImpl pred : eBlock.getPredecessors()) {
                             addStoreAfter(pred, node, mergedStore, addToWorklistAgain);
                         }
                         break;
@@ -125,7 +126,7 @@ public class BackwardAnalysisImpl<
                         TransferInput<V, S> inputAfter = getInput(cBlock);
                         TransferInput<V, S> input = inputAfter.copy();
 
-                        for (Block pred : cBlock.getPredecessors()) {
+                        for (BlockImpl pred : cBlock.getPredecessors()) {
                             propagateStoresTo(pred, null, input, FlowRule.EACH_TO_EACH, false);
                         }
                         break;
@@ -143,7 +144,7 @@ public class BackwardAnalysisImpl<
                         } else {
                             assert sType == SpecialBlockType.EXIT
                                     || sType == SpecialBlockType.EXCEPTIONAL_EXIT;
-                            for (Block pred : sBlock.getPredecessors()) {
+                            for (BlockImpl pred : sBlock.getPredecessors()) {
                                 propagateStoresTo(
                                         pred, null, getInput(sBlock), FlowRule.EACH_TO_EACH, false);
                             }

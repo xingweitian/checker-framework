@@ -834,9 +834,9 @@ public class CFGBuilder {
             // fix predecessor lists by removing any unreachable predecessors
             for (Block c : worklist) {
                 BlockImpl cur = (BlockImpl) c;
-                for (Block pred : new HashSet<>(cur.getPredecessors())) {
-                    if (!worklist.contains((BlockImpl) pred)) {
-                        cur.removePredecessor((BlockImpl) pred);
+                for (BlockImpl pred : new HashSet<>(cur.getPredecessors())) {
+                    if (!worklist.contains(pred)) {
+                        cur.removePredecessor(pred);
                     }
                 }
             }
@@ -876,7 +876,7 @@ public class CFGBuilder {
                     ConditionalBlockImpl cb = (ConditionalBlockImpl) cur;
                     assert cb.getPredecessors().size() == 1;
                     if (cb.getThenSuccessor() == cb.getElseSuccessor()) {
-                        BlockImpl pred = (BlockImpl) cb.getPredecessors().iterator().next();
+                        BlockImpl pred = cb.getPredecessors().iterator().next();
                         PredecessorHolder predecessorHolder = getPredecessorHolder(pred, cb);
                         BlockImpl succ = (BlockImpl) cb.getThenSuccessor();
                         succ.removePredecessor(cb);
@@ -959,19 +959,19 @@ public class CFGBuilder {
 
             RegularBlockImpl cur = start;
             empty.add(cur);
-            for (final Block pred : cur.getPredecessors()) {
+            for (final BlockImpl pred : cur.getPredecessors()) {
                 switch (pred.getType()) {
                     case SPECIAL_BLOCK:
                         // add pred correctly to predecessor list
-                        predecessors.add(getPredecessorHolder((BlockImpl) pred, cur));
+                        predecessors.add(getPredecessorHolder(pred, cur));
                         break;
                     case CONDITIONAL_BLOCK:
                         // add pred correctly to predecessor list
-                        predecessors.add(getPredecessorHolder((BlockImpl) pred, cur));
+                        predecessors.add(getPredecessorHolder(pred, cur));
                         break;
                     case EXCEPTION_BLOCK:
                         // add pred correctly to predecessor list
-                        predecessors.add(getPredecessorHolder((BlockImpl) pred, cur));
+                        predecessors.add(getPredecessorHolder(pred, cur));
                         break;
                     case REGULAR_BLOCK:
                         RegularBlockImpl r = (RegularBlockImpl) pred;
@@ -982,7 +982,7 @@ public class CFGBuilder {
                             }
                         } else {
                             // add pred correctly to predecessor list
-                            predecessors.add(getPredecessorHolder((BlockImpl) pred, cur));
+                            predecessors.add(getPredecessorHolder(pred, cur));
                         }
                         break;
                 }
