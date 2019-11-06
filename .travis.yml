@@ -57,10 +57,10 @@ script:
 - echo "TRAVIS_PULL_REQUEST_SLUG=${TRAVIS_PULL_REQUEST_SLUG}"
 - echo "TRAVIS_REPO_SLUG=${TRAVIS_REPO_SLUG}"
 - >-
-  if [ $JDKVER = jdk8-plus ] ; then
-    DOCKERIMAGE=mdernst/cf-$OS-$JDKVER
-  else
+  if [ $JDKVER = downstream || $JDKVER = checker-framework-inference ] ; then
     DOCKERIMAGE=xingweitian/$OS-for-cfi-$JDKVER
+  else
+    DOCKERIMAGE=mdernst/cf-$OS-$JDKVER
   fi &&
   docker run -v $HOME/.gradle:/root/.gradle -v $HOME/.m2:/root/.m2 $DOCKERIMAGE /bin/bash -c "true &&
      if [ $TRAVIS_EVENT_TYPE = pull_request ] ; then
