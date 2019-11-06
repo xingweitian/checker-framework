@@ -57,7 +57,7 @@ script:
 - echo "TRAVIS_PULL_REQUEST_SLUG=${TRAVIS_PULL_REQUEST_SLUG}"
 - echo "TRAVIS_REPO_SLUG=${TRAVIS_REPO_SLUG}"
 - >-
-  if [ $JDKVER = downstream || $JDKVER = checker-framework-inference ] ; then
+  if [ $GROUP = downstream || $GROUP = checker-framework-inference ] ; then
     DOCKERIMAGE=xingweitian/$OS-for-cfi-$JDKVER
   else
     DOCKERIMAGE=mdernst/cf-$OS-$JDKVER
