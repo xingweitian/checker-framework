@@ -133,6 +133,15 @@ public interface CFGVisualizer<
     String visualizeStoreKeyVal(String keyName, Object value);
 
     /**
+     * Visualize specific information collected according to the specific kind of Store. Currently,
+     * {@code LiveVariableStore} uses this method.
+     *
+     * @param value the value of the specific information to be visualized
+     * @return the String representation of the store
+     */
+    String visualizeStoreVal(Object value);
+
+    /**
      * Called by {@code CFAbstractStore} to visualize any information after the invocation of {@code
      * CFAbstractStore#internalVisualize()}.
      *
