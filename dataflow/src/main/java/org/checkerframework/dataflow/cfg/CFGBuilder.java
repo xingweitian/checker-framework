@@ -2708,7 +2708,7 @@ public class CFGBuilder {
          */
         private Node getReceiver(ExpressionTree tree) {
             assert TreeUtils.isFieldAccess(tree) || TreeUtils.isMethodAccess(tree);
-            if (tree.getKind().equals(Tree.Kind.MEMBER_SELECT)) {
+            if (tree.getKind() == Tree.Kind.MEMBER_SELECT) {
                 MemberSelectTree mtree = (MemberSelectTree) tree;
                 return scan(mtree.getExpression(), null);
             } else {
