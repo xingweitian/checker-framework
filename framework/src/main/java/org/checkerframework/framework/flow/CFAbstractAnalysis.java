@@ -66,6 +66,7 @@ public abstract class CFAbstractAnalysis<
     /** The type utilities. */
     private final Types types;
 
+    /** Class constructor. */
     public CFAbstractAnalysis(
             BaseTypeChecker checker,
             GenericAnnotatedTypeFactory<V, S, T, ? extends CFAbstractAnalysis<V, S, T>> factory,
@@ -152,14 +153,17 @@ public abstract class CFAbstractAnalysis<
         return new CFValue(analysis, annotations, underlyingType);
     }
 
+    /** Get {@link #env}. */
     public ProcessingEnvironment getEnv() {
         return env;
     }
 
+    /** Get {@link #types}. */
     public Types getTypes() {
         return types;
     }
 
+    /** Get {@link #typeHierarchy}. */
     public TypeHierarchy getTypeHierarchy() {
         return typeHierarchy;
     }

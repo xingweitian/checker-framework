@@ -18,6 +18,7 @@ import org.checkerframework.dataflow.cfg.node.Node;
 import org.checkerframework.dataflow.cfg.node.ReturnNode;
 import org.checkerframework.javacutil.BugInCF;
 
+/** The backward analysis implementation. */
 public class BackwardAnalysisImpl<
                 V extends AbstractValue<V>,
                 S extends Store<S>,
@@ -29,17 +30,23 @@ public class BackwardAnalysisImpl<
 
     /**
      * exception store of an Exception Block, propagated by exceptional successors of its Exception
-     * Block, and merged with the normal TransferResult
+     * Block, and merged with the normal TransferResult.
      */
     protected IdentityHashMap<ExceptionBlock, S> exceptionStores;
 
-    /** The store before the entry block */
+    /** The store before the entry block. */
     protected S storeAtEntry;
 
+    /** Class constructor. */
     public BackwardAnalysisImpl() {
         super(Direction.BACKWARD);
     }
 
+    /**
+     * Class constructor.
+     *
+     * @param transfer the transfer function
+     */
     public BackwardAnalysisImpl(T transfer) {
         this();
         this.transferFunction = transfer;

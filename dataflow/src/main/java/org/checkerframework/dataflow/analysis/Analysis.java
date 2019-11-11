@@ -23,7 +23,9 @@ public interface Analysis<
      * FORWARD direction, or a backward analysis with BACKWARD direction.
      */
     enum Direction {
+        /** The forward direction. */
         FORWARD,
+        /** The backward direction. */
         BACKWARD
     }
 

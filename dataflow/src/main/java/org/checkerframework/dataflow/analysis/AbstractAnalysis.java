@@ -98,6 +98,11 @@ public abstract class AbstractAnalysis<
         this.currentTree = currentTree;
     }
 
+    /**
+     * Class constructor.
+     *
+     * @param direction direction of the analysis
+     */
     public AbstractAnalysis(Direction direction) {
         this.direction = direction;
         this.inputs = new IdentityHashMap<>();
@@ -367,7 +372,10 @@ public abstract class AbstractAnalysis<
         /** Map all blocks in the CFG to their depth-first order. */
         protected IdentityHashMap<Block, Integer> depthFirstOrder;
 
-        /** Comparators to allow priority queue to order blocks by their depth-first order. */
+        /**
+         * Comparators to allow priority queue to order blocks by their depth-first order, using by
+         * forward analysis.
+         */
         public class ForwardDFOComparator implements Comparator<Block> {
             @Override
             public int compare(Block b1, Block b2) {
@@ -375,6 +383,10 @@ public abstract class AbstractAnalysis<
             }
         }
 
+        /**
+         * Comparators to allow priority queue to order blocks by their depth-first order, using by
+         * backward analysis.
+         */
         public class BackwardDFOComparator implements Comparator<Block> {
             @Override
             public int compare(Block b1, Block b2) {
@@ -385,6 +397,7 @@ public abstract class AbstractAnalysis<
         /** The backing priority queue. */
         protected PriorityQueue<Block> queue;
 
+        /** The work list. */
         public Worklist(Direction direction) {
             depthFirstOrder = new IdentityHashMap<>();
 
@@ -397,6 +410,7 @@ public abstract class AbstractAnalysis<
             }
         }
 
+        /** Process the control flow graph, add the Blocks to {@link #depthFirstOrder}. */
         public void process(ControlFlowGraph cfg) {
             depthFirstOrder.clear();
             int count = 1;
@@ -407,18 +421,22 @@ public abstract class AbstractAnalysis<
             queue.clear();
         }
 
+        /** Check if {@link #queue} is emtpy. */
         public boolean isEmpty() {
             return queue.isEmpty();
         }
 
+        /** Check if {@link #queue} contains the block which is passed as the argument. */
         public boolean contains(Block block) {
             return queue.contains(block);
         }
 
+        /** Add Block to {@link #queue}. */
         public void add(Block block) {
             queue.add(block);
         }
 
+        /** Retrieves and removes the head of this queue. */
         public Block poll() {
             return queue.poll();
         }
