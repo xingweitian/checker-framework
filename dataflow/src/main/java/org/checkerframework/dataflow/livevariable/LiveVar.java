@@ -3,6 +3,7 @@ package org.checkerframework.dataflow.livevariable;
 import org.checkerframework.dataflow.analysis.AbstractValue;
 import org.checkerframework.dataflow.cfg.node.Node;
 
+/** The live variable class. */
 public class LiveVar implements AbstractValue<LiveVar> {
 
     /** The live node. */

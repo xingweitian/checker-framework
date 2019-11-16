@@ -14,6 +14,7 @@ import org.checkerframework.dataflow.cfg.node.ObjectCreationNode;
 import org.checkerframework.dataflow.cfg.node.ReturnNode;
 import org.checkerframework.dataflow.cfg.node.StringConcatenateAssignmentNode;
 
+/** The live variable transfer function. */
 public class LiveVariableTransfer
         extends AbstractNodeVisitor<
                 TransferResult<LiveVar, LiveVariableStore>,

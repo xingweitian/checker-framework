@@ -14,6 +14,7 @@ import org.checkerframework.dataflow.cfg.node.TernaryExpressionNode;
 import org.checkerframework.dataflow.cfg.node.TypeCastNode;
 import org.checkerframework.dataflow.cfg.node.UnaryOperationNode;
 
+/** The live variable store class. */
 public class LiveVariableStore implements Store<LiveVariableStore> {
 
     /** A set of live variables. */

@@ -7,6 +7,7 @@ import org.checkerframework.dataflow.livevariable.LiveVar;
 import org.checkerframework.dataflow.livevariable.LiveVariableStore;
 import org.checkerframework.dataflow.livevariable.LiveVariableTransfer;
 
+/** The playground of live variable analysis. */
 public class LiveVariablePlayground {
     /** Run live variable for a specific file and create a PDF of the CFG in the end. */
     public static void main(String[] args) {
