@@ -9,6 +9,7 @@ import org.checkerframework.dataflow.analysis.Analysis;
 import org.checkerframework.dataflow.analysis.Store;
 import org.checkerframework.dataflow.analysis.TransferFunction;
 
+/** The CFG visualize launcher. */
 public class CFGVisualizeLauncher {
 
     /** Main method. */
@@ -72,6 +73,7 @@ public class CFGVisualizeLauncher {
         generateDOTofCFGWithoutAnalysis(input, output, method, clas, pdf, verbose);
     }
 
+    /** Generate DOT representation of CFG graph without analysis. */
     public static void generateDOTofCFGWithoutAnalysis(
             String inputFile,
             String outputDir,
