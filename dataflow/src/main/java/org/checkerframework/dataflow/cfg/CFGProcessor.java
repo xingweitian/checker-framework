@@ -11,6 +11,7 @@ import javax.lang.model.element.TypeElement;
 import org.checkerframework.javacutil.BasicTypeProcessor;
 import org.checkerframework.javacutil.TreeUtils;
 
+/** The CFG processor. */
 @SupportedAnnotationTypes("*")
 public class CFGProcessor extends BasicTypeProcessor {
 
@@ -23,12 +24,14 @@ public class CFGProcessor extends BasicTypeProcessor {
 
     private CFGProcessResult result;
 
+    /** Class constructor. */
     protected CFGProcessor(String className, String methodName) {
         this.className = className;
         this.methodName = methodName;
         this.result = null;
     }
 
+    /** Get the CFG process result. */
     public final CFGProcessResult getCFGProcessResult() {
         return this.result;
     }
@@ -89,30 +92,36 @@ public class CFGProcessor extends BasicTypeProcessor {
         return SourceVersion.latestSupported();
     }
 
+    /** The result of CFG process. */
     public static class CFGProcessResult {
         private final ControlFlowGraph controlFlowGraph;
         private final boolean isSuccess;
         private final String errMsg;
 
+        /** Class constructor. */
         CFGProcessResult(final ControlFlowGraph cfg) {
             this(cfg, true, null);
             assert cfg != null : "this constructor should called if cfg were success built.";
         }
 
+        /** Class constructor. */
         CFGProcessResult(ControlFlowGraph cfg, boolean isSuccess, String errMsg) {
             this.controlFlowGraph = cfg;
             this.isSuccess = isSuccess;
             this.errMsg = errMsg;
         }
 
+        /** Check if the CFG process result is success. */
         public boolean isSuccess() {
             return isSuccess;
         }
 
+        /** Get the generated control flow graph. */
         public ControlFlowGraph getCFG() {
             return controlFlowGraph;
         }
 
+        /** Get the error message. */
         public String getErrMsg() {
             return errMsg;
         }
