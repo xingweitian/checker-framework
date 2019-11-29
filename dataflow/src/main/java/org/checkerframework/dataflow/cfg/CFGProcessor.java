@@ -11,27 +11,45 @@ import javax.lang.model.element.TypeElement;
 import org.checkerframework.javacutil.BasicTypeProcessor;
 import org.checkerframework.javacutil.TreeUtils;
 
-/** The CFG processor. */
+/**
+ * The CFG processor running during compilation to generate the control flow graph of a given method
+ * in a given class. See {@link CFGVisualizeLauncher} for the usage.
+ */
 @SupportedAnnotationTypes("*")
 public class CFGProcessor extends BasicTypeProcessor {
 
+    /** Class name. */
     private final String className;
+    /** Method name to generate the CFG for. */
     private final String methodName;
 
+    /** AST for source file. */
     private CompilationUnitTree rootTree;
+    /** Class Tree. */
     private ClassTree classTree;
+    /** Method Tree. */
     private MethodTree methodTree;
 
+    /** Result of CFG process */
     private CFGProcessResult result;
 
-    /** Class constructor. */
+    /**
+     * Class constructor.
+     *
+     * @param className Class name
+     * @param methodName Method name
+     */
     protected CFGProcessor(String className, String methodName) {
         this.className = className;
         this.methodName = methodName;
         this.result = null;
     }
 
-    /** Get the CFG process result. */
+    /**
+     * Get the CFG process result.
+     *
+     * @return result of cfg process
+     */
     public final CFGProcessResult getCFGProcessResult() {
         return this.result;
     }
@@ -92,26 +110,39 @@ public class CFGProcessor extends BasicTypeProcessor {
         return SourceVersion.latestSupported();
     }
 
-    /** The result of CFG process. */
+    /** The result of CFG process, contains the control flow graph when it is succeed. */
     public static class CFGProcessResult {
+        /** Control flow graph. */
         private final ControlFlowGraph controlFlowGraph;
+        /** Is the CFG process succeed or not. */
         private final boolean isSuccess;
+        /** errMsg Error message (When result is failed). */
         private final String errMsg;
 
-        /** Class constructor. */
+        /**
+         * Class constructor. Only called if CFG is built successfully.
+         *
+         * @param cfg Control flow graph
+         */
         CFGProcessResult(final ControlFlowGraph cfg) {
             this(cfg, true, null);
-            assert cfg != null : "this constructor should called if cfg were success built.";
+            assert cfg != null : "this constructor should called if cfg is built successfully.";
         }
 
-        /** Class constructor. */
+        /**
+         * Class constructor.
+         *
+         * @param cfg Control flow graph
+         * @param isSuccess Is a success or not
+         * @param errMsg Error message (When result is failed)
+         */
         CFGProcessResult(ControlFlowGraph cfg, boolean isSuccess, String errMsg) {
             this.controlFlowGraph = cfg;
             this.isSuccess = isSuccess;
             this.errMsg = errMsg;
         }
 
-        /** Check if the CFG process result is success. */
+        /** Check if the CFG process result is succeed. */
         public boolean isSuccess() {
             return isSuccess;
         }
