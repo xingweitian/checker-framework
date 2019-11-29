@@ -22,7 +22,8 @@ public class ConstantPropagationPlayground {
         ConstantPropagationTransfer transfer = new ConstantPropagationTransfer();
         ForwardAnalysis<Constant, ConstantPropagationStore, ConstantPropagationTransfer>
                 forwardAnalysis = new ForwardAnalysisImpl<>(transfer);
-        CFGVisualizeLauncher.generateDOTofCFG(
+        CFGVisualizeLauncher cfgVisualizeLauncher = new CFGVisualizeLauncher();
+        cfgVisualizeLauncher.generateDOTofCFG(
                 inputFile, outputDir, method, clazz, true, false, forwardAnalysis);
     }
 }
