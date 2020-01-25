@@ -219,6 +219,16 @@ public class TypeArgInferenceUtil {
         }
     }
 
+    /**
+     * Return the annotated type that is assigned to executable.
+     *
+     * @param atypeFactory the type factory
+     * @param path the tree path
+     * @param methodElt the method element
+     * @param receiver the receiver
+     * @param arguments the passed arguments
+     * @return the annotated type
+     */
     public static AnnotatedTypeMirror assignedToExecutable(
             AnnotatedTypeFactory atypeFactory,
             TreePath path,
