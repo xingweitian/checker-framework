@@ -2,6 +2,7 @@ package org.checkerframework.framework.type.poly;
 
 import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.NewClassTree;
+import com.sun.source.util.TreePath;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.IdentityHashMap;
@@ -29,6 +30,7 @@ import org.checkerframework.framework.type.visitor.EquivalentAtmComboScanner;
 import org.checkerframework.framework.util.AnnotatedTypes;
 import org.checkerframework.framework.util.AnnotationMirrorMap;
 import org.checkerframework.framework.util.AnnotationMirrorSet;
+import org.checkerframework.framework.util.QualifierPolymorphismUtil;
 import org.checkerframework.javacutil.BugInCF;
 import org.checkerframework.javacutil.TreeUtils;
 import org.checkerframework.javacutil.TypesUtils;
@@ -148,6 +150,21 @@ public abstract class AbstractQualifierPolymorphism implements QualifierPolymorp
                             instantiationMapping,
                             collector.visit(
                                     atypeFactory.getReceiverType(tree), type.getReceiverType()));
+        }
+
+        TreePath path = atypeFactory.getPath(tree);
+        if (path != null) {
+            AnnotatedTypeMirror assignmentContext =
+                    QualifierPolymorphismUtil.assignedTo(atypeFactory, path);
+
+            if (assignmentContext != null) {
+                instantiationMapping =
+                        collector.reduceWithUpperBounds(
+                                instantiationMapping,
+                                collector.visit(
+                                        // Actual assignment lhs type
+                                        assignmentContext, type.getReturnType(), true));
+            }
         }
 
         if (instantiationMapping != null && !instantiationMapping.isEmpty()) {
@@ -384,6 +401,55 @@ public abstract class AbstractQualifierPolymorphism implements QualifierPolymorp
         }
 
         /**
+         * Reduces lower bounds r1 with upper bounds r2.
+         *
+         * @param r1 a map from {@link AnnotationMirror} to {@link AnnotationMirrorSet}
+         * @param r2 a map from {@link AnnotationMirror} to {@link AnnotationMirrorSet}
+         * @return the reduced {@link AnnotationMirrorMap}
+         */
+        private AnnotationMirrorMap<AnnotationMirrorSet> reduceWithUpperBounds(
+                AnnotationMirrorMap<AnnotationMirrorSet> r1,
+                AnnotationMirrorMap<AnnotationMirrorSet> r2) {
+
+            if (r1 == null || r1.isEmpty()) {
+                return r2;
+            }
+            if (r2 == null || r2.isEmpty()) {
+                return r1;
+            }
+
+            AnnotationMirrorMap<AnnotationMirrorSet> res = new AnnotationMirrorMap<>();
+            // Ensure that all qualifiers from r1 and r2 are visited.
+            AnnotationMirrorSet r2remain = new AnnotationMirrorSet();
+            r2remain.addAll(r2.keySet());
+            for (Map.Entry<AnnotationMirror, AnnotationMirrorSet> kv1 : r1.entrySet()) {
+                AnnotationMirror key1 = kv1.getKey();
+                AnnotationMirrorSet a1Annos = kv1.getValue();
+                AnnotationMirrorSet a2Annos = r2.get(key1);
+                if (a2Annos != null && !a2Annos.isEmpty()) {
+                    r2remain.remove(key1);
+                    AnnotationMirrorSet subres = new AnnotationMirrorSet();
+                    for (AnnotationMirror top : topQuals) {
+                        AnnotationMirror a1 = qualHierarchy.findAnnotationInHierarchy(a1Annos, top);
+                        AnnotationMirror a2 = qualHierarchy.findAnnotationInHierarchy(a2Annos, top);
+                        if (a1 != null) {
+                            subres.add(a1);
+                        } else if (a2 != null) {
+                            subres.add(a2);
+                        }
+                    }
+                    res.put(key1, subres);
+                } else {
+                    res.put(key1, a1Annos);
+                }
+            }
+            for (AnnotationMirror key2 : r2remain) {
+                res.put(key2, r2.get(key2));
+            }
+            return res;
+        }
+
+        /**
          * Calls {@link #visit(AnnotatedTypeMirror, AnnotatedTypeMirror)} for each type in {@code
          * types}.
          */
@@ -419,10 +485,12 @@ public abstract class AbstractQualifierPolymorphism implements QualifierPolymorp
          *
          * @param type AnnotateTypeMirror used to find instantiations
          * @param polyType AnnotatedTypeMirror that may have polymorphic qualifiers
+         * @param polyIsSub boolean indicates whether {@code polyType} is the subtype of {@code
+         *     type}
          * @return a mapping of polymorphic qualifiers to their instantiations
          */
         private AnnotationMirrorMap<AnnotationMirrorSet> visit(
-                AnnotatedTypeMirror type, AnnotatedTypeMirror polyType) {
+                AnnotatedTypeMirror type, AnnotatedTypeMirror polyType, boolean polyIsSub) {
             if (type.getKind() == TypeKind.NULL) {
                 return mapQualifierToPoly(type, polyType);
             }
@@ -438,19 +506,39 @@ public abstract class AbstractQualifierPolymorphism implements QualifierPolymorp
 
                 switch (polyType.getKind()) {
                     case WILDCARD:
-                        AnnotatedTypeMirror asSuper =
-                                AnnotatedTypes.asSuper(atypeFactory, wildcardType, polyType);
-                        return visit(asSuper, polyType, null);
-                    case TYPEVAR:
-                        return mapQualifierToPoly(wildcardType.getExtendsBound(), polyType);
+                        if (polyIsSub) {
+                            return visit(
+                                    wildcardType,
+                                    AnnotatedTypes.asSuper(atypeFactory, polyType, wildcardType),
+                                    null);
+                        } else {
+                            return visit(
+                                    AnnotatedTypes.asSuper(atypeFactory, wildcardType, polyType),
+                                    polyType,
+                                    null);
+                        }
                     default:
                         return mapQualifierToPoly(wildcardType.getExtendsBound(), polyType);
                 }
             }
 
-            AnnotatedTypeMirror asSuper = AnnotatedTypes.asSuper(atypeFactory, type, polyType);
+            if (polyIsSub) {
+                return visit(type, AnnotatedTypes.asSuper(atypeFactory, polyType, type), null);
+            } else {
+                return visit(AnnotatedTypes.asSuper(atypeFactory, type, polyType), polyType, null);
+            }
+        }
 
-            return visit(asSuper, polyType, null);
+        /**
+         * A helper method of {@link #visit(AnnotatedTypeMirror, AnnotatedTypeMirror, boolean)}.
+         *
+         * @param type AnnotateTypeMirror used to find instantiations
+         * @param polyType AnnotatedTypeMirror that may have polymorphic qualifiers
+         * @return {@code visit(type, polyType, false)}
+         */
+        private AnnotationMirrorMap<AnnotationMirrorSet> visit(
+                AnnotatedTypeMirror type, AnnotatedTypeMirror polyType) {
+            return visit(type, polyType, false);
         }
 
         @Override
