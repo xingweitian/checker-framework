@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Set;
 import javax.lang.model.element.Element;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.cfg.ControlFlowGraph;
 import org.checkerframework.dataflow.cfg.block.Block;
@@ -22,7 +23,7 @@ import org.checkerframework.javacutil.BugInCF;
 import org.checkerframework.javacutil.ElementUtils;
 
 /**
- * Common code base for BackwardAnalysis and ForwardAnalysis
+ * Common code base for {@link BackwardAnalysis} and {@link ForwardAnalysis}.
  *
  * @param <V> AbstractValue
  * @param <S> Store
@@ -41,10 +42,10 @@ public abstract class AbstractAnalysis<
     /** The transfer function for regular nodes. */
     // TODO: make final. Currently, the transferFunction has a reference to the analysis, so it
     //  can't be created until the Analysis is initialized.
-    protected T transferFunction;
+    protected @Nullable T transferFunction;
 
     /** The current control flow graph to perform the analysis on. */
-    protected ControlFlowGraph cfg;
+    protected @Nullable ControlFlowGraph cfg;
 
     /**
      * The transfer inputs of every basic block (assumed to be 'no information' if not present,
@@ -69,23 +70,23 @@ public abstract class AbstractAnalysis<
      *   !isRunning ==&gt; (currentNode == null)
      * </pre>
      */
-    protected Node currentNode;
+    protected @Nullable Node currentNode;
 
     /**
      * The tree that is currently being looked at. The transfer function can set this tree to make
      * sure that calls to {@code getValue} will not return information for this given tree.
      */
-    protected Tree currentTree;
+    protected @Nullable Tree currentTree;
 
     /** The current transfer input when the analysis is running. */
-    protected TransferInput<V, S> currentInput;
+    protected @Nullable TransferInput<V, S> currentInput;
 
     /**
      * @return the tree that is currently being looked at. The transfer function can set this tree
      *     to make sure that calls to {@code getValue} will not return information for this given
      *     tree.
      */
-    public Tree getCurrentTree() {
+    public @Nullable Tree getCurrentTree() {
         return currentTree;
     }
 
@@ -99,7 +100,7 @@ public abstract class AbstractAnalysis<
     }
 
     /**
-     * Class constructor.
+     * Common code base for {@link BackwardAnalysis} and {@link ForwardAnalysis}.
      *
      * @param direction direction of the analysis
      */
@@ -157,6 +158,7 @@ public abstract class AbstractAnalysis<
             throw new BugInCF(
                     "AbstractAnalysis::getResult() should not be called when analysis is running!");
         }
+        assert cfg != null : "@AssumeAssertion(nullness): invariant";
         return new AnalysisResult<>(
                 nodeValues,
                 inputs,
@@ -166,7 +168,7 @@ public abstract class AbstractAnalysis<
     }
 
     @Override
-    public T getTransferFunction() {
+    public @Nullable T getTransferFunction() {
         return transferFunction;
     }
 
@@ -185,9 +187,9 @@ public abstract class AbstractAnalysis<
 
             // Check that 'n' is a subnode of 'node'. Check immediate operands
             // first for efficiency.
-            if (!(currentNode != n
-                    && (currentNode.getOperands().contains(n)
-                            || currentNode.getTransitiveOperands().contains(n)))) {
+            if (currentNode == n
+                    || (!currentNode.getOperands().contains(n)
+                            && !currentNode.getTransitiveOperands().contains(n))) {
                 return null;
             }
             return nodeValues.get(n);
@@ -209,6 +211,7 @@ public abstract class AbstractAnalysis<
 
     @Override
     public @Nullable S getRegularExitStore() {
+        assert cfg != null : "@AssumeAssertion(nullness): invariant";
         SpecialBlock regularExitBlock = cfg.getRegularExitBlock();
         if (inputs.containsKey(regularExitBlock)) {
             return inputs.get(regularExitBlock).getRegularStore();
@@ -219,6 +222,7 @@ public abstract class AbstractAnalysis<
 
     @Override
     public @Nullable S getExceptionalExitStore() {
+        assert cfg != null : "@AssumeAssertion(nullness): invariant";
         SpecialBlock exceptionalExitBlock = cfg.getExceptionalExitBlock();
         if (inputs.containsKey(exceptionalExitBlock)) {
             return inputs.get(exceptionalExitBlock).getRegularStore();
@@ -230,7 +234,7 @@ public abstract class AbstractAnalysis<
      * Get the set of {@link Node}s for a given {@link Tree}. Returns null for trees that don't
      * produce a value.
      */
-    public Set<Node> getNodesForTree(Tree t) {
+    public @Nullable Set<Node> getNodesForTree(Tree t) {
         if (cfg == null) {
             return null;
         }
@@ -272,6 +276,9 @@ public abstract class AbstractAnalysis<
      * Node} in the CFG or null otherwise.
      */
     public @Nullable MethodTree getContainingMethod(Tree t) {
+        if (cfg == null) {
+            return null;
+        }
         MethodTree mt = cfg.getContainingMethod(t);
         return mt;
     }
@@ -281,6 +288,9 @@ public abstract class AbstractAnalysis<
      * Node} in the CFG or null otherwise.
      */
     public @Nullable ClassTree getContainingClass(Tree t) {
+        if (cfg == null) {
+            return null;
+        }
         ClassTree ct = cfg.getContainingClass(t);
         return ct;
     }
@@ -289,6 +299,7 @@ public abstract class AbstractAnalysis<
      * Call the transfer function for node {@code node}, and set that node as current node first.
      */
     protected TransferResult<V, S> callTransferFunction(Node node, TransferInput<V, S> store) {
+        assert transferFunction != null : "@AssumeAssertion(nullness): invariant";
         if (node.isLValue()) {
             // TODO: should the default behavior return a regular transfer result, a conditional
             //  transfer result (depending on store.hasTwoStores()), or is the following correct?
@@ -306,7 +317,10 @@ public abstract class AbstractAnalysis<
                 LocalVariableNode lhs = (LocalVariableNode) lhst;
                 Element elem = lhs.getElement();
                 if (ElementUtils.isEffectivelyFinal(elem)) {
-                    finalLocalValues.put(elem, transferResult.getResultValue());
+                    V resval = transferResult.getResultValue();
+                    if (resval != null) {
+                        finalLocalValues.put(elem, resval);
+                    }
                 }
             }
         }
@@ -425,7 +439,9 @@ public abstract class AbstractAnalysis<
             queue.clear();
         }
 
-        /** Check if {@link #queue} is emtpy. */
+        /** @see PriorityQueue#isEmpty */
+        @EnsuresNonNullIf(result = false, expression = "poll()")
+        @SuppressWarnings("nullness:contracts.conditional.postcondition.not.satisfied") // forwarded
         public boolean isEmpty() {
             return queue.isEmpty();
         }
@@ -440,7 +456,7 @@ public abstract class AbstractAnalysis<
             queue.add(block);
         }
 
-        /** Retrieves and removes the head of this queue. */
+        /** @see PriorityQueue#poll */
         public Block poll() {
             return queue.poll();
         }

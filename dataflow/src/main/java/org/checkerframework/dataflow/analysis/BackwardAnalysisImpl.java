@@ -4,6 +4,7 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.analysis.Store.FlowRule;
 import org.checkerframework.dataflow.cfg.ControlFlowGraph;
 import org.checkerframework.dataflow.cfg.UnderlyingAST;
@@ -18,7 +19,14 @@ import org.checkerframework.dataflow.cfg.node.Node;
 import org.checkerframework.dataflow.cfg.node.ReturnNode;
 import org.checkerframework.javacutil.BugInCF;
 
-/** The backward analysis implementation. */
+/**
+ * An implementation of a backward analysis to solve a org.checkerframework.dataflow problem given a
+ * control flow graph and a transfer function.
+ *
+ * @param <V> The abstract value type to be tracked by the analysis
+ * @param <S> The store type used in the analysis
+ * @param <T> The transfer function type that is used to approximated runtime behavior
+ */
 public class BackwardAnalysisImpl<
                 V extends AbstractValue<V>,
                 S extends Store<S>,
@@ -26,28 +34,34 @@ public class BackwardAnalysisImpl<
         extends AbstractAnalysis<V, S, T> implements BackwardAnalysis<V, S, T> {
 
     /** Out stores after every basic block (assumed to be 'no information' if not present). */
-    protected IdentityHashMap<Block, S> outStores;
+    protected final IdentityHashMap<Block, S> outStores;
 
     /**
-     * exception store of an Exception Block, propagated by exceptional successors of its Exception
+     * Exception store of an Exception Block, propagated by exceptional successors of its Exception
      * Block, and merged with the normal TransferResult.
      */
-    protected IdentityHashMap<ExceptionBlock, S> exceptionStores;
+    protected final IdentityHashMap<ExceptionBlock, S> exceptionStores;
 
     /** The store before the entry block. */
     protected S storeAtEntry;
 
-    /** Class constructor. */
+    /**
+     * Construct an object that can perform a org.checkerframework.dataflow backward analysis over a
+     * control flow graph. The transfer function is set by the subclass later.
+     */
     public BackwardAnalysisImpl() {
         super(Direction.BACKWARD);
+        this.outStores = new IdentityHashMap<>();
+        this.exceptionStores = new IdentityHashMap<>();
     }
 
     /**
-     * Class constructor.
+     * Construct an object that can perform a org.checkerframework.dataflow backward analysis over a
+     * control flow graph given a transfer function.
      *
      * @param transfer the transfer function
      */
-    public BackwardAnalysisImpl(T transfer) {
+    public BackwardAnalysisImpl(@Nullable T transfer) {
         this();
         this.transferFunction = transfer;
     }
@@ -187,8 +201,8 @@ public class BackwardAnalysisImpl<
     @Override
     protected void initFields(ControlFlowGraph cfg) {
         super.initFields(cfg);
-        outStores = new IdentityHashMap<>();
-        exceptionStores = new IdentityHashMap<>();
+        outStores.clear();
+        exceptionStores.clear();
         // storeAtEntry is null before analysis begin
         storeAtEntry = null;
     }

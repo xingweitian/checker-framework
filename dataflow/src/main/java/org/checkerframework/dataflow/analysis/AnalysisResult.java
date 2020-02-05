@@ -182,7 +182,7 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
     }
 
     /** @return the store immediately before a given {@link Tree}. */
-    public S getStoreBefore(Tree tree) {
+    public @Nullable S getStoreBefore(Tree tree) {
         Set<Node> nodes = getNodesForTree(tree);
         if (nodes == null) {
             return null;
@@ -200,7 +200,7 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
     }
 
     /** @return the store immediately before a given {@link Node}. */
-    public S getStoreBefore(Node node) {
+    public @Nullable S getStoreBefore(Node node) {
         return runAnalysisFor(node, true);
     }
 
@@ -282,7 +282,7 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
     }
 
     /** @return the store immediately after a given {@link Tree}. */
-    public S getStoreAfter(Tree tree) {
+    public @Nullable S getStoreAfter(Tree tree) {
         Set<Node> nodes = getNodesForTree(tree);
         if (nodes == null) {
             return null;
@@ -300,7 +300,7 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
     }
 
     /** @return the store immediately after a given {@link Node}. */
-    public S getStoreAfter(Node node) {
+    public @Nullable S getStoreAfter(Node node) {
         return runAnalysisFor(node, false);
     }
 
@@ -312,8 +312,9 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
      * <p>If the given {@link Node} cannot be reached (in the control flow graph), then {@code null}
      * is returned.
      */
-    protected S runAnalysisFor(Node node, boolean before) {
+    protected @Nullable S runAnalysisFor(Node node, boolean before) {
         Block block = node.getBlock();
+        assert block != null : "@AssumeAssertion(nullness): invariant";
         TransferInput<A, S> transferInput = stores.get(block);
         if (transferInput == null) {
             return null;
