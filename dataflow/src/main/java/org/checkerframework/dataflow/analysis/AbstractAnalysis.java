@@ -43,7 +43,7 @@ public abstract class AbstractAnalysis<
     //  can't be created until the Analysis is initialized.
     protected T transferFunction;
 
-    /** The control flow graph to perform the analysis on. */
+    /** The current control flow graph to perform the analysis on. */
     protected ControlFlowGraph cfg;
 
     /**
@@ -166,11 +166,6 @@ public abstract class AbstractAnalysis<
     }
 
     @Override
-    public void setTransferFunction(T transfer) {
-        this.transferFunction = transfer;
-    }
-
-    @Override
     public T getTransferFunction() {
         return transferFunction;
     }
@@ -205,12 +200,18 @@ public abstract class AbstractAnalysis<
         return nodeValues;
     }
 
+    /** Set all current node values to the given map. */
+    /*package-private*/ void setNodeValues(IdentityHashMap<Node, V> in) {
+        assert !isRunning;
+        nodeValues.clear();
+        nodeValues.putAll(in);
+    }
+
     @Override
     public @Nullable S getRegularExitStore() {
         SpecialBlock regularExitBlock = cfg.getRegularExitBlock();
         if (inputs.containsKey(regularExitBlock)) {
-            S regularExitStore = inputs.get(regularExitBlock).getRegularStore();
-            return regularExitStore;
+            return inputs.get(regularExitBlock).getRegularStore();
         } else {
             return null;
         }
@@ -220,8 +221,7 @@ public abstract class AbstractAnalysis<
     public @Nullable S getExceptionalExitStore() {
         SpecialBlock exceptionalExitBlock = cfg.getExceptionalExitBlock();
         if (inputs.containsKey(exceptionalExitBlock)) {
-            S exceptionalExitStore = inputs.get(exceptionalExitBlock).getRegularStore();
-            return exceptionalExitStore;
+            return inputs.get(exceptionalExitBlock).getRegularStore();
         }
         return null;
     }
@@ -234,8 +234,7 @@ public abstract class AbstractAnalysis<
         if (cfg == null) {
             return null;
         }
-        Set<Node> nodes = cfg.getNodesCorrespondingToTree(t);
-        return nodes;
+        return cfg.getNodesCorrespondingToTree(t);
     }
 
     /**
@@ -273,7 +272,8 @@ public abstract class AbstractAnalysis<
      * Node} in the CFG or null otherwise.
      */
     public @Nullable MethodTree getContainingMethod(Tree t) {
-        return cfg.getContainingMethod(t);
+        MethodTree mt = cfg.getContainingMethod(t);
+        return mt;
     }
 
     /**
@@ -281,7 +281,8 @@ public abstract class AbstractAnalysis<
      * Node} in the CFG or null otherwise.
      */
     public @Nullable ClassTree getContainingClass(Tree t) {
-        return cfg.getContainingClass(t);
+        ClassTree ct = cfg.getContainingClass(t);
+        return ct;
     }
 
     /**
@@ -325,6 +326,9 @@ public abstract class AbstractAnalysis<
      * @param cfg a given control flow graph
      */
     protected void initFields(ControlFlowGraph cfg) {
+        inputs.clear();
+        nodeValues.clear();
+        finalLocalValues.clear();
         this.cfg = cfg;
     }
 
@@ -370,7 +374,7 @@ public abstract class AbstractAnalysis<
     protected static class Worklist {
 
         /** Map all blocks in the CFG to their depth-first order. */
-        protected IdentityHashMap<Block, Integer> depthFirstOrder;
+        protected final IdentityHashMap<Block, Integer> depthFirstOrder;
 
         /**
          * Comparators to allow priority queue to order blocks by their depth-first order, using by
@@ -395,7 +399,7 @@ public abstract class AbstractAnalysis<
         }
 
         /** The backing priority queue. */
-        protected PriorityQueue<Block> queue;
+        protected final PriorityQueue<Block> queue;
 
         /** The work list. */
         public Worklist(Direction direction) {

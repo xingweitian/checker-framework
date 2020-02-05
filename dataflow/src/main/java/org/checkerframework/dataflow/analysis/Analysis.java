@@ -44,8 +44,9 @@ public interface Analysis<
     boolean isRunning();
 
     /**
-     * Perform the actual analysis. Should only be called once after the analysis instance has been
-     * created.
+     * Perform the actual analysis.
+     *
+     * @param cfg the control flow graph
      */
     void performAnalysis(ControlFlowGraph cfg);
 
@@ -63,13 +64,6 @@ public interface Analysis<
      * @return the transfer function of this analysis
      */
     T getTransferFunction();
-
-    /**
-     * Set a transfer function for this analysis.
-     *
-     * @param transferFunction the transfer function set to this analysis
-     */
-    void setTransferFunction(T transferFunction);
 
     /**
      * Get the transfer input of a given {@link Block} b.

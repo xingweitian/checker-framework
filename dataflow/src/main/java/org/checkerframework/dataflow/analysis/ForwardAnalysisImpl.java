@@ -54,13 +54,13 @@ public class ForwardAnalysisImpl<
     protected final int maxCountBeforeWidening;
 
     /** Then stores before every basic block (assumed to be 'no information' if not present). */
-    protected IdentityHashMap<Block, S> thenStores;
+    protected final IdentityHashMap<Block, S> thenStores;
 
     /** Else stores before every basic block (assumed to be 'no information' if not present). */
-    protected IdentityHashMap<Block, S> elseStores;
+    protected final IdentityHashMap<Block, S> elseStores;
 
     /** The stores after every return statement. */
-    protected IdentityHashMap<ReturnNode, TransferResult<V, S>> storesAtReturnStatements;
+    protected final IdentityHashMap<ReturnNode, TransferResult<V, S>> storesAtReturnStatements;
 
     /**
      * Construct an object that can perform a org.checkerframework.dataflow analysis over a control
@@ -70,6 +70,9 @@ public class ForwardAnalysisImpl<
         super(Direction.FORWARD);
         this.maxCountBeforeWidening = maxCountBeforeWidening;
         this.blockCount = maxCountBeforeWidening == -1 ? null : new IdentityHashMap<>();
+        this.thenStores = new IdentityHashMap<>();
+        this.elseStores = new IdentityHashMap<>();
+        this.storesAtReturnStatements = new IdentityHashMap<>();
     }
 
     /**
@@ -78,7 +81,7 @@ public class ForwardAnalysisImpl<
      */
     public ForwardAnalysisImpl(T transfer) {
         this(-1);
-        setTransferFunction(transfer);
+        this.transferFunction = transfer;
     }
 
     @Override
@@ -98,7 +101,7 @@ public class ForwardAnalysisImpl<
             }
         } finally {
             assert isRunning;
-            // In case preformatAnalysisHelper crashed, reset isRunning to false.
+            // In case preformatAnalysisBlock crashed, reset isRunning to false.
             isRunning = false;
         }
     }
@@ -277,7 +280,7 @@ public class ForwardAnalysisImpl<
                         // Apply transfer function to contents until
                         // we found the node we are looking for.
                         TransferInput<V, S> store = transferInput;
-                        TransferResult<V, S> transferResult = null;
+                        TransferResult<V, S> transferResult;
                         for (Node n : rb.getContents()) {
                             currentNode = n;
                             if (n == node && before) {
@@ -342,16 +345,13 @@ public class ForwardAnalysisImpl<
 
     @Override
     protected void initFields(ControlFlowGraph cfg) {
-        super.initFields(cfg);
-        thenStores = new IdentityHashMap<>();
-        elseStores = new IdentityHashMap<>();
-        storesAtReturnStatements = new IdentityHashMap<>();
+        thenStores.clear();
+        elseStores.clear();
         if (blockCount != null) {
             blockCount.clear();
         }
-        inputs.clear();
-        nodeValues.clear();
-        finalLocalValues.clear();
+        storesAtReturnStatements.clear();
+        super.initFields(cfg);
     }
 
     @Override
@@ -585,12 +585,5 @@ public class ForwardAnalysisImpl<
      */
     protected @Nullable TransferInput<V, S> getInputBefore(Block b) {
         return inputs.get(b);
-    }
-
-    /** Set all current node values to the given map. */
-    private void setNodeValues(IdentityHashMap<Node, V> in) {
-        assert !isRunning;
-        nodeValues.clear();
-        nodeValues.putAll(in);
     }
 }
