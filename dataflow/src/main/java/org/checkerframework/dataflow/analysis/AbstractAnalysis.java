@@ -430,6 +430,7 @@ public abstract class AbstractAnalysis<
 
         /** Process the control flow graph, add the Blocks to {@link #depthFirstOrder}. */
         public void process(ControlFlowGraph cfg) {
+            assert cfg != null : "@AssumeAssertion(nullness): invariant";
             depthFirstOrder.clear();
             int count = 1;
             for (Block b : cfg.getDepthFirstOrderedBlocks()) {
@@ -457,7 +458,7 @@ public abstract class AbstractAnalysis<
         }
 
         /** @see PriorityQueue#poll */
-        public Block poll() {
+        public @Nullable Block poll() {
             return queue.poll();
         }
 

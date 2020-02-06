@@ -365,8 +365,10 @@ public class ForwardAnalysisImpl<
 
     @Override
     protected void initInitialInputs() {
+        assert cfg != null : "@AssumeAssertion(nullness): invariant";
         worklist.process(cfg);
-        worklist.add(cfg.getEntryBlock());
+        Block entry = cfg.getEntryBlock();
+        worklist.add(entry);
 
         List<LocalVariableNode> parameters = null;
         UnderlyingAST underlyingAST = cfg.getUnderlyingAST();
@@ -391,7 +393,6 @@ public class ForwardAnalysisImpl<
         }
         assert transferFunction != null : "@AssumeAssertion(nullness): invariant";
         S initialStore = transferFunction.initialStore(underlyingAST, parameters);
-        Block entry = cfg.getEntryBlock();
         thenStores.put(entry, initialStore);
         elseStores.put(entry, initialStore);
         inputs.put(entry, new TransferInput<>(null, this, initialStore));

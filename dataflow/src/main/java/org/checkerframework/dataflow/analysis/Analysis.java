@@ -1,5 +1,6 @@
 package org.checkerframework.dataflow.analysis;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.cfg.ControlFlowGraph;
 import org.checkerframework.dataflow.cfg.block.Block;
 import org.checkerframework.dataflow.cfg.node.Node;
@@ -63,7 +64,7 @@ public interface Analysis<
      *
      * @return the transfer function of this analysis
      */
-    T getTransferFunction();
+    @Nullable T getTransferFunction();
 
     /**
      * Get the transfer input of a given {@link Block} b.
@@ -71,7 +72,7 @@ public interface Analysis<
      * @param b a given Block
      * @return the transfer input of this Block
      */
-    TransferInput<V, S> getInput(Block b);
+    @Nullable TransferInput<V, S> getInput(Block b);
 
     /**
      * @param n a {@link Node}
@@ -79,7 +80,7 @@ public interface Analysis<
      *     available. Note that if the analysis has not finished yet, this value might not represent
      *     the final value for this node.
      */
-    V getValue(Node n);
+    @Nullable V getValue(Node n);
 
     /**
      * Get the regular exit store of this analysis.
@@ -87,12 +88,12 @@ public interface Analysis<
      * @return the regular exit store, or {@code null} if there is no such store (because the method
      *     cannot exit through the regular exit block).
      */
-    S getRegularExitStore();
+    @Nullable S getRegularExitStore();
 
     /**
      * Get the exceptional exit store of this analysis.
      *
      * @return the exceptional exit store, or {@code null} if there is no such store
      */
-    S getExceptionalExitStore();
+    @Nullable S getExceptionalExitStore();
 }

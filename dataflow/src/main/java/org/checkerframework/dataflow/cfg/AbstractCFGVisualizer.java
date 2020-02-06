@@ -57,7 +57,7 @@ public abstract class AbstractCFGVisualizer<
         this.verbose =
                 verb != null
                         && (verb instanceof String
-                                ? Boolean.getBoolean((String) verb)
+                                ? Boolean.parseBoolean((String) verb)
                                 : (boolean) verb);
     }
 
@@ -272,6 +272,7 @@ public abstract class AbstractCFGVisualizer<
 
         if (analysisDirection == Direction.FORWARD) {
             TransferInput<A, S> input = analysis.getInput(bb);
+            assert input != null : "@AssumeAssertion(nullness): invariant";
             isTwoStores = input.containsTwoStores();
             regularStore = input.getRegularStore();
             thenStore = input.getThenStore();
@@ -283,6 +284,8 @@ public abstract class AbstractCFGVisualizer<
         if (!isTwoStores) {
             sbStore.append(visualizeStore(regularStore));
         } else {
+            assert thenStore != null : "@AssumeAssertion(nullness): invariant";
+            assert elseStore != null : "@AssumeAssertion(nullness): invariant";
             sbStore.append("then=");
             sbStore.append(visualizeStore(thenStore));
             sbStore.append(", else=");
@@ -324,6 +327,7 @@ public abstract class AbstractCFGVisualizer<
             regularStore = analysis.getResult().getStoreAfter(bb);
         } else {
             TransferInput<A, S> input = analysis.getInput(bb);
+            assert input != null : "@AssumeAssertion(nullness): invariant";
             isTwoStores = input.containsTwoStores();
             regularStore = input.getRegularStore();
             thenStore = input.getThenStore();
@@ -333,6 +337,8 @@ public abstract class AbstractCFGVisualizer<
         if (!isTwoStores) {
             sbStore.append(visualizeStore(regularStore));
         } else {
+            assert thenStore != null : "@AssumeAssertion(nullness): invariant";
+            assert elseStore != null : "@AssumeAssertion(nullness): invariant";
             sbStore.append("then=");
             sbStore.append(visualizeStore(thenStore));
             sbStore.append(", else=");

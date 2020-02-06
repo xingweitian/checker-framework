@@ -43,7 +43,7 @@ public class BackwardAnalysisImpl<
     protected final IdentityHashMap<ExceptionBlock, S> exceptionStores;
 
     /** The store before the entry block. */
-    protected S storeAtEntry;
+    protected @Nullable S storeAtEntry;
 
     /**
      * Construct an object that can perform a org.checkerframework.dataflow backward analysis over a
@@ -53,6 +53,7 @@ public class BackwardAnalysisImpl<
         super(Direction.BACKWARD);
         this.outStores = new IdentityHashMap<>();
         this.exceptionStores = new IdentityHashMap<>();
+        this.storeAtEntry = null;
     }
 
     /**
@@ -95,6 +96,7 @@ public class BackwardAnalysisImpl<
 
                         while (reverseIter.hasPrevious()) {
                             Node node = reverseIter.previous();
+                            assert currentInput != null : "@AssumeAssertion(nullness): invariant";
                             TransferResult<V, S> transferResult =
                                     callTransferFunction(node, currentInput);
                             addToWorklistAgain |= updateNodeValues(node, transferResult);
@@ -104,6 +106,7 @@ public class BackwardAnalysisImpl<
 
                         // Propagate store to predecessors
                         for (BlockImpl pred : rBlock.getPredecessors()) {
+                            assert currentInput != null : "@AssumeAssertion(nullness): invariant";
                             propagateStoresTo(
                                     pred,
                                     firstNode,
@@ -194,7 +197,7 @@ public class BackwardAnalysisImpl<
     }
 
     @Override
-    public S getEntryStore() {
+    public @Nullable S getEntryStore() {
         return storeAtEntry;
     }
 
@@ -209,6 +212,7 @@ public class BackwardAnalysisImpl<
 
     @Override
     protected void initInitialInputs() {
+        assert cfg != null : "@AssumeAssertion(nullness): invariant";
         worklist.process(cfg);
         SpecialBlock regularExitBlock = cfg.getRegularExitBlock();
         SpecialBlock exceptionExitBlock = cfg.getExceptionalExitBlock();
@@ -222,6 +226,7 @@ public class BackwardAnalysisImpl<
         UnderlyingAST underlyingAST = cfg.getUnderlyingAST();
         List<ReturnNode> returnNodes = cfg.getReturnNodes();
 
+        assert transferFunction != null : "@AssumeAssertion(nullness): invariant";
         S normalInitialStore = transferFunction.initialNormalExitStore(underlyingAST, returnNodes);
         S exceptionalInitialStore = transferFunction.initialExceptionalExitStore(underlyingAST);
 
@@ -257,7 +262,7 @@ public class BackwardAnalysisImpl<
     @Override
     protected void propagateStoresTo(
             Block pred,
-            Node node,
+            @Nullable Node node,
             TransferInput<V, S> currentInput,
             FlowRule flowRule,
             boolean addToWorklistAgain) {
@@ -273,29 +278,36 @@ public class BackwardAnalysisImpl<
      * Add a store after the basic block {@code pred} by merging with the existing stores for that
      * location.
      */
-    protected void addStoreAfter(Block pred, Node node, S s, boolean addBlockToWorklist) {
+    protected void addStoreAfter(Block pred, @Nullable Node node, S s, boolean addBlockToWorklist) {
         // If Block {@code pred} is an ExceptionBlock, decide whether the
         // block of passing node is an exceptional successor of Block {@code pred}
         if (pred instanceof ExceptionBlock
                 && ((ExceptionBlock) pred).getSuccessor() != null
-                && node != null
-                && (((ExceptionBlock) pred).getSuccessor().getId() == node.getBlock().getId())) {
-            // If the block of passing node is an exceptional successor of Block {@code pred},
-            // propagate store to the {@code exceptionStores}
+                && node != null) {
+            @Nullable Block succBlock = ((ExceptionBlock) pred).getSuccessor();
+            @Nullable Block block = node.getBlock();
+            if (succBlock != null && block != null && succBlock.getId() == block.getId()) {
+                // If the block of passing node is an exceptional successor of Block {@code pred},
+                // propagate store to the {@code exceptionStores}
 
-            // Currently it doesn't track the label of an exceptional edge from Exception Block to
-            // its exceptional successors in backward direction, instead, all exception stores of
-            // exceptional successors of an Exception Block will merge to one exception store at the
-            // Exception Block
+                // Currently it doesn't track the label of an exceptional edge from Exception Block
+                // to
+                // its exceptional successors in backward direction, instead, all exception stores
+                // of
+                // exceptional successors of an Exception Block will merge to one exception store at
+                // the
+                // Exception Block
 
-            ExceptionBlock ebPred = (ExceptionBlock) pred;
+                ExceptionBlock ebPred = (ExceptionBlock) pred;
 
-            S exceptionStore = exceptionStores.get(ebPred);
+                S exceptionStore = exceptionStores.get(ebPred);
 
-            S newExceptionStore = (exceptionStore != null) ? exceptionStore.leastUpperBound(s) : s;
-            if (!newExceptionStore.equals(exceptionStore)) {
-                exceptionStores.put(ebPred, newExceptionStore);
-                addBlockToWorklist = true;
+                S newExceptionStore =
+                        (exceptionStore != null) ? exceptionStore.leastUpperBound(s) : s;
+                if (!newExceptionStore.equals(exceptionStore)) {
+                    exceptionStores.put(ebPred, newExceptionStore);
+                    addBlockToWorklist = true;
+                }
             }
         } else {
             S predOutStore = getStoreAfter(pred);
@@ -315,7 +327,7 @@ public class BackwardAnalysisImpl<
     }
 
     /** @return the store corresponding to the location right after the basic block {@code b}. */
-    protected S getStoreAfter(Block b) {
+    protected @Nullable S getStoreAfter(Block b) {
         return readFromStore(outStores, b);
     }
 
@@ -327,11 +339,13 @@ public class BackwardAnalysisImpl<
             IdentityHashMap<Node, V> nodeValues,
             Map<TransferInput<V, S>, IdentityHashMap<Node, TransferResult<V, S>>> analysisCaches) {
         Block block = node.getBlock();
+        assert block != null : "@AssumeAssertion(nullness): invariant";
         Node oldCurrentNode = currentNode;
 
         // TODO: Understand why the Store of passing node is analysis.currentInput.getRegularStore()
         // when the analysis is running
         if (isRunning) {
+            assert currentInput != null : "@AssumeAssertion(nullness): invariant";
             return currentInput.getRegularStore();
         }
 
