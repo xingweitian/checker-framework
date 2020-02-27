@@ -371,6 +371,8 @@ public class ForwardAnalysisImpl<
         worklist.add(entry);
 
         List<LocalVariableNode> parameters = null;
+        // Why @AssumeAssertion(nullness) at above doesn't work?
+        assert cfg != null : "@AssumeAssertion(nullness): invariant";
         UnderlyingAST underlyingAST = cfg.getUnderlyingAST();
         if (underlyingAST.getKind() == Kind.METHOD) {
             MethodTree tree = ((CFGMethod) underlyingAST).getMethod();
