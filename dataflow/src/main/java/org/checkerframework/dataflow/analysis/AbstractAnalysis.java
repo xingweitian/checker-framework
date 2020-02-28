@@ -407,6 +407,7 @@ public abstract class AbstractAnalysis<
      *
      * @param stores a map of stores
      * @param b the target block
+     * @param <S> indicate a generic method
      * @return the store for the target block
      */
     protected static <S> @Nullable S readFromStore(Map<Block, S> stores, Block b) {

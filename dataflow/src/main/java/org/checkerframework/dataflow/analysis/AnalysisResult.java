@@ -264,6 +264,7 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
      * Return the regular store immediately before a given {@link Block}.
      *
      * @param bb the given block
+     * @return the store right before the given block
      */
     public S getStoreBefore(Block bb) {
         TransferInput<A, S> transferInput = stores.get(bb);
@@ -416,6 +417,8 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
      * @param transferInput the transfer input of the block of this node
      * @param nodeValues abstract values of nodes
      * @param analysisCaches caches of analysis results
+     * @param <A> indicate a generic method
+     * @param <S> indicate a generic method
      * @return the store at the location of node after running the analysis
      */
     public static <A extends AbstractValue<A>, S extends Store<S>> S runAnalysisFor(
