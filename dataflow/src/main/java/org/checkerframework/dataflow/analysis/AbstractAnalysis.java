@@ -210,7 +210,11 @@ public abstract class AbstractAnalysis<
         return nodeValues.get(n);
     }
 
-    /** Return all current node values. */
+    /**
+     * Return all current node values.
+     *
+     * @return {@link #nodeValues}
+     */
     public IdentityHashMap<Node, V> getNodeValues() {
         return nodeValues;
     }
@@ -493,7 +497,10 @@ public abstract class AbstractAnalysis<
             queue.clear();
         }
 
-        /** @see PriorityQueue#isEmpty */
+        /**
+         * @see PriorityQueue#isEmpty
+         * @return true if {@link #queue} is empty else false
+         */
         @EnsuresNonNullIf(result = false, expression = "poll()")
         @SuppressWarnings("nullness:contracts.conditional.postcondition.not.satisfied") // forwarded
         public boolean isEmpty() {
@@ -519,7 +526,10 @@ public abstract class AbstractAnalysis<
             queue.add(block);
         }
 
-        /** @see PriorityQueue#poll */
+        /**
+         * @see PriorityQueue#poll
+         * @return the head of {@link #queue}
+         */
         public @Nullable Block poll() {
             return queue.poll();
         }
