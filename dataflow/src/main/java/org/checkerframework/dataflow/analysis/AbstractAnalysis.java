@@ -118,6 +118,12 @@ public abstract class AbstractAnalysis<
     /**
      * Propagate the stores in currentInput to the next block in the direction of analysis,
      * according to the flowRule.
+     *
+     * @param nextBlock the target block to propagate the stores to
+     * @param node the node of the target block
+     * @param currentInput the current transfer input
+     * @param flowRule the flow rule being used
+     * @param addToWorklistAgain whether the block should be added to {@code Worklist} again
      */
     protected abstract void propagateStoresTo(
             Block nextBlock,
@@ -134,6 +140,13 @@ public abstract class AbstractAnalysis<
      * map of a block of node to the cached analysis result. If the cache for {@code transferInput}
      * is not in {@code analysisCaches}, this method create new cache and store it in {@code
      * analysisCaches}. The cache is a map of a node to the analysis result of the node.
+     *
+     * @param node the node to analyze
+     * @param before the boolean value to indicate which store to return
+     * @param transferInput the transfer input of the block of this node
+     * @param nodeValues abstract values of nodes
+     * @param analysisCaches caches of analysis results
+     * @return the store at the location of node after running the analysis
      */
     protected abstract S runAnalysisFor(
             Node node,
@@ -202,7 +215,11 @@ public abstract class AbstractAnalysis<
         return nodeValues;
     }
 
-    /** Set all current node values to the given map. */
+    /**
+     * Set all current node values to the given map.
+     *
+     * @param in the current node values
+     */
     /*package-private*/ void setNodeValues(IdentityHashMap<Node, V> in) {
         assert !isRunning;
         nodeValues.clear();
@@ -233,6 +250,9 @@ public abstract class AbstractAnalysis<
     /**
      * Get the set of {@link Node}s for a given {@link Tree}. Returns null for trees that don't
      * produce a value.
+     *
+     * @param t the given tree
+     * @return the set of corresponding nodes to the given tree
      */
     public @Nullable Set<Node> getNodesForTree(Tree t) {
         if (cfg == null) {
@@ -242,10 +262,12 @@ public abstract class AbstractAnalysis<
     }
 
     /**
-     * @param t a {@link Tree}
-     * @return the abstract value for {@link Tree} {@code t}, or {@code null} if no information is
-     *     available. Note that if the analysis has not finished yet, this value might not represent
-     *     the final value for this node.
+     * Return the abstract value for {@link Tree} {@code t}, or {@code null} if no information is
+     * available. Note that if the analysis has not finished yet, this value might not represent the
+     * final value for this node.
+     *
+     * @param t the given tree
+     * @return the abstract value for the given tree
      */
     public @Nullable V getValue(Tree t) {
         // We do not yet have a org.checkerframework.dataflow fact about the current node
@@ -274,29 +296,37 @@ public abstract class AbstractAnalysis<
     /**
      * Get the {@link MethodTree} of the current CFG if the argument {@link Tree} maps to a {@link
      * Node} in the CFG or null otherwise.
+     *
+     * @param t the given tree
+     * @return the contained method tree of the given tree
      */
     public @Nullable MethodTree getContainingMethod(Tree t) {
         if (cfg == null) {
             return null;
         }
-        MethodTree mt = cfg.getContainingMethod(t);
-        return mt;
+        return cfg.getContainingMethod(t);
     }
 
     /**
      * Get the {@link ClassTree} of the current CFG if the argument {@link Tree} maps to a {@link
      * Node} in the CFG or null otherwise.
+     *
+     * @param t the given tree
+     * @return the contained class tree of the given tree
      */
     public @Nullable ClassTree getContainingClass(Tree t) {
         if (cfg == null) {
             return null;
         }
-        ClassTree ct = cfg.getContainingClass(t);
-        return ct;
+        return cfg.getContainingClass(t);
     }
 
     /**
      * Call the transfer function for node {@code node}, and set that node as current node first.
+     *
+     * @param node the given node
+     * @param store the transfer input
+     * @return the output of the transfer function
      */
     protected TransferResult<V, S> callTransferFunction(Node node, TransferInput<V, S> store) {
         assert transferFunction != null : "@AssumeAssertion(nullness): invariant";
@@ -327,7 +357,11 @@ public abstract class AbstractAnalysis<
         return transferResult;
     }
 
-    /** Initialize the analysis with a new control flow graph. */
+    /**
+     * Initialize the analysis with a new control flow graph.
+     *
+     * @param cfg a given control flow graph
+     */
     protected final void init(ControlFlowGraph cfg) {
         initFields(cfg);
         initInitialInputs();
@@ -349,6 +383,10 @@ public abstract class AbstractAnalysis<
     /**
      * Updates the value of node {@code node} to the value of the {@code transferResult}. Returns
      * true if the node's value changed, or a store was updated.
+     *
+     * @param node the node to update
+     * @param transferResult the transfer result being updated
+     * @return true if the node's value changed, or a store was updated
      */
     protected boolean updateNodeValues(Node node, TransferResult<V, S> transferResult) {
         V newVal = transferResult.getResultValue();
@@ -366,6 +404,10 @@ public abstract class AbstractAnalysis<
     /**
      * Read the store for a particular basic block from a map of stores (or {@code null} if none
      * exists yet).
+     *
+     * @param stores a map of stores
+     * @param b the target block
+     * @return the store for the target block
      */
     protected static <S> @Nullable S readFromStore(Map<Block, S> stores, Block b) {
         return stores.get(b);
@@ -373,6 +415,8 @@ public abstract class AbstractAnalysis<
 
     /**
      * Add a basic block to the Worklist. If {@code b} is already present, the method does nothing.
+     *
+     * @param b the block to add to the Worklist
      */
     protected void addToWorklist(Block b) {
         // TODO: use a more efficient way to check if b is already present
@@ -415,7 +459,11 @@ public abstract class AbstractAnalysis<
         /** The backing priority queue. */
         protected final PriorityQueue<Block> queue;
 
-        /** The work list. */
+        /**
+         * The work list.
+         *
+         * @param direction the direction (forward or backward)
+         */
         public Worklist(Direction direction) {
             depthFirstOrder = new IdentityHashMap<>();
 
@@ -428,7 +476,11 @@ public abstract class AbstractAnalysis<
             }
         }
 
-        /** Process the control flow graph, add the Blocks to {@link #depthFirstOrder}. */
+        /**
+         * Process the control flow graph, add the Blocks to {@link #depthFirstOrder}.
+         *
+         * @param cfg the control flow graph to process
+         */
         public void process(ControlFlowGraph cfg) {
             assert cfg != null : "@AssumeAssertion(nullness): invariant";
             depthFirstOrder.clear();
@@ -447,12 +499,21 @@ public abstract class AbstractAnalysis<
             return queue.isEmpty();
         }
 
-        /** Check if {@link #queue} contains the block which is passed as the argument. */
+        /**
+         * Check if {@link #queue} contains the block which is passed as the argument.
+         *
+         * @param block the given block to check
+         * @return true if {@link #queue} contains the given block
+         */
         public boolean contains(Block block) {
             return queue.contains(block);
         }
 
-        /** Add Block to {@link #queue}. */
+        /**
+         * Add Block to {@link #queue}.
+         *
+         * @param block the block to add to {@link #queue}
+         */
         public void add(Block block) {
             queue.add(block);
         }

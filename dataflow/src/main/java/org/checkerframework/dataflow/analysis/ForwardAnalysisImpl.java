@@ -110,7 +110,11 @@ public class ForwardAnalysisImpl<
         }
     }
 
-    /** Perform the actual analysis on one block. */
+    /**
+     * Perform the actual analysis on one block.
+     *
+     * @param b the block being analyzed
+     */
     private void performAnalysisBlock(Block b) {
         switch (b.getType()) {
             case REGULAR_BLOCK:
@@ -400,9 +404,6 @@ public class ForwardAnalysisImpl<
         inputs.put(entry, new TransferInput<>(null, this, initialStore));
     }
 
-    /**
-     * Call the transfer function for node {@code node}, and set that node as current node first.
-     */
     @Override
     protected TransferResult<V, S> callTransferFunction(Node node, TransferInput<V, S> input) {
         TransferResult<V, S> transferResult = super.callTransferFunction(node, input);
@@ -415,9 +416,6 @@ public class ForwardAnalysisImpl<
         return transferResult;
     }
 
-    /**
-     * Propagate the stores in currentInput to the successor block, succ, according to the flowRule.
-     */
     @Override
     protected void propagateStoresTo(
             Block succ,
@@ -487,6 +485,13 @@ public class ForwardAnalysisImpl<
     /**
      * Add a store before the basic block {@code b} by merging with the existing stores for that
      * location.
+     *
+     * @param b the basic block
+     * @param node the node of the basic block {@code b}
+     * @param s the store being added
+     * @param kind the kind of store {@code s}
+     * @param addBlockToWorklist whether the basic block {@code b} should be added back to {@code
+     *     Worklist}
      */
     protected void addStoreBefore(
             Block b, @Nullable Node node, S s, Store.Kind kind, boolean addBlockToWorklist) {
@@ -577,6 +582,7 @@ public class ForwardAnalysisImpl<
      * @param newStore the new Store
      * @param previousStore the previous Store
      * @param shouldWiden should widen or not
+     * @return the merged Store
      */
     private S mergeStores(S newStore, @Nullable S previousStore, boolean shouldWiden) {
         if (previousStore == null) {
@@ -588,7 +594,13 @@ public class ForwardAnalysisImpl<
         }
     }
 
-    /** @return the store corresponding to the location right before the basic block {@code b}. */
+    /**
+     * Return the store corresponding to the location right before the basic block {@code b}.
+     *
+     * @param b the block
+     * @param kind the kind of store which will be returned
+     * @return the store right before the block {@code b}
+     */
     protected @Nullable S getStoreBefore(Block b, Store.Kind kind) {
         switch (kind) {
             case THEN:
@@ -601,8 +613,11 @@ public class ForwardAnalysisImpl<
     }
 
     /**
-     * @return the transfer input corresponding to the location right before the basic block {@code
-     *     b}.
+     * Return the transfer input corresponding to the location right before the basic block {@code
+     * b}.
+     *
+     * @param b the Block
+     * @return the transfer input right before the block {@code b}
      */
     protected @Nullable TransferInput<V, S> getInputBefore(Block b) {
         return inputs.get(b);

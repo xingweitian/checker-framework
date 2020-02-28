@@ -31,8 +31,12 @@ public interface ForwardTransferFunction<V extends AbstractValue<V>, S extends S
         extends TransferFunction<V, S> {
 
     /**
-     * @return the initial store to be used by the org.checkerframework.dataflow analysis. {@code
-     *     parameters} is only set if the underlying AST is a method.
+     * Return the initial store to be used by the org.checkerframework.dataflow analysis. {@code
+     * parameters} is only set if the underlying AST is a method.
+     *
+     * @param underlyingAST an abstract syntax tree
+     * @param parameters a list of local variable nodes
+     * @return the initial store
      */
     S initialStore(UnderlyingAST underlyingAST, @Nullable List<LocalVariableNode> parameters);
 }

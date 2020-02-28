@@ -62,6 +62,10 @@ public class TransferInput<A extends AbstractValue<A>, S extends Store<S>> {
      *
      * <p>The node-value mapping {@code nodeValues} is provided by the analysis and is only read
      * from within this {@link TransferInput}.
+     *
+     * @param n the corresponding node
+     * @param analysis the corresponding analysis class to get intermediate flow results
+     * @param to the transfer result where stores will be stored internally
      */
     public TransferInput(Node n, AbstractAnalysis<A, S, ?> analysis, TransferResult<A, S> to) {
         node = n;
@@ -84,6 +88,10 @@ public class TransferInput<A extends AbstractValue<A>, S extends Store<S>> {
      *
      * <p>The node-value mapping {@code nodeValues} is provided by the analysis and is only read
      * from within this {@link TransferInput}.
+     *
+     * @param n the corresponding node
+     * @param analysis the corresponding analysis class to get intermediate flow results
+     * @param s the store which will be stored internally
      */
     public TransferInput(@Nullable Node n, AbstractAnalysis<A, S, ?> analysis, S s) {
         node = n;
@@ -97,6 +105,11 @@ public class TransferInput<A extends AbstractValue<A>, S extends Store<S>> {
      *
      * <p><em>Aliasing</em>: The two stores {@code s1} and {@code s2} will be stored internally and
      * are not allowed to be used elsewhere. Full control of them is transferred to this object.
+     *
+     * @param n the corresponding node
+     * @param analysis the corresponding analysis class to get intermediate flow results
+     * @param s1 the store which will be stored internally
+     * @param s2 the store which will be stored internally
      */
     public TransferInput(@Nullable Node n, AbstractAnalysis<A, S, ?> analysis, S s1, S s2) {
         node = n;

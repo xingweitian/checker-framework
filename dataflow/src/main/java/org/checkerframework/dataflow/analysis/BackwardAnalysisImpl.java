@@ -277,6 +277,12 @@ public class BackwardAnalysisImpl<
     /**
      * Add a store after the basic block {@code pred} by merging with the existing stores for that
      * location.
+     *
+     * @param pred the basic block
+     * @param node the node of the basic block {@code b}
+     * @param s the store being added
+     * @param addBlockToWorklist whether the basic block {@code b} should be added back to {@code
+     *     Worklist}
      */
     protected void addStoreAfter(Block pred, @Nullable Node node, S s, boolean addBlockToWorklist) {
         // If Block {@code pred} is an ExceptionBlock, decide whether the
@@ -326,7 +332,12 @@ public class BackwardAnalysisImpl<
         }
     }
 
-    /** @return the store corresponding to the location right after the basic block {@code b}. */
+    /**
+     * Return the store corresponding to the location right after the basic block {@code b}.
+     *
+     * @param b the given block
+     * @return the store right after the given block
+     */
     protected @Nullable S getStoreAfter(Block b) {
         return readFromStore(outStores, b);
     }
