@@ -417,8 +417,8 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
      * @param transferInput the transfer input of the block of this node
      * @param nodeValues abstract values of nodes
      * @param analysisCaches caches of analysis results
-     * @param <A> indicate a generic method
-     * @param <S> indicate a generic method
+     * @param <A> method return type should be a subtype of {@link AbstractValue}
+     * @param <S> method return type should be a subtype of {@link Store}
      * @return the store at the location of node after running the analysis
      */
     public static <A extends AbstractValue<A>, S extends Store<S>> S runAnalysisFor(

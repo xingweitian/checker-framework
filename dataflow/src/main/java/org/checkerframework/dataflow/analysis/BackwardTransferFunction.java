@@ -26,8 +26,8 @@ import org.checkerframework.dataflow.cfg.node.ReturnNode;
  * (and modify) the stores contained in the argument passed; the ownership is transfered from the
  * caller to that function.
  *
- * @param <V> The abstract value
- * @param <S> The {@link Store} used to keep track of intermediate results
+ * @param <V> the abstract value type to be tracked by the analysis
+ * @param <S> the store type used in the analysis
  */
 public interface BackwardTransferFunction<V extends AbstractValue<V>, S extends Store<S>>
         extends TransferFunction<V, S> {

@@ -25,9 +25,9 @@ import org.checkerframework.javacutil.ElementUtils;
 /**
  * Common code base for {@link BackwardAnalysis} and {@link ForwardAnalysis}.
  *
- * @param <V> AbstractValue
- * @param <S> Store
- * @param <T> TransferFunction
+ * @param <V> the abstract value type to be tracked by the analysis
+ * @param <S> the store type used in the analysis
+ * @param <T> the transfer function type that is used to approximated runtime behavior
  */
 public abstract class AbstractAnalysis<
                 V extends AbstractValue<V>, S extends Store<S>, T extends TransferFunction<V, S>>
@@ -411,7 +411,7 @@ public abstract class AbstractAnalysis<
      *
      * @param stores a map of stores
      * @param b the target block
-     * @param <S> indicate a generic method
+     * @param <S> method return type should be a subtype of {@link Store}
      * @return the store for the target block
      */
     protected static <S> @Nullable S readFromStore(Map<Block, S> stores, Block b) {
