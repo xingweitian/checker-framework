@@ -52,6 +52,13 @@ public interface Analysis<
     void performAnalysis(ControlFlowGraph cfg);
 
     /**
+     * Perform the actual analysis on one block.
+     *
+     * @param b the block being analyzed
+     */
+    void performAnalysisBlock(Block b);
+
+    /**
      * Get the analysis result of this analysis. Should only be called after the analysis has been
      * performed.
      *

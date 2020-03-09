@@ -110,12 +110,8 @@ public class ForwardAnalysisImpl<
         }
     }
 
-    /**
-     * Perform the actual analysis on one block.
-     *
-     * @param b the block being analyzed
-     */
-    private void performAnalysisBlock(Block b) {
+    @Override
+    public void performAnalysisBlock(Block b) {
         switch (b.getType()) {
             case REGULAR_BLOCK:
                 {
