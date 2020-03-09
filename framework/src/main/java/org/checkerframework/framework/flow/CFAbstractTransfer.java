@@ -281,14 +281,7 @@ public abstract class CFAbstractTransfer<
                     // on the overridden method.
                     analysis.atypeFactory
                             .getWholeProgramInference()
-                            .updateInferredMethodParameterTypes(
-                                    methodTree,
-                                    methodElem,
-                                    overriddenMethod,
-                                    analysis.getTypeFactory());
-                    analysis.atypeFactory
-                            .getWholeProgramInference()
-                            .updateInferredMethodReceiverType(
+                            .updateFromOverride(
                                     methodTree,
                                     methodElem,
                                     overriddenMethod,
@@ -805,7 +798,7 @@ public abstract class CFAbstractTransfer<
                 // Updates inferred field type
                 analysis.atypeFactory
                         .getWholeProgramInference()
-                        .updateInferredFieldType(
+                        .updateFromFieldAssignment(
                                 (FieldAccessNode) lhs,
                                 rhs,
                                 analysis.getContainingClass(n.getTree()),
@@ -814,7 +807,7 @@ public abstract class CFAbstractTransfer<
                     && ((LocalVariableNode) lhs).getElement().getKind() == ElementKind.PARAMETER) {
                 analysis.atypeFactory
                         .getWholeProgramInference()
-                        .updateInferredParameterType(
+                        .updateFromLocalAssignment(
                                 (LocalVariableNode) lhs,
                                 rhs,
                                 analysis.getContainingClass(n.getTree()),
@@ -834,13 +827,24 @@ public abstract class CFAbstractTransfer<
             // Retrieves class containing the method
             ClassTree classTree = analysis.getContainingClass(n.getTree());
             ClassSymbol classSymbol = (ClassSymbol) TreeUtils.elementFromTree(classTree);
+
+            ExecutableElement methodElem =
+                    TreeUtils.elementFromDeclaration(analysis.getContainingMethod(n.getTree()));
+
+            Map<AnnotatedDeclaredType, ExecutableElement> overriddenMethods =
+                    AnnotatedTypes.overriddenMethods(
+                            analysis.atypeFactory.getElementUtils(),
+                            analysis.atypeFactory,
+                            methodElem);
+
             // Updates the inferred return type of the method
             analysis.atypeFactory
                     .getWholeProgramInference()
-                    .updateInferredMethodReturnType(
+                    .updateFromReturn(
                             n,
                             classSymbol,
                             analysis.getContainingMethod(n.getTree()),
+                            overriddenMethods,
                             analysis.getTypeFactory());
         }
         return super.visitReturn(n, p);
@@ -871,7 +875,7 @@ public abstract class CFAbstractTransfer<
             // Updates inferred field type
             analysis.atypeFactory
                     .getWholeProgramInference()
-                    .updateInferredFieldType(
+                    .updateFromFieldAssignment(
                             (FieldAccessNode) lhs,
                             rhs,
                             analysis.getContainingClass(n.getTree()),
@@ -904,8 +908,7 @@ public abstract class CFAbstractTransfer<
                             .getElement();
             analysis.atypeFactory
                     .getWholeProgramInference()
-                    .updateInferredConstructorParameterTypes(
-                            n, constructorElt, analysis.getTypeFactory());
+                    .updateFromObjectCreation(n, constructorElt, analysis.getTypeFactory());
         }
         return super.visitObjectCreation(n, p);
     }
@@ -952,8 +955,7 @@ public abstract class CFAbstractTransfer<
             // Updates the inferred parameter type of the invoked method
             analysis.atypeFactory
                     .getWholeProgramInference()
-                    .updateInferredMethodParameterTypes(
-                            n, receiverTree, method, analysis.getTypeFactory());
+                    .updateFromMethodInvocation(n, receiverTree, method, analysis.getTypeFactory());
         }
 
         return new ConditionalTransferResult<>(
