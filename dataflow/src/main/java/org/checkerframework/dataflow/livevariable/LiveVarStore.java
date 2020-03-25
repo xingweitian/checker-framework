@@ -127,14 +127,16 @@ public class LiveVarStore implements Store<LiveVarStore> {
 
     @Override
     public String visualize(CFGVisualizer<?, LiveVarStore, ?> viz) {
-        StringBuilder sbStoreVal = new StringBuilder();
         if (liveVarSet.isEmpty()) {
-            sbStoreVal.append("null");
-            return sbStoreVal.toString();
+            return "No live variables.";
         }
+
+        StringBuilder sbStoreVal = new StringBuilder();
+
         for (LiveVar liveVar : liveVarSet) {
             sbStoreVal.append(viz.visualizeStoreVal(liveVar.liveNode));
         }
+
         return sbStoreVal.toString();
     }
 
