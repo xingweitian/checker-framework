@@ -15,22 +15,22 @@ import org.checkerframework.dataflow.cfg.node.TypeCastNode;
 import org.checkerframework.dataflow.cfg.node.UnaryOperationNode;
 
 /** The live variable store class. */
-public class LiveVariableStore implements Store<LiveVariableStore> {
+public class LiveVarStore implements Store<LiveVarStore> {
 
     /** A set of live variables. */
     private Set<LiveVar> liveVarSet;
 
-    /** The class constructor of LiveVariableStore. */
-    public LiveVariableStore() {
+    /** The class constructor of LiveVarStore. */
+    public LiveVarStore() {
         liveVarSet = new HashSet<>();
     }
 
     /**
-     * The class constructor of LiveVariableStore.
+     * The class constructor of LiveVarStore.
      *
      * @param liveVarSet a set of LiveVar
      */
-    public LiveVariableStore(Set<LiveVar> liveVarSet) {
+    public LiveVarStore(Set<LiveVar> liveVarSet) {
         this.liveVarSet = liveVarSet;
     }
 
@@ -86,11 +86,11 @@ public class LiveVariableStore implements Store<LiveVariableStore> {
     @Override
     public boolean equals(Object obj) {
 
-        if (!(obj instanceof LiveVariableStore)) {
+        if (!(obj instanceof LiveVarStore)) {
             return false;
         }
 
-        LiveVariableStore other = (LiveVariableStore) obj;
+        LiveVarStore other = (LiveVarStore) obj;
         return other.liveVarSet.equals(this.liveVarSet);
     }
 
@@ -100,23 +100,23 @@ public class LiveVariableStore implements Store<LiveVariableStore> {
     }
 
     @Override
-    public LiveVariableStore copy() {
+    public LiveVarStore copy() {
         Set<LiveVar> liveVarSetCopy = new HashSet<>();
         liveVarSetCopy.addAll(liveVarSet);
-        return new LiveVariableStore(liveVarSetCopy);
+        return new LiveVarStore(liveVarSetCopy);
     }
 
     @Override
-    public LiveVariableStore leastUpperBound(LiveVariableStore other) {
+    public LiveVarStore leastUpperBound(LiveVarStore other) {
         Set<LiveVar> liveVarSetLub = new HashSet<>();
         liveVarSetLub.addAll(this.liveVarSet);
         liveVarSetLub.addAll(other.liveVarSet);
-        return new LiveVariableStore(liveVarSetLub);
+        return new LiveVarStore(liveVarSetLub);
     }
 
     /** It is not used by backward analysis, so just return null. */
     @Override
-    public LiveVariableStore widenedUpperBound(LiveVariableStore previous) {
+    public LiveVarStore widenedUpperBound(LiveVarStore previous) {
         return null;
     }
 
@@ -126,7 +126,7 @@ public class LiveVariableStore implements Store<LiveVariableStore> {
     }
 
     @Override
-    public String visualize(CFGVisualizer<?, LiveVariableStore, ?> viz) {
+    public String visualize(CFGVisualizer<?, LiveVarStore, ?> viz) {
         StringBuilder sbStoreVal = new StringBuilder();
         if (liveVarSet.isEmpty()) {
             sbStoreVal.append("null");

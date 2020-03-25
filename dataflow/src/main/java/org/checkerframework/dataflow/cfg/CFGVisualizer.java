@@ -134,7 +134,7 @@ public interface CFGVisualizer<
 
     /**
      * Visualize specific information collected according to the specific kind of Store. Currently,
-     * {@code LiveVariableStore} uses this method.
+     * {@code LiveVarStore} uses this method.
      *
      * @param value the value of the specific information to be visualized
      * @return the String representation of the store
