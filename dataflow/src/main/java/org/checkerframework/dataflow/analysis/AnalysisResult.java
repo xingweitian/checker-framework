@@ -49,7 +49,18 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
     protected final Map<TransferInput<A, S>, IdentityHashMap<Node, TransferResult<A, S>>>
             analysisCaches;
 
-    /** Initialize with given mappings. */
+    /**
+     * Initialize with given mappings.
+     *
+     * @param nodeValues abstract values of nodes
+     * @param stores a map from blocks to transfer inputs
+     * @param treeLookup a map from abstract syntax trees to sets of nodes
+     * @param unaryAssignNodeLookup a map from abstract syntax trees to corresponding assignment
+     *     nodes
+     * @param finalLocalValues a map from (effectively final) local variable elements to their
+     *     abstract value
+     * @param analysisCaches caches of analysis results
+     */
     protected AnalysisResult(
             Map<Node, A> nodeValues,
             IdentityHashMap<Block, TransferInput<A, S>> stores,
@@ -66,7 +77,17 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
         this.analysisCaches = analysisCaches;
     }
 
-    /** Initialize with given mappings and empty cache. */
+    /**
+     * Initialize with given mappings and empty cache.
+     *
+     * @param nodeValues abstract values of nodes
+     * @param stores a map from blocks to transfer inputs
+     * @param treeLookup a map from abstract syntax trees to sets of nodes
+     * @param unaryAssignNodeLookup a map from abstract syntax trees to corresponding assignment
+     *     nodes
+     * @param finalLocalValues a map from (effectively final) local variable elements to their
+     *     abstract value
+     */
     public AnalysisResult(
             Map<Node, A> nodeValues,
             IdentityHashMap<Block, TransferInput<A, S>> stores,
@@ -82,7 +103,11 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
                 new IdentityHashMap<>());
     }
 
-    /** Initialize empty result with specified cache. */
+    /**
+     * Initialize empty result with specified cache.
+     *
+     * @param analysisCaches caches of analysis results
+     */
     public AnalysisResult(
             Map<TransferInput<A, S>, IdentityHashMap<Node, TransferResult<A, S>>> analysisCaches) {
         this(
@@ -94,7 +119,11 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
                 analysisCaches);
     }
 
-    /** Combine with another analysis result. */
+    /**
+     * Combine with another analysis result.
+     *
+     * @param other another analysis result waiting for being merged
+     */
     public void combine(AnalysisResult<A, S> other) {
         nodeValues.putAll(other.nodeValues);
         mergeTreeLookup(treeLookup, other.treeLookup);
@@ -103,7 +132,12 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
         finalLocalValues.putAll(other.finalLocalValues);
     }
 
-    // Merge all entries from otherTreeLookup into treeLookup. Merge sets if already present.
+    /**
+     * Merge all entries from otherTreeLookup into treeLookup. Merge sets if already present.
+     *
+     * @param treeLookup a map from abstract syntax trees to sets of nodes
+     * @param otherTreeLookup another treeLookup waiting for being merged into {@code treeLookup}
+     */
     private static void mergeTreeLookup(
             IdentityHashMap<Tree, Set<Node>> treeLookup,
             IdentityHashMap<Tree, Set<Node>> otherTreeLookup) {
@@ -123,16 +157,22 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
     }
 
     /**
-     * @return the abstract value for {@link Node} {@code n}, or {@code null} if no information is
-     *     available.
+     * Return the abstract value for {@link Node} {@code n}, or {@code null} if no information is
+     * available.
+     *
+     * @param n the given node
+     * @return the abstract value of the given node
      */
     public @Nullable A getValue(Node n) {
         return nodeValues.get(n);
     }
 
     /**
-     * @return the abstract value for {@link Tree} {@code t}, or {@code null} if no information is
-     *     available.
+     * Return the abstract value for {@link Tree} {@code t}, or {@code null} if no information is
+     * available.
+     *
+     * @param t the given tree
+     * @return the abstract value of the given tree
      */
     public @Nullable A getValue(Tree t) {
         Set<Node> nodes = treeLookup.get(t);
@@ -169,20 +209,31 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
      * Callers of this method should always iterate through the returned set, possibly ignoring all
      * {@code Node}s they are not interested in.
      *
+     * @param tree the given tree
      * @return the set of {@link Node}s for a given {@link Tree}
      */
     public @Nullable Set<Node> getNodesForTree(Tree tree) {
         return treeLookup.get(tree);
     }
 
-    /** @return the corresponding {@link AssignmentNode} for a given {@link UnaryTree}. */
+    /**
+     * Return the corresponding {@link AssignmentNode} for a given {@link UnaryTree}.
+     *
+     * @param tree the given unary tree
+     * @return the corresponding assignment node
+     */
     public AssignmentNode getAssignForUnaryTree(UnaryTree tree) {
         assert unaryAssignNodeLookup.containsKey(tree) : tree + " is not in unaryAssignNodeLookup";
         return unaryAssignNodeLookup.get(tree);
     }
 
-    /** @return the store immediately before a given {@link Tree}. */
-    public S getStoreBefore(Tree tree) {
+    /**
+     * Return the store immediately before a given tree.
+     *
+     * @param tree the given tree
+     * @return the store before the given tree
+     */
+    public @Nullable S getStoreBefore(Tree tree) {
         Set<Node> nodes = getNodesForTree(tree);
         if (nodes == null) {
             return null;
@@ -199,12 +250,22 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
         return merged;
     }
 
-    /** @return the store immediately before a given {@link Node}. */
-    public S getStoreBefore(Node node) {
+    /**
+     * Return the store immediately before a given node.
+     *
+     * @param node the give node
+     * @return the store before the given node
+     */
+    public @Nullable S getStoreBefore(Node node) {
         return runAnalysisFor(node, true);
     }
 
-    /** @return the regular store immediately before a given {@link Block} */
+    /**
+     * Return the regular store immediately before a given {@link Block}.
+     *
+     * @param bb the given block
+     * @return the store right before the given block
+     */
     public S getStoreBefore(Block bb) {
         TransferInput<A, S> transferInput = stores.get(bb);
         AbstractAnalysis<A, S, ?> analysis = transferInput.analysis;
@@ -242,7 +303,12 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
         }
     }
 
-    /** @return the regular store immediately after a given {@link Block} */
+    /**
+     * Return the regular store immediately after a given block.
+     *
+     * @param bb the given block
+     * @return the store after the given block
+     */
     public S getStoreAfter(Block bb) {
         TransferInput<A, S> transferInput = stores.get(bb);
         AbstractAnalysis<A, S, ?> analysis = transferInput.analysis;
@@ -281,8 +347,13 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
         }
     }
 
-    /** @return the store immediately after a given {@link Tree}. */
-    public S getStoreAfter(Tree tree) {
+    /**
+     * Return the store immediately after a given tree.
+     *
+     * @param tree the given tree
+     * @return the store after the given tree
+     */
+    public @Nullable S getStoreAfter(Tree tree) {
         Set<Node> nodes = getNodesForTree(tree);
         if (nodes == null) {
             return null;
@@ -299,8 +370,13 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
         return merged;
     }
 
-    /** @return the store immediately after a given {@link Node}. */
-    public S getStoreAfter(Node node) {
+    /**
+     * Return the store immediately after a given node.
+     *
+     * @param node the given node
+     * @return the store after the given node
+     */
+    public @Nullable S getStoreAfter(Node node) {
         return runAnalysisFor(node, false);
     }
 
@@ -311,9 +387,14 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
      *
      * <p>If the given {@link Node} cannot be reached (in the control flow graph), then {@code null}
      * is returned.
+     *
+     * @param node the node to analyze
+     * @param before the boolean value to indicate which store to return
+     * @return the store at the location of node after running the analysis
      */
-    protected S runAnalysisFor(Node node, boolean before) {
+    protected @Nullable S runAnalysisFor(Node node, boolean before) {
         Block block = node.getBlock();
+        assert block != null : "@AssumeAssertion(nullness): invariant";
         TransferInput<A, S> transferInput = stores.get(block);
         if (transferInput == null) {
             return null;
@@ -330,6 +411,15 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
      * {@code transferInput} is not in {@code analysisCaches}, this method create new cache and
      * store it in {@code analysisCaches}. The cache is a map from a node to the analysis result of
      * the node.
+     *
+     * @param node the node to analyze
+     * @param before the boolean value to indicate which store to return
+     * @param transferInput the transfer input of the block of this node
+     * @param nodeValues abstract values of nodes
+     * @param analysisCaches caches of analysis results
+     * @param <A> method return type should be a subtype of {@link AbstractValue}
+     * @param <S> method return type should be a subtype of {@link Store}
+     * @return the store at the location of node after running the analysis
      */
     public static <A extends AbstractValue<A>, S extends Store<S>> S runAnalysisFor(
             Node node,

@@ -11,6 +11,7 @@ import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Set;
 import javax.lang.model.element.Element;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.cfg.ControlFlowGraph;
 import org.checkerframework.dataflow.cfg.block.Block;
@@ -22,11 +23,11 @@ import org.checkerframework.javacutil.BugInCF;
 import org.checkerframework.javacutil.ElementUtils;
 
 /**
- * Common code base for BackwardAnalysis and ForwardAnalysis
+ * Common code base for {@link BackwardAnalysis} and {@link ForwardAnalysis}.
  *
- * @param <V> AbstractValue
- * @param <S> Store
- * @param <T> TransferFunction
+ * @param <V> the abstract value type to be tracked by the analysis
+ * @param <S> the store type used in the analysis
+ * @param <T> the transfer function type that is used to approximated runtime behavior
  */
 public abstract class AbstractAnalysis<
                 V extends AbstractValue<V>, S extends Store<S>, T extends TransferFunction<V, S>>
@@ -41,10 +42,10 @@ public abstract class AbstractAnalysis<
     /** The transfer function for regular nodes. */
     // TODO: make final. Currently, the transferFunction has a reference to the analysis, so it
     //  can't be created until the Analysis is initialized.
-    protected T transferFunction;
+    protected @Nullable T transferFunction;
 
-    /** The control flow graph to perform the analysis on. */
-    protected ControlFlowGraph cfg;
+    /** The current control flow graph to perform the analysis on. */
+    protected @Nullable ControlFlowGraph cfg;
 
     /**
      * The transfer inputs of every basic block (assumed to be 'no information' if not present,
@@ -69,23 +70,23 @@ public abstract class AbstractAnalysis<
      *   !isRunning ==&gt; (currentNode == null)
      * </pre>
      */
-    protected Node currentNode;
+    protected @Nullable Node currentNode;
 
     /**
      * The tree that is currently being looked at. The transfer function can set this tree to make
      * sure that calls to {@code getValue} will not return information for this given tree.
      */
-    protected Tree currentTree;
+    protected @Nullable Tree currentTree;
 
     /** The current transfer input when the analysis is running. */
-    protected TransferInput<V, S> currentInput;
+    protected @Nullable TransferInput<V, S> currentInput;
 
     /**
      * @return the tree that is currently being looked at. The transfer function can set this tree
      *     to make sure that calls to {@code getValue} will not return information for this given
      *     tree.
      */
-    public Tree getCurrentTree() {
+    public @Nullable Tree getCurrentTree() {
         return currentTree;
     }
 
@@ -99,7 +100,7 @@ public abstract class AbstractAnalysis<
     }
 
     /**
-     * Class constructor.
+     * Common code base for {@link BackwardAnalysis} and {@link ForwardAnalysis}.
      *
      * @param direction direction of the analysis
      */
@@ -117,6 +118,12 @@ public abstract class AbstractAnalysis<
     /**
      * Propagate the stores in currentInput to the next block in the direction of analysis,
      * according to the flowRule.
+     *
+     * @param nextBlock the target block to propagate the stores to
+     * @param node the node of the target block
+     * @param currentInput the current transfer input
+     * @param flowRule the flow rule being used
+     * @param addToWorklistAgain whether the block should be added to {@code Worklist} again
      */
     protected abstract void propagateStoresTo(
             Block nextBlock,
@@ -133,6 +140,13 @@ public abstract class AbstractAnalysis<
      * map of a block of node to the cached analysis result. If the cache for {@code transferInput}
      * is not in {@code analysisCaches}, this method create new cache and store it in {@code
      * analysisCaches}. The cache is a map of a node to the analysis result of the node.
+     *
+     * @param node the node to analyze
+     * @param before the boolean value to indicate which store to return
+     * @param transferInput the transfer input of the block of this node
+     * @param nodeValues abstract values of nodes
+     * @param analysisCaches caches of analysis results
+     * @return the store at the location of node after running the analysis
      */
     protected abstract S runAnalysisFor(
             Node node,
@@ -157,6 +171,7 @@ public abstract class AbstractAnalysis<
             throw new BugInCF(
                     "AbstractAnalysis::getResult() should not be called when analysis is running!");
         }
+        assert cfg != null : "@AssumeAssertion(nullness): invariant";
         return new AnalysisResult<>(
                 nodeValues,
                 inputs,
@@ -166,12 +181,7 @@ public abstract class AbstractAnalysis<
     }
 
     @Override
-    public void setTransferFunction(T transfer) {
-        this.transferFunction = transfer;
-    }
-
-    @Override
-    public T getTransferFunction() {
+    public @Nullable T getTransferFunction() {
         return transferFunction;
     }
 
@@ -190,9 +200,9 @@ public abstract class AbstractAnalysis<
 
             // Check that 'n' is a subnode of 'node'. Check immediate operands
             // first for efficiency.
-            if (!(currentNode != n
-                    && (currentNode.getOperands().contains(n)
-                            || currentNode.getTransitiveOperands().contains(n)))) {
+            if (currentNode == n
+                    || (!currentNode.getOperands().contains(n)
+                            && !currentNode.getTransitiveOperands().contains(n))) {
                 return null;
             }
             return nodeValues.get(n);
@@ -200,17 +210,32 @@ public abstract class AbstractAnalysis<
         return nodeValues.get(n);
     }
 
-    /** Return all current node values. */
+    /**
+     * Return all current node values.
+     *
+     * @return {@link #nodeValues}
+     */
     public IdentityHashMap<Node, V> getNodeValues() {
         return nodeValues;
     }
 
+    /**
+     * Set all current node values to the given map.
+     *
+     * @param in the current node values
+     */
+    /*package-private*/ void setNodeValues(IdentityHashMap<Node, V> in) {
+        assert !isRunning;
+        nodeValues.clear();
+        nodeValues.putAll(in);
+    }
+
     @Override
     public @Nullable S getRegularExitStore() {
+        assert cfg != null : "@AssumeAssertion(nullness): invariant";
         SpecialBlock regularExitBlock = cfg.getRegularExitBlock();
         if (inputs.containsKey(regularExitBlock)) {
-            S regularExitStore = inputs.get(regularExitBlock).getRegularStore();
-            return regularExitStore;
+            return inputs.get(regularExitBlock).getRegularStore();
         } else {
             return null;
         }
@@ -218,10 +243,10 @@ public abstract class AbstractAnalysis<
 
     @Override
     public @Nullable S getExceptionalExitStore() {
+        assert cfg != null : "@AssumeAssertion(nullness): invariant";
         SpecialBlock exceptionalExitBlock = cfg.getExceptionalExitBlock();
         if (inputs.containsKey(exceptionalExitBlock)) {
-            S exceptionalExitStore = inputs.get(exceptionalExitBlock).getRegularStore();
-            return exceptionalExitStore;
+            return inputs.get(exceptionalExitBlock).getRegularStore();
         }
         return null;
     }
@@ -229,20 +254,24 @@ public abstract class AbstractAnalysis<
     /**
      * Get the set of {@link Node}s for a given {@link Tree}. Returns null for trees that don't
      * produce a value.
+     *
+     * @param t the given tree
+     * @return the set of corresponding nodes to the given tree
      */
-    public Set<Node> getNodesForTree(Tree t) {
+    public @Nullable Set<Node> getNodesForTree(Tree t) {
         if (cfg == null) {
             return null;
         }
-        Set<Node> nodes = cfg.getNodesCorrespondingToTree(t);
-        return nodes;
+        return cfg.getNodesCorrespondingToTree(t);
     }
 
     /**
-     * @param t a {@link Tree}
-     * @return the abstract value for {@link Tree} {@code t}, or {@code null} if no information is
-     *     available. Note that if the analysis has not finished yet, this value might not represent
-     *     the final value for this node.
+     * Return the abstract value for {@link Tree} {@code t}, or {@code null} if no information is
+     * available. Note that if the analysis has not finished yet, this value might not represent the
+     * final value for this node.
+     *
+     * @param t the given tree
+     * @return the abstract value for the given tree
      */
     public @Nullable V getValue(Tree t) {
         // We do not yet have a org.checkerframework.dataflow fact about the current node
@@ -271,23 +300,40 @@ public abstract class AbstractAnalysis<
     /**
      * Get the {@link MethodTree} of the current CFG if the argument {@link Tree} maps to a {@link
      * Node} in the CFG or null otherwise.
+     *
+     * @param t the given tree
+     * @return the contained method tree of the given tree
      */
     public @Nullable MethodTree getContainingMethod(Tree t) {
+        if (cfg == null) {
+            return null;
+        }
         return cfg.getContainingMethod(t);
     }
 
     /**
      * Get the {@link ClassTree} of the current CFG if the argument {@link Tree} maps to a {@link
      * Node} in the CFG or null otherwise.
+     *
+     * @param t the given tree
+     * @return the contained class tree of the given tree
      */
     public @Nullable ClassTree getContainingClass(Tree t) {
+        if (cfg == null) {
+            return null;
+        }
         return cfg.getContainingClass(t);
     }
 
     /**
      * Call the transfer function for node {@code node}, and set that node as current node first.
+     *
+     * @param node the given node
+     * @param store the transfer input
+     * @return the output of the transfer function
      */
     protected TransferResult<V, S> callTransferFunction(Node node, TransferInput<V, S> store) {
+        assert transferFunction != null : "@AssumeAssertion(nullness): invariant";
         if (node.isLValue()) {
             // TODO: should the default behavior return a regular transfer result, a conditional
             //  transfer result (depending on store.hasTwoStores()), or is the following correct?
@@ -305,14 +351,21 @@ public abstract class AbstractAnalysis<
                 LocalVariableNode lhs = (LocalVariableNode) lhst;
                 Element elem = lhs.getElement();
                 if (ElementUtils.isEffectivelyFinal(elem)) {
-                    finalLocalValues.put(elem, transferResult.getResultValue());
+                    V resval = transferResult.getResultValue();
+                    if (resval != null) {
+                        finalLocalValues.put(elem, resval);
+                    }
                 }
             }
         }
         return transferResult;
     }
 
-    /** Initialize the analysis with a new control flow graph. */
+    /**
+     * Initialize the analysis with a new control flow graph.
+     *
+     * @param cfg a given control flow graph
+     */
     protected final void init(ControlFlowGraph cfg) {
         initFields(cfg);
         initInitialInputs();
@@ -325,12 +378,19 @@ public abstract class AbstractAnalysis<
      * @param cfg a given control flow graph
      */
     protected void initFields(ControlFlowGraph cfg) {
+        inputs.clear();
+        nodeValues.clear();
+        finalLocalValues.clear();
         this.cfg = cfg;
     }
 
     /**
      * Updates the value of node {@code node} to the value of the {@code transferResult}. Returns
      * true if the node's value changed, or a store was updated.
+     *
+     * @param node the node to update
+     * @param transferResult the transfer result being updated
+     * @return true if the node's value changed, or a store was updated
      */
     protected boolean updateNodeValues(Node node, TransferResult<V, S> transferResult) {
         V newVal = transferResult.getResultValue();
@@ -348,6 +408,11 @@ public abstract class AbstractAnalysis<
     /**
      * Read the store for a particular basic block from a map of stores (or {@code null} if none
      * exists yet).
+     *
+     * @param stores a map of stores
+     * @param b the target block
+     * @param <S> method return type should be a subtype of {@link Store}
+     * @return the store for the target block
      */
     protected static <S> @Nullable S readFromStore(Map<Block, S> stores, Block b) {
         return stores.get(b);
@@ -355,6 +420,8 @@ public abstract class AbstractAnalysis<
 
     /**
      * Add a basic block to the Worklist. If {@code b} is already present, the method does nothing.
+     *
+     * @param b the block to add to the Worklist
      */
     protected void addToWorklist(Block b) {
         // TODO: use a more efficient way to check if b is already present
@@ -370,7 +437,7 @@ public abstract class AbstractAnalysis<
     protected static class Worklist {
 
         /** Map all blocks in the CFG to their depth-first order. */
-        protected IdentityHashMap<Block, Integer> depthFirstOrder;
+        protected final IdentityHashMap<Block, Integer> depthFirstOrder;
 
         /**
          * Comparators to allow priority queue to order blocks by their depth-first order, using by
@@ -395,9 +462,13 @@ public abstract class AbstractAnalysis<
         }
 
         /** The backing priority queue. */
-        protected PriorityQueue<Block> queue;
+        protected final PriorityQueue<Block> queue;
 
-        /** The work list. */
+        /**
+         * The work list.
+         *
+         * @param direction the direction (forward or backward)
+         */
         public Worklist(Direction direction) {
             depthFirstOrder = new IdentityHashMap<>();
 
@@ -410,8 +481,13 @@ public abstract class AbstractAnalysis<
             }
         }
 
-        /** Process the control flow graph, add the Blocks to {@link #depthFirstOrder}. */
+        /**
+         * Process the control flow graph, add the Blocks to {@link #depthFirstOrder}.
+         *
+         * @param cfg the control flow graph to process
+         */
         public void process(ControlFlowGraph cfg) {
+            assert cfg != null : "@AssumeAssertion(nullness): invariant";
             depthFirstOrder.clear();
             int count = 1;
             for (Block b : cfg.getDepthFirstOrderedBlocks()) {
@@ -421,23 +497,40 @@ public abstract class AbstractAnalysis<
             queue.clear();
         }
 
-        /** Check if {@link #queue} is emtpy. */
+        /**
+         * @see PriorityQueue#isEmpty
+         * @return true if {@link #queue} is empty else false
+         */
+        @EnsuresNonNullIf(result = false, expression = "poll()")
+        @SuppressWarnings("nullness:contracts.conditional.postcondition.not.satisfied") // forwarded
         public boolean isEmpty() {
             return queue.isEmpty();
         }
 
-        /** Check if {@link #queue} contains the block which is passed as the argument. */
+        /**
+         * Check if {@link #queue} contains the block which is passed as the argument.
+         *
+         * @param block the given block to check
+         * @return true if {@link #queue} contains the given block
+         */
         public boolean contains(Block block) {
             return queue.contains(block);
         }
 
-        /** Add Block to {@link #queue}. */
+        /**
+         * Add Block to {@link #queue}.
+         *
+         * @param block the block to add to {@link #queue}
+         */
         public void add(Block block) {
             queue.add(block);
         }
 
-        /** Retrieves and removes the head of this queue. */
-        public Block poll() {
+        /**
+         * @see PriorityQueue#poll
+         * @return the head of {@link #queue}
+         */
+        public @Nullable Block poll() {
             return queue.poll();
         }
 

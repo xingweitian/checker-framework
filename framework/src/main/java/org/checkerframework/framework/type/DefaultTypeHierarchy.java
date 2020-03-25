@@ -164,8 +164,8 @@ public class DefaultTypeHierarchy extends AbstractAtmComboVisitor<Boolean, Void>
     }
 
     /**
-     * Returns true if subtype {@literal <:} supertype, but only for the hierarchy of which {@code
-     * top} is the top.
+     * Returns true if {@code subtype <: supertype}, but only for the hierarchy of which {@code top}
+     * is the top.
      *
      * @param subtype expected subtype
      * @param supertype expected supertype
@@ -461,12 +461,18 @@ public class DefaultTypeHierarchy extends AbstractAtmComboVisitor<Boolean, Void>
     @Override
     public Boolean visitDeclared_Declared(
             AnnotatedDeclaredType subtype, AnnotatedDeclaredType supertype, Void p) {
-        AnnotatedDeclaredType subtypeAsSuper =
-                AnnotatedTypes.castedAsSuper(subtype.atypeFactory, subtype, supertype);
-
-        if (!isPrimarySubtype(subtypeAsSuper, supertype)) {
+        if (!isPrimarySubtype(subtype, supertype)) {
             return false;
         }
+        if (subtype.atypeFactory.ignoreUninferredTypeArguments
+                && (subtype.containsUninferredTypeArguments()
+                        || supertype.containsUninferredTypeArguments())) {
+            // Calling castedAsSuper may cause the uninferredTypeArguments to be lost. So, just
+            // return true here.
+            return true;
+        }
+        AnnotatedDeclaredType subtypeAsSuper =
+                AnnotatedTypes.castedAsSuper(subtype.atypeFactory, subtype, supertype);
 
         if (visitHistory.contains(subtypeAsSuper, supertype, currentTop)) {
             return true;

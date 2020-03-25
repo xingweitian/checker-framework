@@ -17,6 +17,8 @@ import javax.lang.model.element.Name;
 import javax.lang.model.element.VariableElement;
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeMirror;
+import org.checkerframework.checker.signature.qual.ClassGetName;
+import org.checkerframework.checker.signature.qual.DotSeparatedIdentifiers;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.framework.source.Result;
 import org.checkerframework.javacutil.ElementUtils;
@@ -24,8 +26,19 @@ import org.checkerframework.javacutil.PluginUtil;
 import org.checkerframework.javacutil.TreeUtils;
 import org.checkerframework.javacutil.TypesUtils;
 
+/**
+ * Evaluates expressions (such as method calls and field accesses) at compile time, to determine
+ * whether they have compile-time constant values.
+ */
 public class ReflectiveEvaluator {
+
+    /** The checker that is using this ReflectiveEvaluator. */
     private BaseTypeChecker checker;
+
+    /**
+     * Whether to report warnings about problems with evaluation. Controlled by the
+     * -AreportEvalWarns command-line option.
+     */
     private boolean reportWarnings;
 
     public ReflectiveEvaluator(
@@ -159,14 +172,17 @@ public class ReflectiveEvaluator {
      * Method for reflectively obtaining a method object so it can (potentially) be statically
      * executed by the checker for constant propagation.
      *
-     * @return the Method object corresponding to the method being invoke in tree
+     * @param tree a method invocation tree
+     * @return the Method object corresponding to the method invocation tree
      */
     private Method getMethodObject(MethodInvocationTree tree) {
+        final ExecutableElement ele = TreeUtils.elementFromUse(tree);
+        List<Class<?>> paramClzz = null;
         try {
-            ExecutableElement ele = TreeUtils.elementFromUse(tree);
-            Name clazz =
+            @DotSeparatedIdentifiers Name clazz =
                     TypesUtils.getQualifiedName((DeclaredType) ele.getEnclosingElement().asType());
-            List<Class<?>> paramClzz = getParameterClasses(ele);
+            paramClzz = getParameterClasses(ele);
+            @SuppressWarnings("signature") // https://tinyurl.com/cfissue/658 for Class.toString
             Class<?> clzz = Class.forName(clazz.toString());
             Method method =
                     clzz.getMethod(
@@ -180,25 +196,30 @@ public class ReflectiveEvaluator {
         } catch (ClassNotFoundException | UnsupportedClassVersionError | NoClassDefFoundError e) {
             if (reportWarnings) {
                 checker.report(
-                        Result.warning(
-                                "class.find.failed",
-                                TreeUtils.elementFromUse(tree).getEnclosingElement()),
-                        tree);
+                        Result.warning("class.find.failed", ele.getEnclosingElement()), tree);
             }
             return null;
 
         } catch (Throwable e) {
             // The class we attempted to getMethod from inside the
             // call to getMethodObject.
-            Element classElem = TreeUtils.elementFromUse(tree).getEnclosingElement();
+            Element classElem = ele.getEnclosingElement();
 
             if (classElem == null) {
                 if (reportWarnings) {
-                    checker.report(Result.warning("method.find.failed"), tree);
+                    checker.report(
+                            Result.warning("method.find.failed", ele.getSimpleName(), paramClzz),
+                            tree);
                 }
             } else {
                 if (reportWarnings) {
-                    checker.report(Result.warning("method.find.failed.in.class", classElem), tree);
+                    checker.report(
+                            Result.warning(
+                                    "method.find.failed.in.class",
+                                    ele.getSimpleName(),
+                                    paramClzz,
+                                    classElem),
+                            tree);
                 }
             }
             return null;
@@ -246,8 +267,16 @@ public class ReflectiveEvaluator {
         return returnListOfLists;
     }
 
+    /**
+     * Return the value of a static field access. Return null if there is trouble.
+     *
+     * @param classname the class containing the field
+     * @param fieldName the name of the field
+     * @param tree the static field access in the program; used for diagnostics
+     * @return the value of the static field access, or null if it cannot be determined
+     */
     public Object evaluateStaticFieldAccess(
-            String classname, String fieldName, MemberSelectTree tree) {
+            @ClassGetName String classname, String fieldName, MemberSelectTree tree) {
         try {
             Class<?> recClass = Class.forName(classname);
             Field field = recClass.getField(fieldName);

@@ -17,7 +17,7 @@ public abstract class BlockImpl implements Block {
     protected final BlockType type;
 
     /** The set of predecessors. */
-    protected Set<BlockImpl> predecessors;
+    protected final Set<BlockImpl> predecessors;
 
     /** @return a fresh identifier */
     private static long uniqueID() {

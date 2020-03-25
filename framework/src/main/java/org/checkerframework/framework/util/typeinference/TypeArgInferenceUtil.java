@@ -86,9 +86,9 @@ public class TypeArgInferenceUtil {
 
         } else {
             throw new BugInCF(
-                    "TypeArgumentInference.relationsFromMethodArguments:\n"
-                            + "couldn't determine arguments from tree: "
-                            + methodInvocation);
+                    "TypeArgumentInference.relationsFromMethodArguments:%n"
+                            + "couldn't determine arguments from tree: %s",
+                    methodInvocation);
         }
 
         final List<AnnotatedTypeMirror> argTypes = new ArrayList<>(argTrees.size());
@@ -181,6 +181,10 @@ public class TypeArgInferenceUtil {
         } else if (assignmentContext instanceof NewClassTree) {
             // This need to be basically like MethodTree
             NewClassTree newClassTree = (NewClassTree) assignmentContext;
+            if (newClassTree.getEnclosingExpression() instanceof NewClassTree
+                    && (newClassTree.getEnclosingExpression() == path.getLeaf())) {
+                return null;
+            }
             ExecutableElement constructorElt = TreeUtils.constructor(newClassTree);
             AnnotatedTypeMirror receiver = atypeFactory.fromNewClass(newClassTree);
             res =

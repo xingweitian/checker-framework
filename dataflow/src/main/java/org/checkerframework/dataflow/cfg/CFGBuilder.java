@@ -73,8 +73,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.StringJoiner;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.Name;
 import javax.lang.model.element.TypeElement;
@@ -268,8 +270,8 @@ public class CFGBuilder {
     public static ControlFlowGraph build(
             CompilationUnitTree root,
             MethodTree tree,
-            ClassTree classTree,
-            ProcessingEnvironment env) {
+            @Nullable ClassTree classTree,
+            @Nullable ProcessingEnvironment env) {
         UnderlyingAST underlyingAST = new CFGMethod(tree, classTree);
         return build(root, underlyingAST, false, false, env);
     }
@@ -350,7 +352,7 @@ public class CFGBuilder {
 
         @Override
         public String toString() {
-            return "ExtendedNode(" + type + ")";
+            throw new BugInCF("DO NOT CALL ExtendedNode.toString(). Write your own.");
         }
     }
 
@@ -546,19 +548,15 @@ public class CFGBuilder {
 
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder();
             if (this.catchLabels.isEmpty()) {
-                sb.append("TryCatchFrame: no catch labels.\n");
+                return "TryCatchFrame: no catch labels.";
             } else {
-                sb.append("TryCatchFrame: ");
+                StringJoiner sb = new StringJoiner(System.lineSeparator(), "TryCatchFrame: ", "");
+                for (Pair<TypeMirror, Label> ptml : this.catchLabels) {
+                    sb.add(ptml.first.toString() + " -> " + ptml.second.toString());
+                }
+                return sb.toString();
             }
-            for (Pair<TypeMirror, Label> ptml : this.catchLabels) {
-                sb.append(ptml.first.toString());
-                sb.append(" -> ");
-                sb.append(ptml.second.toString());
-                sb.append('\n');
-            }
-            return sb.toString();
         }
 
         /**
@@ -645,9 +643,7 @@ public class CFGBuilder {
 
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("TryFinallyFrame: finallyLabel: " + finallyLabel + '\n');
-            return sb.toString();
+            return "TryFinallyFrame: finallyLabel: " + finallyLabel;
         }
 
         @Override
@@ -698,15 +694,15 @@ public class CFGBuilder {
 
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder();
-            sb.append("TryStack: exitLabel: " + this.exitLabel + '\n');
+            StringJoiner sj = new StringJoiner(System.lineSeparator());
+            sj.add("TryStack: exitLabel: " + this.exitLabel);
             if (this.frames.isEmpty()) {
-                sb.append("No TryFrames.\n");
+                sj.add("No TryFrames.");
             }
             for (TryFrame tf : this.frames) {
-                sb.append(tf.toString());
+                sj.add(tf.toString());
             }
-            return sb.toString();
+            return sj.toString();
         }
     }
 
@@ -738,6 +734,8 @@ public class CFGBuilder {
         }
 
         @Override
+        @SuppressWarnings(
+                "keyfor:contracts.conditional.postcondition.not.satisfied") // get adds everything
         public boolean containsKey(Object key) {
             return true;
         }
@@ -1038,6 +1036,8 @@ public class CFGBuilder {
                     if (e.getSuccessor() == cur) {
                         return singleSuccessorHolder(e, cur);
                     } else {
+                        @SuppressWarnings(
+                                "keyfor:assignment.type.incompatible") // ignore keyfor type
                         Set<Entry<TypeMirror, Set<Block>>> entrySet =
                                 e.getExceptionalSuccessors().entrySet();
                         for (final Entry<TypeMirror, Set<Block>> entry : entrySet) {
@@ -1361,12 +1361,11 @@ public class CFGBuilder {
 
         @Override
         public String toString() {
-            StringBuilder sb = new StringBuilder();
+            StringJoiner sj = new StringJoiner(System.lineSeparator());
             for (ExtendedNode n : nodeList) {
-                sb.append(nodeToString(n));
-                sb.append("\n");
+                sj.add(nodeToString(n));
             }
-            return sb.toString();
+            return sj.toString();
         }
 
         protected String nodeToString(ExtendedNode n) {
@@ -3885,13 +3884,6 @@ public class CFGBuilder {
             } else {
                 Element element = TreeUtils.elementFromUse(tree);
                 switch (element.getKind()) {
-                    case ANNOTATION_TYPE:
-                    case CLASS:
-                    case ENUM:
-                    case INTERFACE:
-                    case TYPE_PARAMETER:
-                        node = new ClassNameNode(tree);
-                        break;
                     case FIELD:
                         // Note that "this"/"super" is a field, but not a field access.
                         if (element.getSimpleName().contentEquals("this")) {
@@ -3910,6 +3902,10 @@ public class CFGBuilder {
                         node = new PackageNameNode(tree);
                         break;
                     default:
+                        if (ElementUtils.isTypeDeclaration(element)) {
+                            node = new ClassNameNode(tree);
+                            break;
+                        }
                         throw new BugInCF("bad element kind " + element.getKind());
                 }
             }
@@ -4169,23 +4165,15 @@ public class CFGBuilder {
             Node expr = scan(tree.getExpression(), p);
             if (!TreeUtils.isFieldAccess(tree)) {
                 // Could be a selector of a class or package
-                Node result = null;
                 Element element = TreeUtils.elementFromUse(tree);
-                switch (element.getKind()) {
-                    case ANNOTATION_TYPE:
-                    case CLASS:
-                    case ENUM:
-                    case INTERFACE:
-                        result = extendWithNode(new ClassNameNode(tree, expr));
-                        break;
-                    case PACKAGE:
-                        result = extendWithNode(new PackageNameNode(tree, (PackageNameNode) expr));
-                        break;
-                    default:
-                        assert false : "Unexpected element kind: " + element.getKind();
-                        return null;
+                if (ElementUtils.isClassElement(element)) {
+                    return extendWithNode(new ClassNameNode(tree, expr));
+                } else if (element.getKind() == ElementKind.PACKAGE) {
+                    return extendWithNode(new PackageNameNode(tree, (PackageNameNode) expr));
+                } else {
+                    assert false : "Unexpected element kind: " + element.getKind();
+                    return null;
                 }
-                return result;
             }
 
             Node node = new FieldAccessNode(tree, expr);
@@ -4681,8 +4669,8 @@ public class CFGBuilder {
         /**
          * Create assignment node which represent increment or decrement.
          *
-         * @param target Target tree for assignment node. If it's null, corresponding assignment
-         *     tree will be generated.
+         * @param target tree for assignment node. If it's null, corresponding assignment tree will
+         *     be generated.
          * @param expr expression node to be incremented or decremented
          * @param isIncrement true when it's increment
          * @return assignment node for corresponding increment or decrement

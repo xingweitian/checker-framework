@@ -1,5 +1,6 @@
 package org.checkerframework.dataflow.analysis;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.cfg.block.SpecialBlock;
 
 /**
@@ -24,5 +25,5 @@ public interface BackwardAnalysis<
      *
      * @return the output store at the entry block of a given CFG
      */
-    S getEntryStore();
+    @Nullable S getEntryStore();
 }

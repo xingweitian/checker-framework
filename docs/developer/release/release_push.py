@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 # encoding: utf-8
 """
 release_push.py
@@ -120,6 +120,10 @@ def stage_maven_artifacts_in_maven_central(new_checker_version):
                             pgp_user, pgp_passphrase)
 
     mvn_sign_and_deploy_all(SONATYPE_OSS_URL, SONATYPE_STAGING_REPO_ID, DATAFLOW_BINARY_RELEASE_POM, DATAFLOW_BINARY,
+                            DATAFLOW_SOURCE_JAR, DATAFLOW_JAVADOC_JAR,
+                            pgp_user, pgp_passphrase)
+
+    mvn_sign_and_deploy_all(SONATYPE_OSS_URL, SONATYPE_STAGING_REPO_ID, DATAFLOW_SHADED_BINARY_RELEASE_POM, DATAFLOW_SHADED_BINARY,
                             DATAFLOW_SOURCE_JAR, DATAFLOW_JAVADOC_JAR,
                             pgp_user, pgp_passphrase)
 
@@ -480,6 +484,10 @@ def main(argv):
         print_step("Push Step 11. Announce the release.") # MANUAL
         continue_or_exit("Please announce the release using the email structure below.\n" +
                          get_announcement_email(new_checker_version))
+
+        print_step("Push Step 12. Update the Checker Framework Gradle plugin.") # MANUAL
+        continue_or_exit("Please update the Checker Framework Gradle plugin:\n"+
+                         "https://github.com/kelloggm/checkerframework-gradle-plugin/blob/master/RELEASE.md#updating-the-checker-framework-version\n")
 
     delete_if_exists(RELEASE_BUILD_COMPLETED_FLAG_FILE)
 

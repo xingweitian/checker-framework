@@ -61,23 +61,32 @@ public abstract class CFAbstractAnalysis<
     protected final List<Pair<VariableElement, V>> fieldValues;
 
     /** The associated processing environment. */
-    private final ProcessingEnvironment env;
+    @SuppressWarnings("HidingField")
+    protected final ProcessingEnvironment env;
 
-    /** The type utilities. */
-    private final Types types;
+    /** Instance of the types utility. */
+    @SuppressWarnings("HidingField")
+    protected final Types types;
 
-    /** Class constructor. */
+    /**
+     * Create a CFAbstractAnalysis.
+     *
+     * @param checker a checker that contains command-line arguments and other information
+     * @param factory an annotated type factory to introduce type and dataflow rules
+     * @param fieldValues initial abstract types for fields
+     * @param maxCountBeforeWidening number of times a block can be analyzed before widening
+     */
     public CFAbstractAnalysis(
             BaseTypeChecker checker,
             GenericAnnotatedTypeFactory<V, S, T, ? extends CFAbstractAnalysis<V, S, T>> factory,
             List<Pair<VariableElement, V>> fieldValues,
             int maxCountBeforeWidening) {
         super(maxCountBeforeWidening);
+        env = checker.getProcessingEnvironment();
+        types = env.getTypeUtils();
         qualifierHierarchy = factory.getQualifierHierarchy();
         typeHierarchy = factory.getTypeHierarchy();
         dependentTypesHelper = factory.getDependentTypesHelper();
-        this.env = checker.getProcessingEnvironment();
-        this.types = env.getTypeUtils();
         this.atypeFactory = factory;
         this.checker = checker;
         this.transferFunction = createTransferFunction();
@@ -153,17 +162,6 @@ public abstract class CFAbstractAnalysis<
         return new CFValue(analysis, annotations, underlyingType);
     }
 
-    /** Get {@link #env}. */
-    public ProcessingEnvironment getEnv() {
-        return env;
-    }
-
-    /** Get {@link #types}. */
-    public Types getTypes() {
-        return types;
-    }
-
-    /** Get {@link #typeHierarchy}. */
     public TypeHierarchy getTypeHierarchy() {
         return typeHierarchy;
     }
@@ -190,5 +188,25 @@ public abstract class CFAbstractAnalysis<
         annos.remove(f);
         annos.add(anno);
         return createAbstractValue(annos, underlyingType);
+    }
+
+    /**
+     * Get the types utility.
+     *
+     * @return {@link #types}
+     */
+    @SuppressWarnings("deprecation")
+    public Types getTypes() {
+        return types;
+    }
+
+    /**
+     * Get the processing environment.
+     *
+     * @return {@link #env}
+     */
+    @SuppressWarnings("deprecation")
+    public ProcessingEnvironment getEnv() {
+        return env;
     }
 }

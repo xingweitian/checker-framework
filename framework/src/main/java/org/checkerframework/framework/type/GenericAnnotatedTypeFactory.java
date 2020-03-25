@@ -18,7 +18,6 @@ import com.sun.source.util.TreePath;
 import java.lang.annotation.Annotation;
 import java.util.ArrayDeque;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -67,10 +66,8 @@ import org.checkerframework.framework.flow.CFStore;
 import org.checkerframework.framework.flow.CFTransfer;
 import org.checkerframework.framework.flow.CFValue;
 import org.checkerframework.framework.qual.DefaultFor;
-import org.checkerframework.framework.qual.DefaultInUncheckedCodeFor;
 import org.checkerframework.framework.qual.DefaultQualifier;
 import org.checkerframework.framework.qual.DefaultQualifierInHierarchy;
-import org.checkerframework.framework.qual.DefaultQualifierInHierarchyInUncheckedCode;
 import org.checkerframework.framework.qual.MonotonicQualifier;
 import org.checkerframework.framework.qual.QualifierForLiterals;
 import org.checkerframework.framework.qual.RelevantJavaTypes;
@@ -97,12 +94,12 @@ import org.checkerframework.framework.util.dependenttypes.DependentTypesHelper;
 import org.checkerframework.framework.util.dependenttypes.DependentTypesTreeAnnotator;
 import org.checkerframework.framework.util.typeinference.TypeArgInferenceUtil;
 import org.checkerframework.javacutil.AnnotationBuilder;
-import org.checkerframework.javacutil.AnnotationUtils;
 import org.checkerframework.javacutil.BugInCF;
 import org.checkerframework.javacutil.CollectionUtils;
 import org.checkerframework.javacutil.Pair;
 import org.checkerframework.javacutil.TreeUtils;
 import org.checkerframework.javacutil.UserError;
+import org.plumelib.reflection.Signatures;
 
 /**
  * A factory that extends {@link AnnotatedTypeFactory} to optionally use flow-sensitive qualifier
@@ -395,14 +392,9 @@ public abstract class GenericAnnotatedTypeFactory<
         Class<?> checkerClass = checker.getClass();
 
         while (checkerClass != BaseTypeChecker.class) {
-            final String classToLoad =
-                    checkerClass
-                            .getName()
-                            .replace("Checker", "Analysis")
-                            .replace("Subchecker", "Analysis");
             FlowAnalysis result =
                     BaseTypeChecker.invokeConstructorFor(
-                            classToLoad,
+                            BaseTypeChecker.getRelatedClassName(checkerClass, "Analysis"),
                             new Class<?>[] {BaseTypeChecker.class, this.getClass(), List.class},
                             new Object[] {checker, this, fieldValues});
             if (result != null) {
@@ -442,14 +434,9 @@ public abstract class GenericAnnotatedTypeFactory<
         Class<?> checkerClass = checker.getClass();
 
         while (checkerClass != BaseTypeChecker.class) {
-            final String classToLoad =
-                    checkerClass
-                            .getName()
-                            .replace("Checker", "Transfer")
-                            .replace("Subchecker", "Transfer");
             TransferFunction result =
                     BaseTypeChecker.invokeConstructorFor(
-                            classToLoad,
+                            BaseTypeChecker.getRelatedClassName(checkerClass, "Transfer"),
                             new Class<?>[] {analysis.getClass()},
                             new Object[] {analysis});
             if (result != null) {
@@ -496,8 +483,7 @@ public abstract class GenericAnnotatedTypeFactory<
     /**
      * Create {@link QualifierDefaults} which handles checker specified defaults, and initialize the
      * created {@link QualifierDefaults}. Subclasses should override {@link
-     * GenericAnnotatedTypeFactory#addCheckedCodeDefaults(QualifierDefaults defs)} or {@link
-     * GenericAnnotatedTypeFactory#addUncheckedCodeDefaults(QualifierDefaults defs)} to add more
+     * GenericAnnotatedTypeFactory#addCheckedCodeDefaults(QualifierDefaults defs)} to add more
      * defaults or use different defaults.
      *
      * @return the QualifierDefaults object
@@ -512,7 +498,6 @@ public abstract class GenericAnnotatedTypeFactory<
         QualifierDefaults defs = createQualifierDefaults();
         addCheckedCodeDefaults(defs);
         addCheckedStandardDefaults(defs);
-        addUncheckedCodeDefaults(defs);
         addUncheckedStandardDefaults(defs);
         checkForDefaultQualifierInHierarchy(defs);
 
@@ -526,15 +511,6 @@ public abstract class GenericAnnotatedTypeFactory<
     protected QualifierDefaults createQualifierDefaults() {
         return new QualifierDefaults(elements, this);
     }
-
-    /** Defines alphabetical sort ordering for qualifiers. */
-    private static final Comparator<Class<? extends Annotation>> QUALIFIER_SORT_ORDERING =
-            new Comparator<Class<? extends Annotation>>() {
-                @Override
-                public int compare(Class<? extends Annotation> a1, Class<? extends Annotation> a2) {
-                    return a1.getCanonicalName().compareTo(a2.getCanonicalName());
-                }
-            };
 
     /**
      * Creates and returns a string containing the number of qualifiers and the canonical class
@@ -554,9 +530,8 @@ public abstract class GenericAnnotatedTypeFactory<
 
         // Create a list of the supported qualifiers and sort the list
         // alphabetically
-        List<Class<? extends Annotation>> sortedSupportedQuals = new ArrayList<>();
-        sortedSupportedQuals.addAll(stq);
-        Collections.sort(sortedSupportedQuals, QUALIFIER_SORT_ORDERING);
+        List<Class<? extends Annotation>> sortedSupportedQuals = new ArrayList<>(stq);
+        sortedSupportedQuals.sort(Comparator.comparing(Class::getCanonicalName));
 
         // display the number of qualifiers as well as the names of each
         // qualifier.
@@ -611,46 +586,6 @@ public abstract class GenericAnnotatedTypeFactory<
     }
 
     /**
-     * Adds default qualifiers for code that is not type-checked by reading
-     * {@code @DefaultInUncheckedCodeFor} and {@code @DefaultQualifierInHierarchyInUncheckedCode}
-     * meta-annotations. Then it applies the standard unchecked code defaults, if a default was not
-     * specified for a particular location.
-     *
-     * <p>Standard unchecked code default are: <br>
-     * top: {@code TypeUseLocation.RETURN,TypeUseLocation.FIELD,TypeUseLocation.UPPER_BOUND}<br>
-     * bottom: {@code TypeUseLocation.PARAMETER, TypeUseLocation.LOWER_BOUND}<br>
-     *
-     * <p>If {@code @DefaultQualifierInHierarchyInUncheckedCode} code is not found or a default for
-     * {@code TypeUseLocation.Otherwise} is not used, the defaults for checked code will be applied
-     * to locations without a default for unchecked code.
-     *
-     * <p>Subclasses may override this method to add defaults that cannot be specified with a
-     * {@code @DefaultInUncheckedCodeFor} or {@code @DefaultQualifierInHierarchyInUncheckedCode}
-     * meta-annotations or to change the standard defaults.
-     *
-     * @param defs {@link QualifierDefaults} object to which defaults are added
-     */
-    protected void addUncheckedCodeDefaults(QualifierDefaults defs) {
-        for (Class<? extends Annotation> annotation : getSupportedTypeQualifiers()) {
-            DefaultInUncheckedCodeFor defaultInUncheckedCodeFor =
-                    annotation.getAnnotation(DefaultInUncheckedCodeFor.class);
-
-            if (defaultInUncheckedCodeFor != null) {
-                final TypeUseLocation[] locations = defaultInUncheckedCodeFor.value();
-                defs.addUncheckedCodeDefaults(
-                        AnnotationBuilder.fromClass(elements, annotation), locations);
-            }
-
-            if (annotation.getAnnotation(DefaultQualifierInHierarchyInUncheckedCode.class)
-                    != null) {
-                defs.addUncheckedCodeDefault(
-                        AnnotationBuilder.fromClass(elements, annotation),
-                        TypeUseLocation.OTHERWISE);
-            }
-        }
-    }
-
-    /**
      * Adds standard unchecked defaults that do not conflict with previously added defaults.
      *
      * @param defs {@link QualifierDefaults} object to which defaults are added
@@ -674,8 +609,6 @@ public abstract class GenericAnnotatedTypeFactory<
                             + getSortedQualifierNames());
         }
 
-        // Don't require @DefaultQualifierInHierarchyInUncheckedCode or an
-        // unchecked default for TypeUseLocation.OTHERWISE.
         // If a default unchecked code qualifier isn't specified, the defaults
         // for checked code will be used.
     }
@@ -778,8 +711,7 @@ public abstract class GenericAnnotatedTypeFactory<
             Store store = getStoreBefore(tree);
             Value value = store.getValue(receiver);
             if (value != null) {
-                annotationMirror =
-                        AnnotationUtils.getAnnotationByClass(value.getAnnotations(), clazz);
+                annotationMirror = getAnnotationByClass(value.getAnnotations(), clazz);
             }
         }
         // If the specific annotation wasn't in the store, look in the type factory.
@@ -1659,6 +1591,11 @@ public abstract class GenericAnnotatedTypeFactory<
                         "-Acfgviz specified without arguments, should be -Acfgviz=VizClassName[,opts,...]");
             }
             String[] opts = cfgviz.split(",");
+            String vizClassName = opts[0];
+            if (!Signatures.isBinaryName(vizClassName)) {
+                throw new UserError(
+                        "Bad -Acfgviz class name \"%s\", should be a binary name.", vizClassName);
+            }
 
             Map<String, Object> args = processCFGVisualizerOption(opts);
             if (!args.containsKey("verbose")) {
@@ -1668,7 +1605,7 @@ public abstract class GenericAnnotatedTypeFactory<
             args.put("checkerName", getCheckerName());
 
             CFGVisualizer<Value, Store, TransferFunction> res =
-                    BaseTypeChecker.invokeConstructorFor(opts[0], null, null);
+                    BaseTypeChecker.invokeConstructorFor(vizClassName, null, null);
             res.init(args);
             return res;
         }
@@ -1676,13 +1613,15 @@ public abstract class GenericAnnotatedTypeFactory<
         return null;
     }
 
-    /* A simple utility method to determine a short checker name to be
-     * used by CFG visualizations.
+    /**
+     * A simple utility method to determine a short checker name to be used by CFG visualizations.
      */
     private String getCheckerName() {
         String checkerName = checker.getClass().getSimpleName();
-        if (checkerName.endsWith("Checker") || checkerName.endsWith("checker")) {
-            checkerName = checkerName.substring(0, checkerName.length() - "checker".length());
+        if (checkerName.endsWith("Checker")) {
+            checkerName = checkerName.substring(0, checkerName.length() - "Checker".length());
+        } else if (checkerName.endsWith("Subchecker")) {
+            checkerName = checkerName.substring(0, checkerName.length() - "Subchecker".length());
         }
         return checkerName;
     }

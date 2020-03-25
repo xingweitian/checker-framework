@@ -53,7 +53,7 @@ import scenelib.annotations.io.IndexFileWriter;
  * precision achieved by the whole-program inference analysis will be better. {@link
  * #writeScenesToJaif} rewrites the initial .jaif files, and may create new ones.
  */
-public class WholeProgramInferenceScenesHelper {
+public class WholeProgramInferenceScenesStorage {
 
     /**
      * Maps the toString() representation of an ATypeElement and its TypeUseLocation to a set of
@@ -86,7 +86,13 @@ public class WholeProgramInferenceScenesHelper {
      */
     private final Set<String> modifiedScenes = new HashSet<>();
 
-    public WholeProgramInferenceScenesHelper(boolean ignoreNullAssignments) {
+    /**
+     * Default constructor.
+     *
+     * @param ignoreNullAssignments indicates whether assignments where the rhs is null should be
+     *     ignored
+     */
+    public WholeProgramInferenceScenesStorage(boolean ignoreNullAssignments) {
         this.ignoreNullAssignments = ignoreNullAssignments;
     }
 
@@ -119,21 +125,29 @@ public class WholeProgramInferenceScenesHelper {
                                 + e.getMessage(),
                         e);
             } catch (DefException e) {
-                throw new BugInCF(e.getMessage(), e);
+                throw new BugInCF(e);
             }
         }
         modifiedScenes.clear();
     }
 
-    /** Returns the String representing the .jaif path of a class given its name. */
+    /**
+     * Returns the String representing the .jaif path of a class given its name.
+     *
+     * @param className the basename of a class
+     * @return the .jaif file path
+     */
     protected String getJaifPath(String className) {
         String jaifPath = JAIF_FILES_PATH + className + ".jaif";
         return jaifPath;
     }
 
     /**
-     * Returns the Scene stored in a .jaif file path passed as input. If the file does not exist, an
-     * empty Scene is created.
+     * Reads a Scene from the given .jaif file, or returns an empty Scene if the file does not
+     * exist.
+     *
+     * @param jaifPath the .jaif file
+     * @return the Scene read from the file, or an empty Scene if the file does not exist
      */
     protected AScene getScene(String jaifPath) {
         AScene scene;
@@ -172,9 +186,9 @@ public class WholeProgramInferenceScenesHelper {
      *
      * <ul>
      *   <li>If there was no previous annotation for that location, then the updated set will be the
-     *       annotations in newATM.
+     *       annotations in rhsATM.
      *   <li>If there was a previous annotation, the updated set will be the LUB between the
-     *       previous annotation and newATM.
+     *       previous annotation and rhsATM.
      * </ul>
      *
      * @param type ATypeElement of the Scene which will be modified

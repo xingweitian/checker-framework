@@ -12,6 +12,7 @@ import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeParameterElement;
 import javax.lang.model.element.VariableElement;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
 import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedArrayType;
 import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedDeclaredType;
@@ -185,7 +186,7 @@ public class TypeVisualizer {
         }
 
         @Override
-        public boolean equals(Object obj) {
+        public boolean equals(@Nullable Object obj) {
             if (obj == null) {
                 return false;
             }
@@ -254,12 +255,8 @@ public class TypeVisualizer {
                     writer.flush();
                 } catch (IOException e) {
                     throw new BugInCF(
-                            "Exception visualizing type:\n"
-                                    + "file="
-                                    + file
-                                    + "\n"
-                                    + "type="
-                                    + type,
+                            String.format(
+                                    "Exception visualizing type:%nfile=%s%ntype=%s", file, type),
                             e);
                 } finally {
                     if (writer != null) {
@@ -268,7 +265,7 @@ public class TypeVisualizer {
                 }
             } catch (IOException exc) {
                 throw new BugInCF(
-                        "Exception visualizing type:\n" + "file=" + file + "\n" + "type=" + type,
+                        String.format("Exception visualizing type:%nfile=%s%ntype=%s", file, type),
                         exc);
             }
         }
@@ -491,8 +488,7 @@ public class TypeVisualizer {
                     visitAll(type.getThrownTypes());
 
                 } else {
-                    throw new BugInCF(
-                            "Executable types should never be recursive\n" + "type=" + type);
+                    throw new BugInCF("Executable types should never be recursive%ntype=%s", type);
                 }
                 return null;
             }

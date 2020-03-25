@@ -9,9 +9,9 @@ import org.checkerframework.javacutil.Pair;
  * general behaviors of a forward analysis, given a control flow graph and a forward transfer
  * function.
  *
- * @param <V> The abstract value type to be tracked by the analysis
- * @param <S> The store type used in the analysis.
- * @param <T> The forward transfer function type that is used to approximated runtime behavior
+ * @param <V> the abstract value type to be tracked by the analysis
+ * @param <S> the store type used in the analysis
+ * @param <T> the forward transfer function type that is used to approximated runtime behavior
  */
 public interface ForwardAnalysis<
                 V extends AbstractValue<V>,

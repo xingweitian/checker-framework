@@ -93,18 +93,13 @@ abstract class AFReducingVisitor extends AbstractAtmComboVisitor<Void, Set<AFCon
             AnnotatedTypeMirror subtype,
             AnnotatedTypeMirror supertype,
             Set<AFConstraint> constraints) {
-        return "Unexpected "
-                + reducerType.getSimpleName()
-                + " + Combination:\n"
-                + "subtype="
-                + subtype
-                + "\n"
-                + "supertype="
-                + supertype
-                + "\n"
-                + "constraints=[\n"
-                + PluginUtil.join(", ", constraints)
-                + "\n]";
+        return PluginUtil.joinLines(
+                "Unexpected " + reducerType.getSimpleName() + " + Combination:",
+                "subtype=" + subtype,
+                "supertype=" + supertype,
+                "constraints=[",
+                PluginUtil.join(", ", constraints),
+                "]");
     }
 
     // ------------------------------------------------------------------------
@@ -309,7 +304,7 @@ abstract class AFReducingVisitor extends AbstractAtmComboVisitor<Void, Set<AFCon
         // at least one of the intersection bound types must be convertible to the param type
         final AnnotatedDeclaredType subtypeAsParam =
                 AnnotatedTypes.castedAsSuper(typeFactory, subtype, supertype);
-        if (subtypeAsParam != null && !subtypeAsParam.equals(subtype)) {
+        if (subtypeAsParam != null && !subtypeAsParam.equals(supertype)) {
             addConstraint(subtypeAsParam, supertype, constraints);
         }
 

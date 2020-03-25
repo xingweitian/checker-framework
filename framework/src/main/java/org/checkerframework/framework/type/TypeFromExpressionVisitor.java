@@ -27,7 +27,6 @@ import com.sun.source.tree.WildcardTree;
 import java.util.List;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
@@ -37,6 +36,7 @@ import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedExecutab
 import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedWildcardType;
 import org.checkerframework.framework.type.visitor.AnnotatedTypeMerger;
 import org.checkerframework.framework.util.AnnotatedTypes;
+import org.checkerframework.javacutil.BugInCF;
 import org.checkerframework.javacutil.Pair;
 import org.checkerframework.javacutil.TreeUtils;
 
@@ -203,7 +203,9 @@ class TypeFromExpressionVisitor extends TypeFromTreeVisitor {
         }
 
         if (node.getIdentifier().contentEquals("this")) {
-            // TODO: why don't we use getSelfType here?
+            // TODO: Both of these don't work.  See https://tinyurl.com/cfissue/2208
+            // return f.getSelfType(node.getExpression());
+            // return f.getSelfType(node);
             return f.getEnclosingType(
                     (TypeElement) TreeUtils.elementFromTree(node.getExpression()), node);
         } else {
@@ -223,8 +225,17 @@ class TypeFromExpressionVisitor extends TypeFromTreeVisitor {
             f.visitorState.setAssignmentContext(null);
 
             AnnotatedTypeMirror type = f.getAnnotatedType(node.getExpression());
-            assert type instanceof AnnotatedArrayType;
-            return ((AnnotatedArrayType) type).getComponentType();
+            if (type.getKind() == TypeKind.ARRAY) {
+                return ((AnnotatedArrayType) type).getComponentType();
+            } else if (type.getKind() == TypeKind.WILDCARD
+                    && ((AnnotatedWildcardType) type).isUninferredTypeArgument()) {
+                // Clean-up after Issue #979.
+                AnnotatedTypeMirror wcbound = ((AnnotatedWildcardType) type).getExtendsBound();
+                if (wcbound instanceof AnnotatedArrayType) {
+                    return ((AnnotatedArrayType) wcbound).getComponentType();
+                }
+            }
+            throw new BugInCF("Unexpected type: " + type);
         } finally {
             f.visitorState.setAssignmentContext(preAssCtxt);
         }
@@ -307,12 +318,6 @@ class TypeFromExpressionVisitor extends TypeFromTreeVisitor {
         // contains explicit annotations.
         AnnotatedDeclaredType type = f.fromNewClass(node);
 
-        // Enum constructors lead to trouble.
-        // TODO: is there more to check? Can one annotate them?
-        if (isNewEnum(type)) {
-            return type;
-        }
-
         // Add annotations that are on the constructor declaration.
         AnnotatedExecutableType ex = f.constructorFromUse(node).executableType;
         type.addMissingAnnotations(ex.getReturnType().getAnnotations());
@@ -325,10 +330,6 @@ class TypeFromExpressionVisitor extends TypeFromTreeVisitor {
             MethodInvocationTree node, AnnotatedTypeFactory f) {
         AnnotatedExecutableType ex = f.methodFromUse(node).executableType;
         return ex.getReturnType().asUse();
-    }
-
-    private boolean isNewEnum(AnnotatedDeclaredType type) {
-        return type.getUnderlyingType().asElement().getKind() == ElementKind.ENUM;
     }
 
     @Override

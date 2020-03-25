@@ -28,8 +28,8 @@ import org.checkerframework.javacutil.BugInCF;
 import org.checkerframework.javacutil.Pair;
 
 /**
- * An implementation of an iterative algorithm to solve a org.checkerframework.dataflow problem
- * given a control flow graph and a transfer function.
+ * An implementation of a forward analysis to solve a org.checkerframework.dataflow problem given a
+ * control flow graph and a transfer function.
  *
  * @param <V> The abstract value type to be tracked by the analysis
  * @param <S> The store type used in the analysis
@@ -45,7 +45,7 @@ public class ForwardAnalysisImpl<
      * Number of times each block has been analyzed since the last time widening was applied. Null
      * if maxCountBeforeWidening is -1, which implies widening isn't used for this analysis.
      */
-    protected final IdentityHashMap<Block, Integer> blockCount;
+    protected final @Nullable IdentityHashMap<Block, Integer> blockCount;
 
     /**
      * Number of times a block can be analyzed before widening. -1 implies that widening shouldn't
@@ -54,31 +54,38 @@ public class ForwardAnalysisImpl<
     protected final int maxCountBeforeWidening;
 
     /** Then stores before every basic block (assumed to be 'no information' if not present). */
-    protected IdentityHashMap<Block, S> thenStores;
+    protected final IdentityHashMap<Block, S> thenStores;
 
     /** Else stores before every basic block (assumed to be 'no information' if not present). */
-    protected IdentityHashMap<Block, S> elseStores;
+    protected final IdentityHashMap<Block, S> elseStores;
 
     /** The stores after every return statement. */
-    protected IdentityHashMap<ReturnNode, TransferResult<V, S>> storesAtReturnStatements;
+    protected final IdentityHashMap<ReturnNode, TransferResult<V, S>> storesAtReturnStatements;
 
     /**
-     * Construct an object that can perform a org.checkerframework.dataflow analysis over a control
-     * flow graph. The transfer function is set later using {@code setTransferFunction}.
+     * Construct an object that can perform a org.checkerframework.dataflow forward analysis over a
+     * control flow graph. The transfer function is set by the subclass later.
+     *
+     * @param maxCountBeforeWidening number of times a block can be analyzed before widening
      */
     public ForwardAnalysisImpl(int maxCountBeforeWidening) {
         super(Direction.FORWARD);
         this.maxCountBeforeWidening = maxCountBeforeWidening;
         this.blockCount = maxCountBeforeWidening == -1 ? null : new IdentityHashMap<>();
+        this.thenStores = new IdentityHashMap<>();
+        this.elseStores = new IdentityHashMap<>();
+        this.storesAtReturnStatements = new IdentityHashMap<>();
     }
 
     /**
-     * Construct an object that can perform a org.checkerframework.dataflow analysis over a control
-     * flow graph given a transfer function.
+     * Construct an object that can perform a org.checkerframework.dataflow forward analysis over a
+     * control flow graph given a transfer function.
+     *
+     * @param transfer the transfer function
      */
-    public ForwardAnalysisImpl(T transfer) {
+    public ForwardAnalysisImpl(@Nullable T transfer) {
         this(-1);
-        setTransferFunction(transfer);
+        this.transferFunction = transfer;
     }
 
     @Override
@@ -98,13 +105,13 @@ public class ForwardAnalysisImpl<
             }
         } finally {
             assert isRunning;
-            // In case preformatAnalysisHelper crashed, reset isRunning to false.
+            // In case preformatAnalysisBlock crashed, reset isRunning to false.
             isRunning = false;
         }
     }
 
-    /** Perform the actual analysis on one block. */
-    private void performAnalysisBlock(Block b) {
+    @Override
+    public void performAnalysisBlock(Block b) {
         switch (b.getType()) {
             case REGULAR_BLOCK:
                 {
@@ -112,25 +119,25 @@ public class ForwardAnalysisImpl<
 
                     // Apply transfer function to contents
                     TransferInput<V, S> inputBefore = getInputBefore(rb);
-                    assert inputBefore != null;
+                    assert inputBefore != null : "@AssumeAssertion(nullness): invariant";
                     currentInput = inputBefore.copy();
                     Node lastNode = null;
                     boolean addToWorklistAgain = false;
                     for (Node n : rb.getContents()) {
+                        assert currentInput != null : "@AssumeAssertion(nullness): invariant";
                         TransferResult<V, S> transferResult = callTransferFunction(n, currentInput);
                         addToWorklistAgain |= updateNodeValues(n, transferResult);
                         currentInput = new TransferInput<>(n, this, transferResult);
                         lastNode = n;
                     }
+                    assert currentInput != null : "@AssumeAssertion(nullness): invariant";
                     // Loop will run at least once, making transferResult non-null
 
                     // Propagate store to successors
                     Block succ = rb.getSuccessor();
 
-                    if (succ == null) {
-                        throw new BugInCF(
-                                "regular basic block without non-exceptional successor unexpected");
-                    }
+                    assert succ != null
+                            : "@AssumeAssertion(nullness): regular basic block without non-exceptional successor unexpected";
 
                     propagateStoresTo(
                             succ, lastNode, currentInput, rb.getFlowRule(), addToWorklistAgain);
@@ -143,7 +150,7 @@ public class ForwardAnalysisImpl<
 
                     // Apply transfer function to content
                     TransferInput<V, S> inputBefore = getInputBefore(eb);
-                    assert inputBefore != null;
+                    assert inputBefore != null : "@AssumeAssertion(nullness): invariant";
                     currentInput = inputBefore.copy();
                     Node node = eb.getNode();
                     TransferResult<V, S> transferResult = callTransferFunction(node, currentInput);
@@ -193,7 +200,7 @@ public class ForwardAnalysisImpl<
 
                     // Get store before
                     TransferInput<V, S> inputBefore = getInputBefore(cb);
-                    assert inputBefore != null;
+                    assert inputBefore != null : "@AssumeAssertion(nullness): invariant";
                     TransferInput<V, S> input = inputBefore.copy();
 
                     // Propagate store to successor
@@ -212,7 +219,9 @@ public class ForwardAnalysisImpl<
                     SpecialBlock sb = (SpecialBlock) b;
                     Block succ = sb.getSuccessor();
                     if (succ != null) {
-                        propagateStoresTo(succ, null, getInputBefore(b), sb.getFlowRule(), false);
+                        TransferInput<V, S> input = getInputBefore(b);
+                        assert input != null : "@AssumeAssertion(nullness): invariant";
+                        propagateStoresTo(succ, null, input, sb.getFlowRule(), false);
                     }
                     break;
                 }
@@ -231,6 +240,7 @@ public class ForwardAnalysisImpl<
 
     @Override
     public List<Pair<ReturnNode, TransferResult<V, S>>> getReturnStatementStores() {
+        assert cfg != null : "@AssumeAssertion(nullness): invariant";
         List<Pair<ReturnNode, TransferResult<V, S>>> result = new ArrayList<>();
         for (ReturnNode returnNode : cfg.getReturnNodes()) {
             TransferResult<V, S> store = storesAtReturnStatements.get(returnNode);
@@ -247,6 +257,7 @@ public class ForwardAnalysisImpl<
             IdentityHashMap<Node, V> nodeValues,
             Map<TransferInput<V, S>, IdentityHashMap<Node, TransferResult<V, S>>> analysisCaches) {
         Block block = node.getBlock();
+        assert block != null : "@AssumeAssertion(nullness): invariant";
         Node oldCurrentNode = currentNode;
 
         // Prepare cache
@@ -264,6 +275,7 @@ public class ForwardAnalysisImpl<
         // TODO: Understand why the Store of passing node is analysis.currentInput.getRegularStore()
         //  when the analysis is running
         if (isRunning) {
+            assert currentInput != null : "@AssumeAssertion(nullness): invariant";
             return currentInput.getRegularStore();
         }
         setNodeValues(nodeValues);
@@ -277,7 +289,7 @@ public class ForwardAnalysisImpl<
                         // Apply transfer function to contents until
                         // we found the node we are looking for.
                         TransferInput<V, S> store = transferInput;
-                        TransferResult<V, S> transferResult = null;
+                        TransferResult<V, S> transferResult;
                         for (Node n : rb.getContents()) {
                             currentNode = n;
                             if (n == node && before) {
@@ -342,24 +354,25 @@ public class ForwardAnalysisImpl<
 
     @Override
     protected void initFields(ControlFlowGraph cfg) {
-        super.initFields(cfg);
-        thenStores = new IdentityHashMap<>();
-        elseStores = new IdentityHashMap<>();
-        storesAtReturnStatements = new IdentityHashMap<>();
+        thenStores.clear();
+        elseStores.clear();
         if (blockCount != null) {
             blockCount.clear();
         }
-        inputs.clear();
-        nodeValues.clear();
-        finalLocalValues.clear();
+        storesAtReturnStatements.clear();
+        super.initFields(cfg);
     }
 
     @Override
     protected void initInitialInputs() {
+        assert cfg != null : "@AssumeAssertion(nullness): invariant";
         worklist.process(cfg);
-        worklist.add(cfg.getEntryBlock());
+        Block entry = cfg.getEntryBlock();
+        worklist.add(entry);
 
         List<LocalVariableNode> parameters = null;
+        // Why @AssumeAssertion(nullness) at above doesn't work?
+        assert cfg != null : "@AssumeAssertion(nullness): invariant";
         UnderlyingAST underlyingAST = cfg.getUnderlyingAST();
         if (underlyingAST.getKind() == Kind.METHOD) {
             MethodTree tree = ((CFGMethod) underlyingAST).getMethod();
@@ -380,16 +393,13 @@ public class ForwardAnalysisImpl<
                 //  belongs to
             }
         }
+        assert transferFunction != null : "@AssumeAssertion(nullness): invariant";
         S initialStore = transferFunction.initialStore(underlyingAST, parameters);
-        Block entry = cfg.getEntryBlock();
         thenStores.put(entry, initialStore);
         elseStores.put(entry, initialStore);
         inputs.put(entry, new TransferInput<>(null, this, initialStore));
     }
 
-    /**
-     * Call the transfer function for node {@code node}, and set that node as current node first.
-     */
     @Override
     protected TransferResult<V, S> callTransferFunction(Node node, TransferInput<V, S> input) {
         TransferResult<V, S> transferResult = super.callTransferFunction(node, input);
@@ -402,13 +412,10 @@ public class ForwardAnalysisImpl<
         return transferResult;
     }
 
-    /**
-     * Propagate the stores in currentInput to the successor block, succ, according to the flowRule.
-     */
     @Override
     protected void propagateStoresTo(
             Block succ,
-            Node node,
+            @Nullable Node node,
             TransferInput<V, S> currentInput,
             Store.FlowRule flowRule,
             boolean addToWorklistAgain) {
@@ -474,12 +481,20 @@ public class ForwardAnalysisImpl<
     /**
      * Add a store before the basic block {@code b} by merging with the existing stores for that
      * location.
+     *
+     * @param b the basic block
+     * @param node the node of the basic block {@code b}
+     * @param s the store being added
+     * @param kind the kind of store {@code s}
+     * @param addBlockToWorklist whether the basic block {@code b} should be added back to {@code
+     *     Worklist}
      */
     protected void addStoreBefore(
-            Block b, Node node, S s, Store.Kind kind, boolean addBlockToWorklist) {
+            Block b, @Nullable Node node, S s, Store.Kind kind, boolean addBlockToWorklist) {
         S thenStore = getStoreBefore(b, Store.Kind.THEN);
         S elseStore = getStoreBefore(b, Store.Kind.ELSE);
         boolean shouldWiden = false;
+
         if (blockCount != null) {
             Integer count = blockCount.get(b);
             if (count == null) {
@@ -557,7 +572,15 @@ public class ForwardAnalysisImpl<
         }
     }
 
-    private S mergeStores(S newStore, S previousStore, boolean shouldWiden) {
+    /**
+     * Merge two stores, possibly widening the result.
+     *
+     * @param newStore the new Store
+     * @param previousStore the previous Store
+     * @param shouldWiden should widen or not
+     * @return the merged Store
+     */
+    private S mergeStores(S newStore, @Nullable S previousStore, boolean shouldWiden) {
         if (previousStore == null) {
             return newStore;
         } else if (shouldWiden) {
@@ -567,7 +590,13 @@ public class ForwardAnalysisImpl<
         }
     }
 
-    /** @return the store corresponding to the location right before the basic block {@code b}. */
+    /**
+     * Return the store corresponding to the location right before the basic block {@code b}.
+     *
+     * @param b the block
+     * @param kind the kind of store which will be returned
+     * @return the store right before the block {@code b}
+     */
     protected @Nullable S getStoreBefore(Block b, Store.Kind kind) {
         switch (kind) {
             case THEN:
@@ -580,17 +609,13 @@ public class ForwardAnalysisImpl<
     }
 
     /**
-     * @return the transfer input corresponding to the location right before the basic block {@code
-     *     b}.
+     * Return the transfer input corresponding to the location right before the basic block {@code
+     * b}.
+     *
+     * @param b the Block
+     * @return the transfer input right before the block {@code b}
      */
     protected @Nullable TransferInput<V, S> getInputBefore(Block b) {
         return inputs.get(b);
-    }
-
-    /** Set all current node values to the given map. */
-    private void setNodeValues(IdentityHashMap<Node, V> in) {
-        assert !isRunning;
-        nodeValues.clear();
-        nodeValues.putAll(in);
     }
 }

@@ -24,15 +24,19 @@ import org.checkerframework.dataflow.cfg.node.Node;
  * (and modify) the stores contained in the argument passed; the ownership is transferred from the
  * caller to that function.
  *
- * @param <V> The abstract value
- * @param <S> The {@link Store} used to keep track of intermediate results
+ * @param <V> the abstract value type to be tracked by the analysis
+ * @param <S> the store type used in the analysis
  */
 public interface ForwardTransferFunction<V extends AbstractValue<V>, S extends Store<S>>
         extends TransferFunction<V, S> {
 
     /**
-     * @return the initial store to be used by the org.checkerframework.dataflow analysis. {@code
-     *     parameters} is only set if the underlying AST is a method.
+     * Return the initial store to be used by the org.checkerframework.dataflow analysis. {@code
+     * parameters} is only set if the underlying AST is a method.
+     *
+     * @param underlyingAST an abstract syntax tree
+     * @param parameters a list of local variable nodes
+     * @return the initial store
      */
     S initialStore(UnderlyingAST underlyingAST, @Nullable List<LocalVariableNode> parameters);
 }
