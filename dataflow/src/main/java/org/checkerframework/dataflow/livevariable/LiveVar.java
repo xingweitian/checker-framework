@@ -1,5 +1,6 @@
 package org.checkerframework.dataflow.livevariable;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.analysis.AbstractValue;
 import org.checkerframework.dataflow.cfg.node.Node;
 
@@ -29,7 +30,7 @@ public class LiveVar implements AbstractValue<LiveVar> {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
         if (!(obj instanceof LiveVar)) {
             return false;
         }

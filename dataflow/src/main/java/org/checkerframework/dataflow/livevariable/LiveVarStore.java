@@ -2,6 +2,7 @@ package org.checkerframework.dataflow.livevariable;
 
 import java.util.HashSet;
 import java.util.Set;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.analysis.FlowExpressions.Receiver;
 import org.checkerframework.dataflow.analysis.Store;
 import org.checkerframework.dataflow.cfg.CFGVisualizer;
@@ -84,7 +85,7 @@ public class LiveVarStore implements Store<LiveVarStore> {
     }
 
     @Override
-    public boolean equals(Object obj) {
+    public boolean equals(@Nullable Object obj) {
 
         if (!(obj instanceof LiveVarStore)) {
             return false;
@@ -113,10 +114,10 @@ public class LiveVarStore implements Store<LiveVarStore> {
         return new LiveVarStore(liveVarSetLub);
     }
 
-    /** It is not used by backward analysis, so just return null. */
+    /** It should not be called since it is not used by the backward analysis. */
     @Override
     public LiveVarStore widenedUpperBound(LiveVarStore previous) {
-        return null;
+        throw new RuntimeException("wub of LiveVarStore get called!");
     }
 
     @Override
