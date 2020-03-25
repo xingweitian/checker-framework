@@ -18,15 +18,15 @@ import org.checkerframework.dataflow.cfg.node.UnaryOperationNode;
 public class LiveVarStore implements Store<LiveVarStore> {
 
     /** A set of live variables. */
-    private Set<LiveVar> liveVarSet;
+    private final Set<LiveVar> liveVarSet;
 
-    /** The class constructor of LiveVarStore. */
+    /** Create a new LiveVarStore. */
     public LiveVarStore() {
         liveVarSet = new HashSet<>();
     }
 
     /**
-     * The class constructor of LiveVarStore.
+     * Create a new LiveVarStore.
      *
      * @param liveVarSet a set of LiveVar
      */
@@ -35,7 +35,7 @@ public class LiveVarStore implements Store<LiveVarStore> {
     }
 
     /**
-     * Put {@code variable} into {@code liveVarSet}.
+     * Add {@code variable} into {@code liveVarSet}.
      *
      * @param variable a LiveVar
      */
@@ -101,8 +101,7 @@ public class LiveVarStore implements Store<LiveVarStore> {
 
     @Override
     public LiveVarStore copy() {
-        Set<LiveVar> liveVarSetCopy = new HashSet<>();
-        liveVarSetCopy.addAll(liveVarSet);
+        Set<LiveVar> liveVarSetCopy = new HashSet<>(liveVarSet);
         return new LiveVarStore(liveVarSetCopy);
     }
 
@@ -134,7 +133,7 @@ public class LiveVarStore implements Store<LiveVarStore> {
         StringBuilder sbStoreVal = new StringBuilder();
 
         for (LiveVar liveVar : liveVarSet) {
-            sbStoreVal.append(viz.visualizeStoreVal(liveVar.liveNode));
+            sbStoreVal.append(viz.visualizeLiveVarStoreVal(liveVar.liveNode));
         }
 
         return sbStoreVal.toString();

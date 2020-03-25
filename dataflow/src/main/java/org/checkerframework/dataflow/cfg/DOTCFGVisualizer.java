@@ -275,7 +275,7 @@ public class DOTCFGVisualizer<
     }
 
     @Override
-    public String visualizeStoreVal(Object value) {
+    public String visualizeLiveVarStoreVal(Object value) {
         return storeEntryIndent + escapeDoubleQuotes(value);
     }
 

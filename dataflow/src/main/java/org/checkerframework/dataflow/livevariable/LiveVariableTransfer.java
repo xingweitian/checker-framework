@@ -82,6 +82,13 @@ public class LiveVariableTransfer
         return transferResult;
     }
 
+    /**
+     * Update live variable information in an assignment.
+     *
+     * @param variable the variable that should be removed from the store
+     * @param expression the expression that should be added to the store
+     * @param store the live variable store
+     */
     private void processLiveVarInAssignment(Node variable, Node expression, LiveVarStore store) {
         store.killLiveVar(new LiveVar(variable));
         store.addUseInExpression(expression);

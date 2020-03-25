@@ -7,7 +7,7 @@ import org.checkerframework.dataflow.cfg.node.Node;
 public class LiveVar implements AbstractValue<LiveVar> {
 
     /** The live node. */
-    Node liveNode;
+    protected final Node liveNode;
 
     @Override
     public LiveVar leastUpperBound(LiveVar other) {
@@ -15,7 +15,7 @@ public class LiveVar implements AbstractValue<LiveVar> {
     }
 
     /**
-     * The class constructor of LiveVar.
+     * Create a new LiveVar.
      *
      * @param n a Node
      */

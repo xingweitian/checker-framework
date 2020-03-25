@@ -133,13 +133,14 @@ public interface CFGVisualizer<
     String visualizeStoreKeyVal(String keyName, Object value);
 
     /**
-     * Visualize specific information collected according to the specific kind of Store. Currently,
-     * {@code LiveVarStore} uses this method.
+     * Called by {@link
+     * org.checkerframework.dataflow.livevariable.LiveVarStore#visualize(CFGVisualizer)} to
+     * visualize the name of the live variables collected by this Store.
      *
-     * @param value the value of the specific information to be visualized
-     * @return the String representation of the store
+     * @param value the live node to be visualized
+     * @return the String representation of live variables' name
      */
-    String visualizeStoreVal(Object value);
+    String visualizeLiveVarStoreVal(Object value);
 
     /**
      * Called by {@code CFAbstractStore} to visualize any information after the invocation of {@code
