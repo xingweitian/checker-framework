@@ -241,7 +241,7 @@ public class ForwardAnalysisImpl<
     }
 
     @Override
-    public List<Pair<ReturnNode, TransferResult<V, S>>> getReturnStatementStores() {
+    public List<Pair<ReturnNode, @Nullable TransferResult<V, S>>> getReturnStatementStores() {
         assert cfg != null : "@AssumeAssertion(nullness): invariant";
         List<Pair<ReturnNode, @Nullable TransferResult<V, S>>> result = new ArrayList<>();
         for (ReturnNode returnNode : cfg.getReturnNodes()) {

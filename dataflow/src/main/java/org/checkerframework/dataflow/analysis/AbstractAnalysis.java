@@ -165,7 +165,6 @@ public abstract class AbstractAnalysis<
     }
 
     @Override
-    @RequiresNonNull("cfg")
     public AnalysisResult<V, S> getResult() {
         if (isRunning) {
             throw new BugInCF(
@@ -231,7 +230,6 @@ public abstract class AbstractAnalysis<
     }
 
     @Override
-    @RequiresNonNull("cfg")
     public @Nullable S getRegularExitStore() {
         assert cfg != null : "@AssumeAssertion(nullness): invariant";
         SpecialBlock regularExitBlock = cfg.getRegularExitBlock();
@@ -243,7 +241,6 @@ public abstract class AbstractAnalysis<
     }
 
     @Override
-    @RequiresNonNull("cfg")
     public @Nullable S getExceptionalExitStore() {
         assert cfg != null : "@AssumeAssertion(nullness): invariant";
         SpecialBlock exceptionalExitBlock = cfg.getExceptionalExitBlock();
@@ -370,7 +367,6 @@ public abstract class AbstractAnalysis<
      *
      * @param cfg the control flow graph to use
      */
-    @EnsuresNonNull("this.cfg")
     protected final void init(ControlFlowGraph cfg) {
         initFields(cfg);
         initInitialInputs();
@@ -382,6 +378,7 @@ public abstract class AbstractAnalysis<
      *
      * @param cfg a given control flow graph
      */
+    @EnsuresNonNull("this.cfg")
     protected void initFields(ControlFlowGraph cfg) {
         inputs.clear();
         nodeValues.clear();

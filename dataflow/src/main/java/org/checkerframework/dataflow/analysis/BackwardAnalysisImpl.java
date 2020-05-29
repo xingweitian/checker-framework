@@ -99,6 +99,7 @@ public class BackwardAnalysisImpl<
                     RegularBlock rb = (RegularBlock) b;
 
                     TransferInput<V, S> inputAfter = getInput(rb);
+                    assert inputAfter != null : "@AssumeAssertion(nullness): invariant";
                     currentInput = inputAfter.copy();
                     Node firstNode = null;
                     boolean addToWorklistAgain = false;
@@ -134,6 +135,7 @@ public class BackwardAnalysisImpl<
                     ExceptionBlock eb = (ExceptionBlock) b;
 
                     TransferInput<V, S> inputAfter = getInput(eb);
+                    assert inputAfter != null : "@AssumeAssertion(nullness): invariant";
                     currentInput = inputAfter.copy();
                     Node node = eb.getNode();
                     TransferResult<V, S> transferResult = callTransferFunction(node, currentInput);
@@ -159,6 +161,7 @@ public class BackwardAnalysisImpl<
                     ConditionalBlock cb = (ConditionalBlock) b;
 
                     TransferInput<V, S> inputAfter = getInput(cb);
+                    assert inputAfter != null : "@AssumeAssertion(nullness): invariant";
                     TransferInput<V, S> input = inputAfter.copy();
 
                     for (BlockImpl pred : cb.getPredecessors()) {
@@ -179,9 +182,10 @@ public class BackwardAnalysisImpl<
                     } else {
                         assert sType == SpecialBlockType.EXIT
                                 || sType == SpecialBlockType.EXCEPTIONAL_EXIT;
+                        TransferInput<V, S> input = getInput(sb);
+                        assert input != null : "@AssumeAssertion(nullness): invariant";
                         for (BlockImpl pred : sb.getPredecessors()) {
-                            propagateStoresTo(
-                                    pred, null, getInput(sb), FlowRule.EACH_TO_EACH, false);
+                            propagateStoresTo(pred, null, input, FlowRule.EACH_TO_EACH, false);
                         }
                     }
                     break;
@@ -195,7 +199,7 @@ public class BackwardAnalysisImpl<
     }
 
     @Override
-    public TransferInput<V, S> getInput(Block b) {
+    public @Nullable TransferInput<V, S> getInput(Block b) {
         return inputs.get(b);
     }
 
