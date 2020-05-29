@@ -8,6 +8,7 @@ import org.checkerframework.dataflow.analysis.FlowExpressions;
 import org.checkerframework.dataflow.analysis.Store;
 import org.checkerframework.dataflow.analysis.TransferFunction;
 import org.checkerframework.dataflow.cfg.block.Block;
+import org.checkerframework.dataflow.cfg.block.ConditionalBlock;
 import org.checkerframework.dataflow.cfg.block.SpecialBlock;
 import org.checkerframework.dataflow.cfg.node.Node;
 
@@ -159,11 +160,19 @@ public interface CFGVisualizer<
     String visualizeSpecialBlock(SpecialBlock sbb);
 
     /**
+     * Visualize a ConditionalBlock.
+     *
+     * @param cbb the conditional block
+     * @return the String representation of the conditional block
+     */
+    String visualizeConditionalBlock(ConditionalBlock cbb);
+
+    /**
      * Visualize the transferInput before a Block based on the analysis.
      *
      * @param bb the block
      * @param analysis the current analysis
-     * @return the String representations of the transferInput before the given block
+     * @return the String representation of the transferInput before the given block
      */
     String visualizeBlockTransferInputBefore(Block bb, Analysis<A, S, T> analysis);
 
@@ -172,7 +181,7 @@ public interface CFGVisualizer<
      *
      * @param bb the block
      * @param analysis the current analysis
-     * @return the String representations of the transferInput after the given block
+     * @return the String representation of the transferInput after the given block
      */
     String visualizeBlockTransferInputAfter(Block bb, Analysis<A, S, T> analysis);
 

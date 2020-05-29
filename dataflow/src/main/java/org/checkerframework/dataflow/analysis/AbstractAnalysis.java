@@ -11,8 +11,7 @@ import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Set;
 import javax.lang.model.element.Element;
-import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
-import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.checker.nullness.qual.*;
 import org.checkerframework.dataflow.cfg.ControlFlowGraph;
 import org.checkerframework.dataflow.cfg.block.Block;
 import org.checkerframework.dataflow.cfg.block.SpecialBlock;
@@ -45,7 +44,7 @@ public abstract class AbstractAnalysis<
     protected @Nullable T transferFunction;
 
     /** The current control flow graph to perform the analysis on. */
-    protected @Nullable ControlFlowGraph cfg;
+    protected @MonotonicNonNull ControlFlowGraph cfg;
 
     /**
      * The transfer inputs of every basic block (assumed to be 'no information' if not present,
@@ -166,6 +165,7 @@ public abstract class AbstractAnalysis<
     }
 
     @Override
+    @RequiresNonNull("cfg")
     public AnalysisResult<V, S> getResult() {
         if (isRunning) {
             throw new BugInCF(
@@ -231,6 +231,7 @@ public abstract class AbstractAnalysis<
     }
 
     @Override
+    @RequiresNonNull("cfg")
     public @Nullable S getRegularExitStore() {
         assert cfg != null : "@AssumeAssertion(nullness): invariant";
         SpecialBlock regularExitBlock = cfg.getRegularExitBlock();
@@ -242,13 +243,16 @@ public abstract class AbstractAnalysis<
     }
 
     @Override
+    @RequiresNonNull("cfg")
     public @Nullable S getExceptionalExitStore() {
         assert cfg != null : "@AssumeAssertion(nullness): invariant";
         SpecialBlock exceptionalExitBlock = cfg.getExceptionalExitBlock();
         if (inputs.containsKey(exceptionalExitBlock)) {
-            return inputs.get(exceptionalExitBlock).getRegularStore();
+            S exceptionalExitStore = inputs.get(exceptionalExitBlock).getRegularStore();
+            return exceptionalExitStore;
+        } else {
+            return null;
         }
-        return null;
     }
 
     /**
@@ -364,8 +368,9 @@ public abstract class AbstractAnalysis<
     /**
      * Initialize the analysis with a new control flow graph.
      *
-     * @param cfg a given control flow graph
+     * @param cfg the control flow graph to use
      */
+    @EnsuresNonNull("this.cfg")
     protected final void init(ControlFlowGraph cfg) {
         initFields(cfg);
         initInitialInputs();
@@ -444,6 +449,7 @@ public abstract class AbstractAnalysis<
          * forward analysis.
          */
         public class ForwardDFOComparator implements Comparator<Block> {
+            @SuppressWarnings("unboxing.of.nullable")
             @Override
             public int compare(Block b1, Block b2) {
                 return depthFirstOrder.get(b1) - depthFirstOrder.get(b2);
@@ -455,6 +461,7 @@ public abstract class AbstractAnalysis<
          * backward analysis.
          */
         public class BackwardDFOComparator implements Comparator<Block> {
+            @SuppressWarnings("unboxing.of.nullable")
             @Override
             public int compare(Block b1, Block b2) {
                 return depthFirstOrder.get(b2) - depthFirstOrder.get(b1);

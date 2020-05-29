@@ -45,9 +45,11 @@ public class BackwardAnalysisImpl<
     /** The store before the entry block. */
     protected @Nullable S storeAtEntry;
 
+    // `@code`, not `@link`, because dataflow module doesn't depend on framework module.
     /**
      * Construct an object that can perform a org.checkerframework.dataflow backward analysis over a
-     * control flow graph. The transfer function is set by the subclass later.
+     * control flow graph. The transfer function is set by the subclass, e.g., {@code
+     * org.checkerframework.framework.flow.CFAbstractAnalysis}, later.
      */
     public BackwardAnalysisImpl() {
         super(Direction.BACKWARD);
@@ -84,7 +86,7 @@ public class BackwardAnalysisImpl<
             }
         } finally {
             assert isRunning;
-            // In case preformatAnalysisBlock crashed, reset isRunning to false.
+            // In case performAnalysisBlock crashed, reset isRunning to false.
             isRunning = false;
         }
     }

@@ -62,9 +62,11 @@ public class ForwardAnalysisImpl<
     /** The stores after every return statement. */
     protected final IdentityHashMap<ReturnNode, TransferResult<V, S>> storesAtReturnStatements;
 
+    // `@code`, not `@link`, because dataflow module doesn't depend on framework module.
     /**
      * Construct an object that can perform a org.checkerframework.dataflow forward analysis over a
-     * control flow graph. The transfer function is set by the subclass later.
+     * control flow graph. The transfer function is set by the subclass, e.g., {@code
+     * org.checkerframework.framework.flow.CFAbstractAnalysis}, later.
      *
      * @param maxCountBeforeWidening number of times a block can be analyzed before widening
      */
@@ -105,7 +107,7 @@ public class ForwardAnalysisImpl<
             }
         } finally {
             assert isRunning;
-            // In case preformatAnalysisBlock crashed, reset isRunning to false.
+            // In case performAnalysisBlock crashed, reset isRunning to false.
             isRunning = false;
         }
     }
@@ -241,7 +243,7 @@ public class ForwardAnalysisImpl<
     @Override
     public List<Pair<ReturnNode, TransferResult<V, S>>> getReturnStatementStores() {
         assert cfg != null : "@AssumeAssertion(nullness): invariant";
-        List<Pair<ReturnNode, TransferResult<V, S>>> result = new ArrayList<>();
+        List<Pair<ReturnNode, @Nullable TransferResult<V, S>>> result = new ArrayList<>();
         for (ReturnNode returnNode : cfg.getReturnNodes()) {
             TransferResult<V, S> store = storesAtReturnStatements.get(returnNode);
             result.add(Pair.of(returnNode, store));

@@ -11,6 +11,7 @@ import java.util.Queue;
 import java.util.Set;
 import java.util.StringJoiner;
 import javax.lang.model.type.TypeMirror;
+import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.analysis.AbstractValue;
 import org.checkerframework.dataflow.analysis.Analysis;
@@ -185,8 +186,10 @@ public abstract class AbstractCFGVisualizer<
             if (bb.getType() == Block.BlockType.SPECIAL_BLOCK) {
                 sbBlock.append(visualizeSpecialBlock((SpecialBlock) bb));
                 centered = true;
+            } else if (bb.getType() == Block.BlockType.CONDITIONAL_BLOCK) {
+                sbBlock.append(visualizeConditionalBlock((ConditionalBlock) bb));
             } else {
-                return "";
+                sbBlock.append("<empty block>");
             }
         }
 
@@ -243,7 +246,7 @@ public abstract class AbstractCFGVisualizer<
     }
 
     /**
-     * Visualize the transfer input before the block.
+     * Visualize the transfer input before a block.
      *
      * @param bb the block
      * @param analysis the current analysis
@@ -307,7 +310,6 @@ public abstract class AbstractCFGVisualizer<
      */
     protected String visualizeBlockTransferInputAfterHelper(
             Block bb, Analysis<A, S, T> analysis, String escapeString) {
-
         if (analysis == null) {
             throw new BugInCF(
                     "analysis should be non-null when visualizing the transfer input of a block.");
@@ -364,7 +366,7 @@ public abstract class AbstractCFGVisualizer<
             case EXCEPTIONAL_EXIT:
                 return "<exceptional-exit>" + separator;
             default:
-                return "";
+                throw new Error("Unrecognized special block type: " + sbb.getType());
         }
     }
 
@@ -381,7 +383,11 @@ public abstract class AbstractCFGVisualizer<
         int count = 1;
         for (Block b : cfg.getDepthFirstOrderedBlocks()) {
             depthFirstOrder.computeIfAbsent(b, k -> new ArrayList<>());
-            depthFirstOrder.get(b).add(count++);
+            @SuppressWarnings(
+                    "nullness:assignment.type.incompatible") // computeIfAbsent's function doesn't
+            // return null
+            @NonNull List<Integer> blockIds = depthFirstOrder.get(b);
+            blockIds.add(count++);
         }
         return depthFirstOrder;
     }
