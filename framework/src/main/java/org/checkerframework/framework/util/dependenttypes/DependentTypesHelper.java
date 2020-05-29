@@ -35,7 +35,6 @@ import javax.lang.model.type.TypeMirror;
 import org.checkerframework.dataflow.analysis.FlowExpressions;
 import org.checkerframework.dataflow.analysis.FlowExpressions.Receiver;
 import org.checkerframework.framework.qual.JavaExpression;
-import org.checkerframework.framework.source.Result;
 import org.checkerframework.framework.source.SourceChecker;
 import org.checkerframework.framework.type.AnnotatedTypeFactory;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
@@ -53,7 +52,7 @@ import org.checkerframework.javacutil.AnnotationBuilder;
 import org.checkerframework.javacutil.AnnotationUtils;
 import org.checkerframework.javacutil.BugInCF;
 import org.checkerframework.javacutil.ElementUtils;
-import org.checkerframework.javacutil.PluginUtil;
+import org.checkerframework.javacutil.SystemUtil;
 import org.checkerframework.javacutil.TreeUtils;
 
 /**
@@ -711,9 +710,8 @@ public class DependentTypesHelper {
             errorsFormatted.add(dte.format());
         }
         SourceChecker checker = factory.getContext().getChecker();
-        checker.report(
-                Result.failure("expression.unparsable.type.invalid", errorsFormatted.toString()),
-                errorTree);
+        checker.reportError(
+                errorTree, "expression.unparsable.type.invalid", errorsFormatted.toString());
     }
 
     /**
@@ -750,8 +748,8 @@ public class DependentTypesHelper {
             return;
         }
         SourceChecker checker = factory.getContext().getChecker();
-        String error = PluginUtil.joinLines(errors);
-        checker.report(Result.failure("flowexpr.parse.error", error), errorTree);
+        String error = SystemUtil.joinLines(errors);
+        checker.reportError(errorTree, "flowexpr.parse.error", error);
     }
 
     /**

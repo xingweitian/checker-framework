@@ -160,7 +160,7 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
      * Return the abstract value for {@link Node} {@code n}, or {@code null} if no information is
      * available.
      *
-     * @param n the given node
+     * @param n a node
      * @return the abstract value of the given node
      */
     public @Nullable A getValue(Node n) {
@@ -171,7 +171,7 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
      * Return the abstract value for {@link Tree} {@code t}, or {@code null} if no information is
      * available.
      *
-     * @param t the given tree
+     * @param t a tree
      * @return the abstract value of the given tree
      */
     public @Nullable A getValue(Tree t) {
@@ -209,7 +209,7 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
      * Callers of this method should always iterate through the returned set, possibly ignoring all
      * {@code Node}s they are not interested in.
      *
-     * @param tree the given tree
+     * @param tree a tree
      * @return the set of {@link Node}s for a given {@link Tree}
      */
     public @Nullable Set<Node> getNodesForTree(Tree tree) {
@@ -219,18 +219,20 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
     /**
      * Return the corresponding {@link AssignmentNode} for a given {@link UnaryTree}.
      *
-     * @param tree the given unary tree
+     * @param tree a unary tree
      * @return the corresponding assignment node
      */
     public AssignmentNode getAssignForUnaryTree(UnaryTree tree) {
-        assert unaryAssignNodeLookup.containsKey(tree) : tree + " is not in unaryAssignNodeLookup";
+        if (!unaryAssignNodeLookup.containsKey(tree)) {
+            throw new Error(tree + " is not in unaryAssignNodeLookup");
+        }
         return unaryAssignNodeLookup.get(tree);
     }
 
     /**
      * Return the store immediately before a given tree.
      *
-     * @param tree the given tree
+     * @param tree a tree
      * @return the store before the given tree
      */
     public @Nullable S getStoreBefore(Tree tree) {
@@ -253,7 +255,7 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
     /**
      * Return the store immediately before a given node.
      *
-     * @param node the give node
+     * @param node a node
      * @return the store before the given node
      */
     public @Nullable S getStoreBefore(Node node) {
@@ -263,11 +265,13 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
     /**
      * Return the regular store immediately before a given {@link Block}.
      *
-     * @param bb the given block
+     * @param bb a block
      * @return the store right before the given block
      */
     public S getStoreBefore(Block bb) {
         TransferInput<A, S> transferInput = stores.get(bb);
+        assert transferInput != null
+                : "@AssumeAssertion(nullness): transferInput should be non-null";
         AbstractAnalysis<A, S, ?> analysis = transferInput.analysis;
         switch (analysis.getDirection()) {
             case FORWARD:
@@ -306,27 +310,18 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
     /**
      * Return the regular store immediately after a given block.
      *
-     * @param bb the given block
+     * @param bb a block
      * @return the store after the given block
      */
     public S getStoreAfter(Block bb) {
         TransferInput<A, S> transferInput = stores.get(bb);
+        assert transferInput != null
+                : "@AssumeAssertion(nullness): transferInput should be non-null";
         AbstractAnalysis<A, S, ?> analysis = transferInput.analysis;
         switch (analysis.getDirection()) {
             case FORWARD:
                 {
-                    Node lastNode;
-                    switch (bb.getType()) {
-                        case REGULAR_BLOCK:
-                            List<Node> blockContents = ((RegularBlock) bb).getContents();
-                            lastNode = blockContents.get(blockContents.size() - 1);
-                            break;
-                        case EXCEPTION_BLOCK:
-                            lastNode = ((ExceptionBlock) bb).getNode();
-                            break;
-                        default:
-                            lastNode = null;
-                    }
+                    Node lastNode = getLastNode(bb);
                     if (lastNode == null) {
                         // This block doesn't contains any node, return store in transfer input
                         return transferInput.getRegularStore();
@@ -348,9 +343,30 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
     }
 
     /**
+     * Returns the last node of a block, or null if none.
+     *
+     * @param bb the block
+     * @return the last node of this block or {@code null}
+     */
+    protected @Nullable Node getLastNode(Block bb) {
+        switch (bb.getType()) {
+            case REGULAR_BLOCK:
+                List<Node> blockContents = ((RegularBlock) bb).getContents();
+                return blockContents.get(blockContents.size() - 1);
+            case CONDITIONAL_BLOCK:
+            case SPECIAL_BLOCK:
+                return null;
+            case EXCEPTION_BLOCK:
+                return ((ExceptionBlock) bb).getNode();
+            default:
+                throw new Error("Unrecognized block type: " + bb.getType());
+        }
+    }
+
+    /**
      * Return the store immediately after a given tree.
      *
-     * @param tree the given tree
+     * @param tree a tree
      * @return the store after the given tree
      */
     public @Nullable S getStoreAfter(Tree tree) {
@@ -373,7 +389,7 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
     /**
      * Return the store immediately after a given node.
      *
-     * @param node the given node
+     * @param node a node
      * @return the store after the given node
      */
     public @Nullable S getStoreAfter(Node node) {

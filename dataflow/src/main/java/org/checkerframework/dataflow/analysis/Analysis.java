@@ -59,10 +59,10 @@ public interface Analysis<
     void performAnalysisBlock(Block b);
 
     /**
-     * Get the analysis result of this analysis. Should only be called after the analysis has been
-     * performed.
+     * The result of running the analysis. This is only available once the analysis finished
+     * running.
      *
-     * @return the result of a org.checkerframework.dataflow analysis
+     * @return the result of running the analysis
      */
     AnalysisResult<V, S> getResult();
 

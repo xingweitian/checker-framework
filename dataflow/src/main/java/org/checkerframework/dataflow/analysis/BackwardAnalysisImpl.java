@@ -45,9 +45,11 @@ public class BackwardAnalysisImpl<
     /** The store before the entry block. */
     protected @Nullable S storeAtEntry;
 
+    // `@code`, not `@link`, because dataflow module doesn't depend on framework module.
     /**
      * Construct an object that can perform a org.checkerframework.dataflow backward analysis over a
-     * control flow graph. The transfer function is set by the subclass later.
+     * control flow graph. The transfer function is set by the subclass, e.g., {@code
+     * org.checkerframework.framework.flow.CFAbstractAnalysis}, later.
      */
     public BackwardAnalysisImpl() {
         super(Direction.BACKWARD);
@@ -84,7 +86,7 @@ public class BackwardAnalysisImpl<
             }
         } finally {
             assert isRunning;
-            // In case preformatAnalysisBlock crashed, reset isRunning to false.
+            // In case performAnalysisBlock crashed, reset isRunning to false.
             isRunning = false;
         }
     }
@@ -97,6 +99,7 @@ public class BackwardAnalysisImpl<
                     RegularBlock rb = (RegularBlock) b;
 
                     TransferInput<V, S> inputAfter = getInput(rb);
+                    assert inputAfter != null : "@AssumeAssertion(nullness): invariant";
                     currentInput = inputAfter.copy();
                     Node firstNode = null;
                     boolean addToWorklistAgain = false;
@@ -132,6 +135,7 @@ public class BackwardAnalysisImpl<
                     ExceptionBlock eb = (ExceptionBlock) b;
 
                     TransferInput<V, S> inputAfter = getInput(eb);
+                    assert inputAfter != null : "@AssumeAssertion(nullness): invariant";
                     currentInput = inputAfter.copy();
                     Node node = eb.getNode();
                     TransferResult<V, S> transferResult = callTransferFunction(node, currentInput);
@@ -157,6 +161,7 @@ public class BackwardAnalysisImpl<
                     ConditionalBlock cb = (ConditionalBlock) b;
 
                     TransferInput<V, S> inputAfter = getInput(cb);
+                    assert inputAfter != null : "@AssumeAssertion(nullness): invariant";
                     TransferInput<V, S> input = inputAfter.copy();
 
                     for (BlockImpl pred : cb.getPredecessors()) {
@@ -177,9 +182,10 @@ public class BackwardAnalysisImpl<
                     } else {
                         assert sType == SpecialBlockType.EXIT
                                 || sType == SpecialBlockType.EXCEPTIONAL_EXIT;
+                        TransferInput<V, S> input = getInput(sb);
+                        assert input != null : "@AssumeAssertion(nullness): invariant";
                         for (BlockImpl pred : sb.getPredecessors()) {
-                            propagateStoresTo(
-                                    pred, null, getInput(sb), FlowRule.EACH_TO_EACH, false);
+                            propagateStoresTo(pred, null, input, FlowRule.EACH_TO_EACH, false);
                         }
                     }
                     break;
@@ -193,7 +199,7 @@ public class BackwardAnalysisImpl<
     }
 
     @Override
-    public TransferInput<V, S> getInput(Block b) {
+    public @Nullable TransferInput<V, S> getInput(Block b) {
         return inputs.get(b);
     }
 

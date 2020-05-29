@@ -1,6 +1,7 @@
 package org.checkerframework.dataflow.analysis;
 
 import java.util.List;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.cfg.node.ReturnNode;
 import org.checkerframework.javacutil.Pair;
 
@@ -27,5 +28,5 @@ public interface ForwardAnalysis<
      * @return a list of {@code Pair} which each {@code Pair} is a {@link ReturnNode} and its
      *     corresponding {@link TransferResult}
      */
-    List<Pair<ReturnNode, TransferResult<V, S>>> getReturnStatementStores();
+    List<Pair<ReturnNode, @Nullable TransferResult<V, S>>> getReturnStatementStores();
 }
