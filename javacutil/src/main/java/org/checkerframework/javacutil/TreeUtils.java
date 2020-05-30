@@ -434,6 +434,15 @@ public final class TreeUtils {
                 TreePath grandParentPath = parentPath.getParentPath();
                 if (grandParentPath != null
                         && grandParentPath.getLeaf() instanceof MethodInvocationTree) {
+                    MethodInvocationTree grandTree =
+                            (MethodInvocationTree) grandParentPath.getLeaf();
+
+                    // adapted from TypeArgInferenceUtil#assignedTo to be consistent
+                    if (grandTree.getMethodSelect() instanceof MemberSelectTree
+                            && ((MemberSelectTree) grandTree.getMethodSelect()).getExpression()
+                                    == treePath.getLeaf()) {
+                        return null;
+                    }
                     return grandParentPath.getLeaf();
                 } else {
                     return null;
