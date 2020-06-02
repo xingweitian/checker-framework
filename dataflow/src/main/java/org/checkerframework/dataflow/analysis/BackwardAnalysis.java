@@ -4,8 +4,7 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.cfg.block.SpecialBlock;
 
 /**
- * General dataflow backward analysis interface. This sub-interface of {@link Analysis} defines the
- * general behaviors of a backward analysis, given a control flow graph and a backward transfer
+ * This interface defines a backward analysis, given a control flow graph and a backward transfer
  * function.
  *
  * @param <V> The abstract value type to be tracked by the analysis

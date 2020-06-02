@@ -22,7 +22,8 @@ import org.checkerframework.javacutil.BugInCF;
 import org.checkerframework.javacutil.ElementUtils;
 
 /**
- * Common code base for {@link BackwardAnalysis} and {@link ForwardAnalysis}.
+ * Implementation of common features for {@link BackwardAnalysisImpl} and {@link
+ * ForwardAnalysisImpl}.
  *
  * @param <V> the abstract value type to be tracked by the analysis
  * @param <S> the store type used in the analysis
@@ -99,7 +100,8 @@ public abstract class AbstractAnalysis<
     }
 
     /**
-     * Common code base for {@link BackwardAnalysis} and {@link ForwardAnalysis}.
+     * Implementation of common features for {@link BackwardAnalysisImpl} and {@link
+     * ForwardAnalysisImpl}.
      *
      * @param direction direction of the analysis
      */
@@ -196,9 +198,6 @@ public abstract class AbstractAnalysis<
             // Check that 'n' is a subnode of 'node'. Check immediate operands
             // first for efficiency.
             assert !n.isLValue() : "Did not expect an lvalue, but got " + n;
-
-            // Check that 'n' is a subnode of 'node'. Check immediate operands
-            // first for efficiency.
             if (currentNode == n
                     || (!currentNode.getOperands().contains(n)
                             && !currentNode.getTransitiveOperands().contains(n))) {

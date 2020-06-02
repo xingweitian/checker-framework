@@ -6,8 +6,7 @@ import org.checkerframework.dataflow.cfg.node.ReturnNode;
 import org.checkerframework.javacutil.Pair;
 
 /**
- * General dataflow forward analysis interface. This sub-interface of {@link Analysis} defines the
- * general behaviors of a forward analysis, given a control flow graph and a forward transfer
+ * This interface defines a forward analysis, given a control flow graph and a forward transfer
  * function.
  *
  * @param <V> the abstract value type to be tracked by the analysis
@@ -22,11 +21,10 @@ public interface ForwardAnalysis<
 
     /**
      * Get stores at return statements. These stores are transfer results at return node. Thus for a
-     * forward analysis, these stores contains the analyzed flow information from entry nodes to
+     * forward analysis, these stores contain the analyzed flow information from entry nodes to
      * return nodes.
      *
-     * @return a list of {@code Pair} which each {@code Pair} is a {@link ReturnNode} and its
-     *     corresponding {@link TransferResult}
+     * @return the transfer results for each return node in the CFG
      */
     List<Pair<ReturnNode, @Nullable TransferResult<V, S>>> getReturnStatementStores();
 }

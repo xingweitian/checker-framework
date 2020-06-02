@@ -275,35 +275,29 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
         AbstractAnalysis<A, S, ?> analysis = transferInput.analysis;
         switch (analysis.getDirection()) {
             case FORWARD:
-                {
+                return transferInput.getRegularStore();
+            case BACKWARD:
+                Node firstNode;
+                switch (bb.getType()) {
+                    case REGULAR_BLOCK:
+                        firstNode = ((RegularBlock) bb).getContents().get(0);
+                        break;
+                    case EXCEPTION_BLOCK:
+                        firstNode = ((ExceptionBlock) bb).getNode();
+                        break;
+                    default:
+                        firstNode = null;
+                }
+                if (firstNode == null) {
+                    // This block doesn't contains any node, return store in transfer input
                     return transferInput.getRegularStore();
                 }
-            case BACKWARD:
-                {
-                    Node firstNode;
-                    switch (bb.getType()) {
-                        case REGULAR_BLOCK:
-                            firstNode = ((RegularBlock) bb).getContents().get(0);
-                            break;
-                        case EXCEPTION_BLOCK:
-                            firstNode = ((ExceptionBlock) bb).getNode();
-                            break;
-                        default:
-                            firstNode = null;
-                    }
-                    if (firstNode == null) {
-                        // This block doesn't contains any node, return store in transfer input
-                        return transferInput.getRegularStore();
-                    }
-                    return analysis.runAnalysisFor(
-                            firstNode, true, transferInput, nodeValues, analysisCaches);
-                }
+                return analysis.runAnalysisFor(
+                        firstNode, true, transferInput, nodeValues, analysisCaches);
             default:
-                {
-                    throw new BugInCF(
-                            "AnalysisResult::getStoreAfter: unknown direction: "
-                                    + analysis.getDirection());
-                }
+                throw new BugInCF(
+                        "AnalysisResult::getStoreBefore: unknown direction: "
+                                + analysis.getDirection());
         }
     }
 

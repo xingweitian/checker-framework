@@ -260,7 +260,7 @@ public abstract class AbstractCFGVisualizer<
 
         if (analysis == null) {
             throw new BugInCF(
-                    "analysis should be non-null when visualizing the transfer input of a block.");
+                    "analysis must be non-null when visualizing the transfer input of a block.");
         }
 
         S regularStore;

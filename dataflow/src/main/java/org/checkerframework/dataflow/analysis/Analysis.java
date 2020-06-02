@@ -6,11 +6,10 @@ import org.checkerframework.dataflow.cfg.block.Block;
 import org.checkerframework.dataflow.cfg.node.Node;
 
 /**
- * General Dataflow Analysis Interface. This interface defines general behaviors of a data-flow
- * analysis, given a control flow graph and a transfer function. A data-flow analysis should only
- * has one direction, either forward or backward. The direction of corresponding transfer function
- * should be consistent with the analysis, i.e. a forward analysis should be given a forward
- * transfer function, and a backward analysis should be given a backward transfer function.
+ * This interface defines a dataflow analysis, given a control flow graph and a backward transfer
+ * function. A dataflow analysis has a direction, either forward or backward. The direction of
+ * corresponding transfer function is consistent with the analysis, i.e. a forward analysis has a
+ * forward transfer function, and a backward analysis has a backward transfer function.
  *
  * @param <V> the abstract value type to be tracked by the analysis
  * @param <S> the store type used in the analysis
@@ -19,10 +18,7 @@ import org.checkerframework.dataflow.cfg.node.Node;
 public interface Analysis<
         V extends AbstractValue<V>, S extends Store<S>, T extends TransferFunction<V, S>> {
 
-    /**
-     * The direction of an analysis instance. An analysis could either be a forward analysis with
-     * FORWARD direction, or a backward analysis with BACKWARD direction.
-     */
+    /** The direction of an analysis instance. */
     enum Direction {
         /** The forward direction. */
         FORWARD,
@@ -38,9 +34,9 @@ public interface Analysis<
     Direction getDirection();
 
     /**
-     * Get the status of the analysis that whether it is currently running.
+     * Is the analysis currently running?
      *
-     * @return true if the analysis is running currently
+     * @return true if the analysis is running currently, else false
      */
     boolean isRunning();
 
@@ -54,7 +50,7 @@ public interface Analysis<
     /**
      * Perform the actual analysis on one block.
      *
-     * @param b the block being analyzed
+     * @param b the block to analyze
      */
     void performAnalysisBlock(Block b);
 

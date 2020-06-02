@@ -42,7 +42,7 @@ public class BackwardAnalysisImpl<
      */
     protected final IdentityHashMap<ExceptionBlock, S> exceptionStores;
 
-    /** The store before the entry block. */
+    /** The store right before the entry block. */
     protected @Nullable S storeAtEntry;
 
     // `@code`, not `@link`, because dataflow module doesn't depend on framework module.
@@ -73,7 +73,7 @@ public class BackwardAnalysisImpl<
     public void performAnalysis(ControlFlowGraph cfg) {
         if (isRunning) {
             throw new BugInCF(
-                    "BackwardAnalysisImpl::performAnalysis() doesn't expected get called when analysis is running!");
+                    "BackwardAnalysisImpl::performAnalysis() shouldn't be called when the analysis is running.");
         }
         isRunning = true;
 
@@ -240,7 +240,7 @@ public class BackwardAnalysisImpl<
         // exceptionExitBlock and regularExitBlock will always be non-null, as
         // CFGBuilder#CFGTranslationPhaseTwo#process() will always create these two exit blocks on a
         // CFG whether it has exit blocks or not according to the underlying AST.
-        // Here the workaround is using the inner protected Map in Worklist to decide whether a
+        // Here the workaround is using the inner protected Map in worklist to decide whether a
         // given cfg has a regularExitBlock and/or an exceptionExitBlock
         if (worklist.depthFirstOrder.get(regularExitBlock) != null) {
             worklist.add(regularExitBlock);
@@ -262,7 +262,7 @@ public class BackwardAnalysisImpl<
 
         if (inputs.isEmpty() || outStores.isEmpty()) {
             throw new BugInCF(
-                    "BackwardAnalysisImpl::initInitialInputs() should has at least one input and outStore at beginning");
+                    "BackwardAnalysisImpl::initInitialInputs() should has at least one input and outStore at beginning.");
         }
     }
 
