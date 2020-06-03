@@ -2023,15 +2023,8 @@ public class AnnotatedTypeFactory implements AnnotationProvider {
     public ParameterizedExecutableType methodFromUse(
             ExpressionTree tree, ExecutableElement methodElt, AnnotatedTypeMirror receiverType) {
 
-        AnnotatedExecutableType memberType = getAnnotatedType(methodElt); // get unsubstituted type
-
-        methodFromUsePreSubstitution(tree, memberType);
-        if (viewpointAdapter != null) {
-            viewpointAdapter.viewpointAdaptMethod(receiverType, methodElt, memberType);
-        }
-
         AnnotatedExecutableType methodType =
-                AnnotatedTypes.asMemberOf(types, this, receiverType, methodElt, memberType);
+                AnnotatedTypes.asMemberOf(types, this, receiverType, methodElt);
         List<AnnotatedTypeMirror> typeargs = new ArrayList<>(methodType.getTypeVariables().size());
 
         Map<TypeVariable, AnnotatedTypeMirror> typeVarMapping =
@@ -2062,17 +2055,6 @@ public class AnnotatedTypeFactory implements AnnotationProvider {
         }
 
         return new ParameterizedExecutableType(methodType, typeargs);
-    }
-
-    /**
-     * A callback method for the AnnotatedTypeFactory subtypes to customize the handling of the
-     * declared method type before type variable substitution.
-     *
-     * @param tree either a method invocation or a member reference tree
-     * @param type declared method type before type variable substitution
-     */
-    protected void methodFromUsePreSubstitution(ExpressionTree tree, AnnotatedExecutableType type) {
-        assert tree instanceof MethodInvocationTree || tree instanceof MemberReferenceTree;
     }
 
     /**
@@ -2165,15 +2147,7 @@ public class AnnotatedTypeFactory implements AnnotationProvider {
         ExecutableElement ctor = TreeUtils.constructor(tree);
         AnnotatedTypeMirror type = fromNewClass(tree);
         addComputedTypeAnnotations(tree, type);
-
-        AnnotatedExecutableType con = getAnnotatedType(ctor); // get unsubstituted type
-
-        constructorFromUsePreSubstitution(tree, con);
-        if (viewpointAdapter != null) {
-            viewpointAdapter.viewpointAdaptConstructor(type, ctor, con);
-        }
-
-        con = AnnotatedTypes.asMemberOf(types, this, type, ctor, con);
+        AnnotatedExecutableType con = AnnotatedTypes.asMemberOf(types, this, type, ctor);
 
         if (tree.getArguments().size() == con.getParameterTypes().size() + 1
                 && isSyntheticArgument(tree.getArguments().get(0))) {
@@ -2199,22 +2173,7 @@ public class AnnotatedTypeFactory implements AnnotationProvider {
         return new ParameterizedExecutableType(con, typeargs);
     }
 
-    /**
-     * A callback method for the AnnotatedTypeFactory subtypes to customize the handling of the
-     * declared constructor type before type variable substitution.
-     *
-     * @param tree a NewClassTree from constructorFromUse()
-     * @param type declared method type before type variable substitution
-     */
-    protected void constructorFromUsePreSubstitution(
-            NewClassTree tree, AnnotatedExecutableType type) {}
-
-    /**
-     * Returns the return type of the method {@code m}.
-     *
-     * @param m a tree of method
-     * @return the return type of the method
-     */
+    /** Returns the return type of the method {@code m}. */
     public AnnotatedTypeMirror getMethodReturnType(MethodTree m) {
         AnnotatedExecutableType methodType = getAnnotatedType(m);
         AnnotatedTypeMirror ret = methodType.getReturnType();

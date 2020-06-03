@@ -308,46 +308,13 @@ public class AnnotatedTypes {
         return asSuper(atypeFactory, type, superType);
     }
 
-    /**
-     * Specialization of {@link #asMemberOf(Types, AnnotatedTypeFactory, AnnotatedTypeMirror,
-     * Element)} with more precise return type.
-     *
-     * @see #asMemberOf(Types, AnnotatedTypeFactory, AnnotatedTypeMirror, Element)
-     * @param types the Types instance to use
-     * @param atypeFactory the type factory to use
-     * @param t the receiver type
-     * @param elem the element that should be viewed as member of t
-     * @return the type of elem as member of t
-     */
+    /** @see #asMemberOf(Types, AnnotatedTypeFactory, AnnotatedTypeMirror, Element) */
     public static AnnotatedExecutableType asMemberOf(
             Types types,
             AnnotatedTypeFactory atypeFactory,
             AnnotatedTypeMirror t,
             ExecutableElement elem) {
         return (AnnotatedExecutableType) asMemberOf(types, atypeFactory, t, (Element) elem);
-    }
-
-    /**
-     * Specialization of {@link #asMemberOf(Types, AnnotatedTypeFactory, AnnotatedTypeMirror,
-     * Element, AnnotatedTypeMirror)} with more precise return type.
-     *
-     * @see #asMemberOf(Types, AnnotatedTypeFactory, AnnotatedTypeMirror, Element,
-     *     AnnotatedTypeMirror)
-     * @param types the Types instance to use
-     * @param atypeFactory the type factory to use
-     * @param t the receiver type
-     * @param elem the element that should be viewed as member of t
-     * @param type unsubstituted type of member
-     * @return the type of member as member of of, with initial type memberType; can be an alias to
-     *     memberType
-     */
-    public static AnnotatedExecutableType asMemberOf(
-            Types types,
-            AnnotatedTypeFactory atypeFactory,
-            AnnotatedTypeMirror t,
-            ExecutableElement elem,
-            AnnotatedExecutableType type) {
-        return (AnnotatedExecutableType) asMemberOf(types, atypeFactory, t, (Element) elem, type);
     }
 
     /**
@@ -359,7 +326,7 @@ public class AnnotatedTypes {
      * {@code @NonNull String}.
      *
      * <p>The result is customized according to the type system semantics, according to {@link
-     * AnnotatedTypeFactory#postAsMemberOf(AnnotatedTypeMirror, AnnotatedTypeMirror, Element)}.
+     * AnnotatedTypeFactory#postAsMemberOf( AnnotatedTypeMirror, AnnotatedTypeMirror, Element)}.
      *
      * <p>Note that this method does not currently return (top level) captured types for type
      * parameters, parameters, and return types. Instead, the original wildcard is returned, or
@@ -370,38 +337,11 @@ public class AnnotatedTypes {
      * where captures should appear (like type arguments). This should just involve the bounds of
      * the wildcard where the bounds of the capture would have been used.
      *
-     * @param types the Types instance to use
-     * @param atypeFactory the type factory to use
-     * @param t the receiver type
-     * @param elem the element that should be viewed as member of t
-     * @return the type of elem as member of t
+     * @param t a type
+     * @param elem an element
      */
     public static AnnotatedTypeMirror asMemberOf(
             Types types, AnnotatedTypeFactory atypeFactory, AnnotatedTypeMirror t, Element elem) {
-        final AnnotatedTypeMirror memberType = atypeFactory.getAnnotatedType(elem);
-        return asMemberOf(types, atypeFactory, t, elem, memberType);
-    }
-
-    /**
-     * Returns the type of an element when that element is viewed as a member of, or otherwise
-     * directly contained by, a given type. An initial type for the member is provided, to allow for
-     * earlier changes to the declared type of elem. For example, polymorphic qualifiers must be
-     * substituted before type variables are substituted.
-     *
-     * @param types the Types instance to use
-     * @param atypeFactory the type factory to use
-     * @param t the receiver type
-     * @param elem the element that should be viewed as member of t
-     * @param elemType unsubstituted type of elem
-     * @return the type of elem as member of t
-     * @see #asMemberOf(Types, AnnotatedTypeFactory, AnnotatedTypeMirror, Element)
-     */
-    public static AnnotatedTypeMirror asMemberOf(
-            Types types,
-            AnnotatedTypeFactory atypeFactory,
-            AnnotatedTypeMirror t,
-            Element elem,
-            AnnotatedTypeMirror elemType) {
         // asMemberOf is only for fields, variables, and methods!
         // Otherwise, simply use fromElement.
         switch (elem.getKind()) {
@@ -410,34 +350,23 @@ public class AnnotatedTypes {
             case OTHER:
             case STATIC_INIT:
             case TYPE_PARAMETER:
-                return elemType;
+                return atypeFactory.fromElement(elem);
             default:
-                AnnotatedTypeMirror res = asMemberOfImpl(types, atypeFactory, t, elem, elemType);
+                AnnotatedTypeMirror type = asMemberOfImpl(types, atypeFactory, t, elem);
                 if (!ElementUtils.isStatic(elem)) {
-                    atypeFactory.postAsMemberOf(res, t, elem);
+                    atypeFactory.postAsMemberOf(type, t, elem);
                 }
-                return res;
+                return type;
         }
     }
 
-    /**
-     * Helper for {@link AnnotatedTypes#asMemberOf(Types, AnnotatedTypeFactory, AnnotatedTypeMirror,
-     * Element)}.
-     *
-     * @param types the Types instance to use
-     * @param atypeFactory the type factory to use
-     * @param of the receiver type
-     * @param member the element that should be viewed as member of of
-     * @param memberType unsubstituted type of member
-     * @return the type of member as member of of, with initial type memberType; can be an alias to
-     *     memberType
-     */
     private static AnnotatedTypeMirror asMemberOfImpl(
             final Types types,
             final AnnotatedTypeFactory atypeFactory,
             final AnnotatedTypeMirror of,
-            final Element member,
-            final AnnotatedTypeMirror memberType) {
+            final Element member) {
+        AnnotatedTypeMirror memberType = atypeFactory.getAnnotatedType(member);
+
         if (ElementUtils.isStatic(member)) {
             return memberType;
         }
@@ -452,11 +381,7 @@ public class AnnotatedTypes {
                 return memberType;
             case TYPEVAR:
                 return asMemberOf(
-                        types,
-                        atypeFactory,
-                        ((AnnotatedTypeVariable) of).getUpperBound(),
-                        member,
-                        memberType);
+                        types, atypeFactory, ((AnnotatedTypeVariable) of).getUpperBound(), member);
             case WILDCARD:
                 if (((AnnotatedWildcardType) of).isUninferredTypeArgument()) {
                     return substituteUninferredTypeArgs(atypeFactory, member, memberType);
@@ -465,15 +390,15 @@ public class AnnotatedTypes {
                         types,
                         atypeFactory,
                         ((AnnotatedWildcardType) of).getExtendsBound().deepCopy(),
-                        member,
-                        memberType);
+                        member);
             case INTERSECTION:
-                AnnotatedTypeMirror iter = memberType;
                 for (AnnotatedDeclaredType superType :
                         ((AnnotatedIntersectionType) of).directSuperTypes()) {
-                    iter = substituteTypeVariables(types, atypeFactory, superType, member, iter);
+                    memberType =
+                            substituteTypeVariables(
+                                    types, atypeFactory, superType, member, memberType);
                 }
-                return iter;
+                return memberType;
             case UNION:
             case DECLARED:
                 return substituteTypeVariables(types, atypeFactory, of, member, memberType);
