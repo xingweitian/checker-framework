@@ -276,7 +276,7 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
         TransferInput<A, S> transferInput = stores.get(bb);
         assert transferInput != null
                 : "@AssumeAssertion(nullness): transferInput should be non-null";
-        AbstractAnalysis<A, S, ?> analysis = transferInput.analysis;
+        Analysis<A, S, ?> analysis = transferInput.analysis;
         switch (analysis.getDirection()) {
             case FORWARD:
                 return transferInput.getRegularStore();
@@ -315,7 +315,7 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
         TransferInput<A, S> transferInput = stores.get(bb);
         assert transferInput != null
                 : "@AssumeAssertion(nullness): transferInput should be non-null";
-        AbstractAnalysis<A, S, ?> analysis = transferInput.analysis;
+        Analysis<A, S, ?> analysis = transferInput.analysis;
         switch (analysis.getDirection()) {
             case FORWARD:
                 {

@@ -51,7 +51,7 @@ public class TransferInput<A extends AbstractValue<A>, S extends Store<S>> {
     protected final @Nullable S elseStore;
 
     /** The corresponding analysis class to get intermediate flow results. */
-    protected final AbstractAnalysis<A, S, ?> analysis;
+    protected final Analysis<A, S, ?> analysis;
 
     /**
      * Create a {@link TransferInput}, given a {@link TransferResult} and a node-value mapping.
@@ -67,7 +67,7 @@ public class TransferInput<A extends AbstractValue<A>, S extends Store<S>> {
      * @param analysis the corresponding analysis class to get intermediate flow results
      * @param to the transfer result where stores will be stored internally
      */
-    public TransferInput(Node n, AbstractAnalysis<A, S, ?> analysis, TransferResult<A, S> to) {
+    public TransferInput(Node n, Analysis<A, S, ?> analysis, TransferResult<A, S> to) {
         node = n;
         this.analysis = analysis;
         if (to.containsTwoStores()) {
@@ -93,7 +93,7 @@ public class TransferInput<A extends AbstractValue<A>, S extends Store<S>> {
      * @param analysis the corresponding analysis class to get intermediate flow results
      * @param s the store which will be stored internally
      */
-    public TransferInput(@Nullable Node n, AbstractAnalysis<A, S, ?> analysis, S s) {
+    public TransferInput(@Nullable Node n, Analysis<A, S, ?> analysis, S s) {
         node = n;
         this.analysis = analysis;
         store = s;
@@ -111,7 +111,7 @@ public class TransferInput<A extends AbstractValue<A>, S extends Store<S>> {
      * @param s1 the store which will be stored internally
      * @param s2 the store which will be stored internally
      */
-    public TransferInput(@Nullable Node n, AbstractAnalysis<A, S, ?> analysis, S s1, S s2) {
+    public TransferInput(@Nullable Node n, Analysis<A, S, ?> analysis, S s1, S s2) {
         node = n;
         this.analysis = analysis;
         thenStore = s1;

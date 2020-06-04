@@ -133,29 +133,6 @@ public abstract class AbstractAnalysis<
             Store.FlowRule flowRule,
             boolean addToWorklistAgain);
 
-    /**
-     * Runs the analysis again within the block of {@code node} and returns the store at the
-     * location of {@code node}. If {@code before} is true, then the store immediately before the
-     * {@link Node} {@code node} is returned. Otherwise, the store after {@code node} is returned.
-     * If {@code analysisCaches} is not null, this method uses a cache. {@code analysisCaches} is a
-     * map of a block of node to the cached analysis result. If the cache for {@code transferInput}
-     * is not in {@code analysisCaches}, this method create new cache and store it in {@code
-     * analysisCaches}. The cache is a map of a node to the analysis result of the node.
-     *
-     * @param node the node to analyze
-     * @param before the boolean value to indicate which store to return
-     * @param transferInput the transfer input of the block of this node
-     * @param nodeValues abstract values of nodes
-     * @param analysisCaches caches of analysis results
-     * @return the store at the location of node after running the analysis
-     */
-    protected abstract S runAnalysisFor(
-            Node node,
-            boolean before,
-            TransferInput<V, S> transferInput,
-            IdentityHashMap<Node, V> nodeValues,
-            Map<TransferInput<V, S>, IdentityHashMap<Node, TransferResult<V, S>>> analysisCaches);
-
     @Override
     public boolean isRunning() {
         return isRunning;
