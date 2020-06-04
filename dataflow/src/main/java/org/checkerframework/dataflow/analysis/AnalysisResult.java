@@ -157,22 +157,26 @@ public class AnalysisResult<A extends AbstractValue<A>, S extends Store<S>> {
     }
 
     /**
-     * Return the abstract value for {@link Node} {@code n}, or {@code null} if no information is
-     * available.
+     * Returns the abstract value for {@link Node} {@code n}, or {@code null} if no information is
+     * available. Note that if the analysis has not finished yet, this value might not represent the
+     * final value for this node.
      *
      * @param n a node
-     * @return the abstract value of the given node
+     * @return the abstract value for {@link Node} {@code n}, or {@code null} if no information is
+     *     available
      */
     public @Nullable A getValue(Node n) {
         return nodeValues.get(n);
     }
 
     /**
-     * Return the abstract value for {@link Tree} {@code t}, or {@code null} if no information is
-     * available.
+     * Returns the abstract value for {@link Tree} {@code t}, or {@code null} if no information is
+     * available. Note that if the analysis has not finished yet, this value might not represent the
+     * final value for this node.
      *
      * @param t a tree
-     * @return the abstract value of the given tree
+     * @return the abstract value for {@link Tree} {@code t}, or {@code null} if no information is
+     *     available
      */
     public @Nullable A getValue(Tree t) {
         Set<Node> nodes = treeLookup.get(t);

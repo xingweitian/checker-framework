@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import javax.lang.model.type.TypeMirror;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -169,7 +168,7 @@ public class ForwardAnalysisImpl<
                     }
 
                     // Propagate store to exceptional successors
-                    for (Entry<TypeMirror, Set<Block>> e :
+                    for (Map.Entry<TypeMirror, Set<Block>> e :
                             eb.getExceptionalSuccessors().entrySet()) {
                         TypeMirror cause = e.getKey();
                         S exceptionalStore = transferResult.getExceptionalStore(cause);
@@ -597,7 +596,7 @@ public class ForwardAnalysisImpl<
      *
      * @param b the block
      * @param kind the kind of store which will be returned
-     * @return the store right before the block {@code b}
+     * @return the store corresponding to the location right before the basic block {@code b}
      */
     protected @Nullable S getStoreBefore(Block b, Store.Kind kind) {
         switch (kind) {
@@ -615,7 +614,8 @@ public class ForwardAnalysisImpl<
      * b}.
      *
      * @param b the Block
-     * @return the transfer input right before the block {@code b}
+     * @return the transfer input corresponding to the location right before the basic block {@code
+     *     b}
      */
     protected @Nullable TransferInput<V, S> getInputBefore(Block b) {
         return inputs.get(b);

@@ -501,6 +501,8 @@ public abstract class AbstractAnalysis<
         }
 
         /**
+         * See {@link PriorityQueue#isEmpty}.
+         *
          * @see PriorityQueue#isEmpty
          * @return true if {@link #queue} is empty else false
          */
@@ -530,6 +532,8 @@ public abstract class AbstractAnalysis<
         }
 
         /**
+         * See {@link PriorityQueue#poll}.
+         *
          * @see PriorityQueue#poll
          * @return the head of {@link #queue}
          */

@@ -78,25 +78,29 @@ public interface Analysis<
     @Nullable TransferInput<V, S> getInput(Block b);
 
     /**
+     * Returns the abstract value for {@link Node} {@code n}, or {@code null} if no information is
+     * available. Note that if the analysis has not finished yet, this value might not represent the
+     * final value for this node.
+     *
      * @param n a {@link Node}
      * @return the abstract value for {@link Node} {@code n}, or {@code null} if no information is
-     *     available. Note that if the analysis has not finished yet, this value might not represent
-     *     the final value for this node.
+     *     available
      */
     @Nullable V getValue(Node n);
 
     /**
-     * Get the regular exit store of this analysis.
+     * Returns the regular exit store, or {@code null}, if there is no such store (because the
+     * method cannot exit through the regular exit block).
      *
-     * @return the regular exit store, or {@code null} if there is no such store (because the method
-     *     cannot exit through the regular exit block).
+     * @return the regular exit store, or {@code null}, if there is no such store (because the
+     *     method cannot exit through the regular exit block)
      */
     @Nullable S getRegularExitStore();
 
     /**
-     * Get the exceptional exit store of this analysis.
+     * Returns the exceptional exit store.
      *
-     * @return the exceptional exit store, or {@code null} if there is no such store
+     * @return the exceptional exit store
      */
     @Nullable S getExceptionalExitStore();
 }
