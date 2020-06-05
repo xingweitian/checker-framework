@@ -147,7 +147,7 @@ public abstract class AbstractAnalysis<
     public AnalysisResult<V, S> getResult() {
         if (isRunning) {
             throw new BugInCF(
-                    "AbstractAnalysis::getResult() should not be called when analysis is running.");
+                    "AbstractAnalysis::getResult() shouldn't be called when the analysis is running.");
         }
         assert cfg != null : "@AssumeAssertion(nullness): invariant";
         return new AnalysisResult<>(
@@ -180,7 +180,7 @@ public abstract class AbstractAnalysis<
                             && !currentNode.getTransitiveOperands().contains(n))) {
                 return null;
             }
-            return nodeValues.get(n);
+            // fall through when the current node is not 'n', and 'n' is not a subnode.
         }
         return nodeValues.get(n);
     }

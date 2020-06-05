@@ -93,7 +93,7 @@ public class ForwardAnalysisImpl<
     public void performAnalysis(ControlFlowGraph cfg) {
         if (isRunning) {
             throw new BugInCF(
-                    "ForwardAnalysisImpl::performAnalysis() doesn't expected get called when analysis is running!");
+                    "ForwardAnalysisImpl::performAnalysis() shouldn't be called when the analysis is running.");
         }
         isRunning = true;
 

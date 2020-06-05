@@ -1,7 +1,6 @@
 package org.checkerframework.dataflow.analysis;
 
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.dataflow.cfg.block.SpecialBlock;
 
 /**
  * This interface defines a backward analysis, given a control flow graph and a backward transfer
@@ -18,9 +17,8 @@ public interface BackwardAnalysis<
         extends Analysis<V, S, T> {
 
     /**
-     * Get the output store at the entry block of a given CFG. Since the entry block is a {@link
-     * SpecialBlock}, for a backward analysis, the output store contains the analyzed flow
-     * information from exit blocks to entry block.
+     * Get the output store at the entry block of a given CFG. For a backward analysis, the output
+     * store contain the analyzed flow information from exit block to entry block.
      *
      * @return the output store at the entry block of a given CFG
      */

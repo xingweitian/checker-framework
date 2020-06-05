@@ -7,8 +7,8 @@ import org.checkerframework.dataflow.cfg.node.Node;
 import org.checkerframework.dataflow.cfg.node.ReturnNode;
 
 /**
- * General interface of a backward transfer function for the abstract interpretation used for the
- * backward flow analysis.
+ * Interface of a backward transfer function for the abstract interpretation used for the backward
+ * flow analysis.
  *
  * <p>A backward transfer function consists of the following components:
  *
@@ -23,7 +23,7 @@ import org.checkerframework.dataflow.cfg.node.ReturnNode;
  * </ul>
  *
  * <p><em>Important</em>: The individual transfer functions ( {@code visit*}) are allowed to use
- * (and modify) the stores contained in the argument passed; the ownership is transfered from the
+ * (and modify) the stores contained in the argument passed; the ownership is transferred from the
  * caller to that function.
  *
  * @param <V> the abstract value type to be tracked by the analysis
