@@ -286,7 +286,6 @@ public class ForwardAnalysisImpl<
                 case REGULAR_BLOCK:
                     {
                         RegularBlock rb = (RegularBlock) block;
-
                         // Apply transfer function to contents until
                         // we found the node we are looking for.
                         TransferInput<V, S> store = transferInput;
@@ -315,11 +314,9 @@ public class ForwardAnalysisImpl<
                         throw new BugInCF(
                                 "ForwardAnalysisImpl::runAnalysisFor() this point should never be reached!");
                     }
-
                 case EXCEPTION_BLOCK:
                     {
                         ExceptionBlock eb = (ExceptionBlock) block;
-
                         // Apply transfer function to content
                         if (eb.getNode() != node) {
                             throw new BugInCF(
@@ -329,24 +326,20 @@ public class ForwardAnalysisImpl<
                                             + "\teBlock.getNode(): "
                                             + eb.getNode());
                         }
-
                         if (before) {
                             return transferInput.getRegularStore();
                         }
-
                         currentNode = node;
                         TransferResult<V, S> transferResult =
                                 callTransferFunction(node, transferInput);
                         return transferResult.getRegularStore();
                     }
-
                 default:
                     // Only regular blocks and exceptional blocks can hold nodes.
                     throw new BugInCF(
                             "ForwardAnalysisImpl::runAnalysisFor() unexpected block type: "
                                     + block.getType());
             }
-
         } finally {
             currentNode = oldCurrentNode;
             isRunning = false;
@@ -370,9 +363,7 @@ public class ForwardAnalysisImpl<
         worklist.process(cfg);
         Block entry = cfg.getEntryBlock();
         worklist.add(entry);
-
         List<LocalVariableNode> parameters = null;
-        // Why @AssumeAssertion(nullness) at above doesn't work?
         assert cfg != null : "@AssumeAssertion(nullness): invariant";
         UnderlyingAST underlyingAST = cfg.getUnderlyingAST();
         if (underlyingAST.getKind() == Kind.METHOD) {
@@ -381,8 +372,7 @@ public class ForwardAnalysisImpl<
             for (VariableTree p : tree.getParameters()) {
                 LocalVariableNode var = new LocalVariableNode(p);
                 parameters.add(var);
-                // TODO: document that LocalVariableNode has no block that it
-                //  belongs to
+                // TODO: document that LocalVariableNode has no block that it belongs to
             }
         } else if (underlyingAST.getKind() == Kind.LAMBDA) {
             LambdaExpressionTree lambda = ((CFGLambda) underlyingAST).getLambdaTree();
@@ -390,8 +380,7 @@ public class ForwardAnalysisImpl<
             for (VariableTree p : lambda.getParameters()) {
                 LocalVariableNode var = new LocalVariableNode(p);
                 parameters.add(var);
-                // TODO: document that LocalVariableNode has no block that it
-                //  belongs to
+                // TODO: document that LocalVariableNode has no block that it belongs to
             }
         }
         assert transferFunction != null : "@AssumeAssertion(nullness): invariant";

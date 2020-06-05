@@ -19,7 +19,7 @@ public interface BackwardAnalysis<
 
     /**
      * Get the output store at the entry block of a given CFG. Since the entry block is a {@link
-     * SpecialBlock}, for a backward analysis, the output store should contains the analyzed flow
+     * SpecialBlock}, for a backward analysis, the output store contains the analyzed flow
      * information from exit blocks to entry block.
      *
      * @return the output store at the entry block of a given CFG

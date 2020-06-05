@@ -76,10 +76,8 @@ public class BackwardAnalysisImpl<
                     "BackwardAnalysisImpl::performAnalysis() shouldn't be called when the analysis is running.");
         }
         isRunning = true;
-
         try {
             init(cfg);
-
             while (!worklist.isEmpty()) {
                 Block b = worklist.poll();
                 performAnalysisBlock(b);
@@ -97,16 +95,13 @@ public class BackwardAnalysisImpl<
             case REGULAR_BLOCK:
                 {
                     RegularBlock rb = (RegularBlock) b;
-
                     TransferInput<V, S> inputAfter = getInput(rb);
                     assert inputAfter != null : "@AssumeAssertion(nullness): invariant";
                     currentInput = inputAfter.copy();
                     Node firstNode = null;
                     boolean addToWorklistAgain = false;
-
                     List<Node> nodeList = rb.getContents();
                     ListIterator<Node> reverseIter = nodeList.listIterator(nodeList.size());
-
                     while (reverseIter.hasPrevious()) {
                         Node node = reverseIter.previous();
                         assert currentInput != null : "@AssumeAssertion(nullness): invariant";
@@ -116,7 +111,6 @@ public class BackwardAnalysisImpl<
                         currentInput = new TransferInput<>(node, this, transferResult);
                         firstNode = node;
                     }
-
                     // Propagate store to predecessors
                     for (BlockImpl pred : rb.getPredecessors()) {
                         assert currentInput != null : "@AssumeAssertion(nullness): invariant";
@@ -129,18 +123,15 @@ public class BackwardAnalysisImpl<
                     }
                     break;
                 }
-
             case EXCEPTION_BLOCK:
                 {
                     ExceptionBlock eb = (ExceptionBlock) b;
-
                     TransferInput<V, S> inputAfter = getInput(eb);
                     assert inputAfter != null : "@AssumeAssertion(nullness): invariant";
                     currentInput = inputAfter.copy();
                     Node node = eb.getNode();
                     TransferResult<V, S> transferResult = callTransferFunction(node, currentInput);
                     boolean addToWorklistAgain = updateNodeValues(node, transferResult);
-
                     // Merge transferResult with exceptionStore if exist one
                     S exceptionStore = exceptionStores.get(eb);
                     S mergedStore =
@@ -149,27 +140,22 @@ public class BackwardAnalysisImpl<
                                             .getRegularStore()
                                             .leastUpperBound(exceptionStore)
                                     : transferResult.getRegularStore();
-
                     for (BlockImpl pred : eb.getPredecessors()) {
                         addStoreAfter(pred, node, mergedStore, addToWorklistAgain);
                     }
                     break;
                 }
-
             case CONDITIONAL_BLOCK:
                 {
                     ConditionalBlock cb = (ConditionalBlock) b;
-
                     TransferInput<V, S> inputAfter = getInput(cb);
                     assert inputAfter != null : "@AssumeAssertion(nullness): invariant";
                     TransferInput<V, S> input = inputAfter.copy();
-
                     for (BlockImpl pred : cb.getPredecessors()) {
                         propagateStoresTo(pred, null, input, FlowRule.EACH_TO_EACH, false);
                     }
                     break;
                 }
-
             case SPECIAL_BLOCK:
                 {
                     // Special basic blocks are empty and cannot throw exceptions,
@@ -190,7 +176,6 @@ public class BackwardAnalysisImpl<
                     }
                     break;
                 }
-
             default:
                 throw new BugInCF(
                         "BackwardAnalysisImpl::performAnalysis() unexpected block type: "
@@ -223,20 +208,16 @@ public class BackwardAnalysisImpl<
         worklist.process(cfg);
         SpecialBlock regularExitBlock = cfg.getRegularExitBlock();
         SpecialBlock exceptionExitBlock = cfg.getExceptionalExitBlock();
-
         if (worklist.depthFirstOrder.get(regularExitBlock) == null
                 && worklist.depthFirstOrder.get(exceptionExitBlock) == null) {
             throw new BugInCF(
                     "regularExitBlock and exceptionExitBlock should never both be null at the same time.");
         }
-
         UnderlyingAST underlyingAST = cfg.getUnderlyingAST();
         List<ReturnNode> returnNodes = cfg.getReturnNodes();
-
         assert transferFunction != null : "@AssumeAssertion(nullness): invariant";
         S normalInitialStore = transferFunction.initialNormalExitStore(underlyingAST, returnNodes);
         S exceptionalInitialStore = transferFunction.initialExceptionalExitStore(underlyingAST);
-
         // exceptionExitBlock and regularExitBlock will always be non-null, as
         // CFGBuilder#CFGTranslationPhaseTwo#process() will always create these two exit blocks on a
         // CFG whether it has exit blocks or not according to the underlying AST.
@@ -247,19 +228,16 @@ public class BackwardAnalysisImpl<
             inputs.put(regularExitBlock, new TransferInput<>(null, this, normalInitialStore));
             outStores.put(regularExitBlock, normalInitialStore);
         }
-
         if (worklist.depthFirstOrder.get(exceptionExitBlock) != null) {
             worklist.add(exceptionExitBlock);
             inputs.put(
                     exceptionExitBlock, new TransferInput<>(null, this, exceptionalInitialStore));
             outStores.put(exceptionExitBlock, exceptionalInitialStore);
         }
-
         if (worklist.isEmpty()) {
             throw new BugInCF(
                     "BackwardAnalysisImpl::initInitialInputs() worklist should has at least one exit block as start point.");
         }
-
         if (inputs.isEmpty() || outStores.isEmpty()) {
             throw new BugInCF(
                     "BackwardAnalysisImpl::initInitialInputs() should has at least one input and outStore at beginning.");
@@ -302,19 +280,12 @@ public class BackwardAnalysisImpl<
             if (succBlock != null && block != null && succBlock.getId() == block.getId()) {
                 // If the block of passing node is an exceptional successor of Block {@code pred},
                 // propagate store to the {@code exceptionStores}
-
                 // Currently it doesn't track the label of an exceptional edge from Exception Block
-                // to
-                // its exceptional successors in backward direction, instead, all exception stores
-                // of
-                // exceptional successors of an Exception Block will merge to one exception store at
-                // the
-                // Exception Block
-
+                // to its exceptional successors in backward direction, instead, all exception
+                // stores of exceptional successors of an Exception Block will merge to one
+                // exception store at the Exception Block
                 ExceptionBlock ebPred = (ExceptionBlock) pred;
-
                 S exceptionStore = exceptionStores.get(ebPred);
-
                 S newExceptionStore =
                         (exceptionStore != null) ? exceptionStore.leastUpperBound(s) : s;
                 if (!newExceptionStore.equals(exceptionStore)) {
@@ -324,16 +295,13 @@ public class BackwardAnalysisImpl<
             }
         } else {
             S predOutStore = getStoreAfter(pred);
-
             S newPredOutStore = (predOutStore != null) ? predOutStore.leastUpperBound(s) : s;
-
             if (!newPredOutStore.equals(predOutStore)) {
                 outStores.put(pred, newPredOutStore);
                 inputs.put(pred, new TransferInput<>(node, this, newPredOutStore));
                 addBlockToWorklist = true;
             }
         }
-
         if (addBlockToWorklist) {
             addToWorklist(pred);
         }
@@ -359,28 +327,23 @@ public class BackwardAnalysisImpl<
         Block block = node.getBlock();
         assert block != null : "@AssumeAssertion(nullness): invariant";
         Node oldCurrentNode = currentNode;
-
         // TODO: Understand why the Store of passing node is analysis.currentInput.getRegularStore()
         // when the analysis is running
         if (isRunning) {
             assert currentInput != null : "@AssumeAssertion(nullness): invariant";
             return currentInput.getRegularStore();
         }
-
         isRunning = true;
         try {
             switch (block.getType()) {
                 case REGULAR_BLOCK:
                     {
                         RegularBlock rBlock = (RegularBlock) block;
-
                         // Apply transfer function to contents until we found the node we are
                         // looking for.
                         TransferInput<V, S> store = transferInput;
-
                         List<Node> nodeList = rBlock.getContents();
                         ListIterator<Node> reverseIter = nodeList.listIterator(nodeList.size());
-
                         while (reverseIter.hasPrevious()) {
                             Node n = reverseIter.previous();
                             currentNode = n;
@@ -398,11 +361,9 @@ public class BackwardAnalysisImpl<
                         throw new BugInCF(
                                 "BackwardAnalysisImpl::runAnalysisFor() This point should never be reached!");
                     }
-
                 case EXCEPTION_BLOCK:
                     {
                         ExceptionBlock eBlock = (ExceptionBlock) block;
-
                         if (eBlock.getNode() != node) {
                             throw new BugInCF(
                                     "BackwardAnalysisImpl::runAnalysisFor() it is expected node is equal to the node"
@@ -411,24 +372,20 @@ public class BackwardAnalysisImpl<
                                             + "\teBlock.getNode(): "
                                             + eBlock.getNode());
                         }
-
                         if (!before) {
                             return transferInput.getRegularStore();
                         }
-
                         currentNode = node;
                         TransferResult<V, S> transferResult =
                                 callTransferFunction(node, transferInput);
-
                         // Merge transfer result with the exception store of this exceptional block
                         S exceptionStore = exceptionStores.get(eBlock);
                         return exceptionStore == null
                                 ? transferResult.getRegularStore()
                                 : transferResult.getRegularStore().leastUpperBound(exceptionStore);
                     }
-
-                    // Only regular blocks and exceptional blocks can hold nodes.
                 default:
+                    // Only regular blocks and exceptional blocks can hold nodes.
                     throw new BugInCF(
                             "BackwardAnalysisImpl::runAnalysisFor() unexpected block type: "
                                     + block.getType());
