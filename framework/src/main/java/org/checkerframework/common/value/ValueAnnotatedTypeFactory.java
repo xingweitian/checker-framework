@@ -2316,6 +2316,35 @@ public class ValueAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
     public AnnotatedTypeMirror getDummyAssignedTo(ExpressionTree expressionTree) {
         TypeMirror type = TreeUtils.typeOf(expressionTree);
         if (type.getKind() != TypeKind.VOID) {
+            TreePath pathToExpression = getPath(expressionTree);
+            // if the assignment context exists but not usable by type inference, return upper bound
+            if (pathToExpression != null
+                    && TreeUtils.getAssignmentContext(pathToExpression, true) == null
+                    && TreeUtils.getAssignmentContext(pathToExpression) != null) {
+                Tree grandTree = pathToExpression.getParentPath().getParentPath().getLeaf();
+                if (grandTree instanceof MethodInvocationTree) {
+                    ExecutableElement methodElt =
+                            TreeUtils.elementFromUse((MethodInvocationTree) grandTree);
+                    AnnotatedTypeMirror.AnnotatedDeclaredType declReceiverType =
+                            getAnnotatedType(methodElt).getReceiverType();
+                    if (declReceiverType != null) {
+                        ArrayList<AnnotatedTypeMirror> typeVarUpperBounds =
+                                new ArrayList<>(declReceiverType.getTypeArguments().size());
+                        for (AnnotatedTypeMirror tv : declReceiverType.getTypeArguments()) {
+                            if (tv instanceof AnnotatedTypeMirror.AnnotatedTypeVariable) {
+                                typeVarUpperBounds.add(
+                                        ((AnnotatedTypeMirror.AnnotatedTypeVariable) tv)
+                                                .getUpperBound());
+                            }
+                        }
+                        declReceiverType.setTypeArguments(
+                                Collections.unmodifiableList(typeVarUpperBounds));
+                    }
+
+                    return declReceiverType;
+                }
+                //                return null;
+            }
             AnnotatedTypeMirror atm = type(expressionTree);
             addDefaultAnnotations(atm);
             return atm;

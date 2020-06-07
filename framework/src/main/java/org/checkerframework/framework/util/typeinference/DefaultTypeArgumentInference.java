@@ -139,7 +139,7 @@ public class DefaultTypeArgumentInference implements TypeArgumentInference {
         if (TreeUtils.enclosingNonParen(pathToExpression).first.getKind()
                         == Tree.Kind.LAMBDA_EXPRESSION
                 || (assignedTo == null
-                        && TreeUtils.getAssignmentContext(pathToExpression) != null)) {
+                        && TreeUtils.getAssignmentContext(pathToExpression, true) != null)) {
             // If the type of the assignment context isn't found, but the expression is assigned,
             // then don't attempt to infer type arguments, because the Java type inferred will be
             // incorrect.  The assignment type is null when it includes uninferred type arguments.

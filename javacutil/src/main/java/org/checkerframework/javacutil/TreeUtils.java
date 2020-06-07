@@ -53,7 +53,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
@@ -393,9 +392,13 @@ public final class TreeUtils {
      *
      * <p>Otherwise, null is returned.
      *
+     * @param treePath the tree path
+     * @param extendedResult if extended result is needed. Current extended result: pseudo
+     *     assignment of method invocation receiver
      * @return the assignment context as described, {@code null} otherwise
      */
-    public static @Nullable Tree getAssignmentContext(final TreePath treePath) {
+    public static @Nullable Tree getAssignmentContext(
+            final TreePath treePath, boolean extendedResult) {
         TreePath parentPath = treePath.getParentPath();
 
         if (parentPath == null) {
@@ -423,8 +426,12 @@ public final class TreeUtils {
             case VARIABLE:
                 return parent;
             case MEMBER_SELECT:
+                // since :javacutil:checkWorkingNullness seems not support assertion and living
+                // variable inference, assign to a local variable to pass the test
+                Element parentEle = TreeUtils.elementFromTree(parent);
+
                 // Don't process method().field
-                if (Objects.requireNonNull(TreeUtils.elementFromTree(parent)).getKind().isField()) {
+                if (parentEle != null && parentEle.getKind().isField()) {
                     return null;
                 }
                 // Also check case when treepath's leaf tree is used as method
@@ -434,14 +441,17 @@ public final class TreeUtils {
                 TreePath grandParentPath = parentPath.getParentPath();
                 if (grandParentPath != null
                         && grandParentPath.getLeaf() instanceof MethodInvocationTree) {
-                    MethodInvocationTree grandTree =
-                            (MethodInvocationTree) grandParentPath.getLeaf();
 
-                    // adapted from TypeArgInferenceUtil#assignedTo to be consistent
-                    if (grandTree.getMethodSelect() instanceof MemberSelectTree
-                            && ((MemberSelectTree) grandTree.getMethodSelect()).getExpression()
-                                    == treePath.getLeaf()) {
-                        return null;
+                    if (extendedResult) {
+                        MethodInvocationTree grandTree =
+                                (MethodInvocationTree) grandParentPath.getLeaf();
+
+                        // adapted from TypeArgInferenceUtil#assignedTo to be consistent
+                        if (grandTree.getMethodSelect() instanceof MemberSelectTree
+                                && ((MemberSelectTree) grandTree.getMethodSelect()).getExpression()
+                                        == treePath.getLeaf()) {
+                            return null;
+                        }
                     }
                     return grandParentPath.getLeaf();
                 } else {
@@ -456,6 +466,16 @@ public final class TreeUtils {
                 }
                 return null;
         }
+    }
+
+    /**
+     * See {@code getAssignmentContext}. Not using extended result.
+     *
+     * @param treePath the tree path
+     * @return the assignment context as described, {@code null} otherwise
+     */
+    public static @Nullable Tree getAssignmentContext(final TreePath treePath) {
+        return getAssignmentContext(treePath, false);
     }
 
     /**
