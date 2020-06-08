@@ -98,7 +98,7 @@ public abstract class AbstractViewpointAdapter implements ViewpointAdapter {
             ExecutableElement constructorElt,
             AnnotatedExecutableType constructorType) {
 
-        AnnotatedExecutableType declConstructorType = atypeFactory.getAnnotatedType(constructorElt);
+        AnnotatedExecutableType declConstructorType = constructorType.deepCopy();
 
         // For constructors, we adapt parameter types, return type and type parameters
         List<AnnotatedTypeMirror> parameterTypes = declConstructorType.getParameterTypes();
@@ -135,7 +135,7 @@ public abstract class AbstractViewpointAdapter implements ViewpointAdapter {
             return;
         }
 
-        AnnotatedExecutableType declMethodType = atypeFactory.getAnnotatedType(methodElt);
+        AnnotatedExecutableType declMethodType = methodType.deepCopy();
 
         // For methods, we additionally adapt method receiver compared to constructors
         List<AnnotatedTypeMirror> parameterTypes = declMethodType.getParameterTypes();
