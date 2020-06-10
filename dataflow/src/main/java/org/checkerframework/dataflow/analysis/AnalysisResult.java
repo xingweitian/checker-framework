@@ -166,9 +166,6 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
      * @return the abstract value for {@link Node} {@code n}, or {@code null} if no information is
      *     available Returns the abstract value for {@link Node} {@code n}, or {@code null} if no
      *     information is available.
-     * @param n a node
-     * @return the abstract value for {@link Node} {@code n}, or {@code null} if no information is
-     *     available
      */
     public @Nullable V getValue(Node n) {
         return nodeValues.get(n);
