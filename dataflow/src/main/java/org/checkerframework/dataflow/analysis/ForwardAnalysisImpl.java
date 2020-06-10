@@ -28,11 +28,11 @@ import org.checkerframework.javacutil.Pair;
 
 /**
  * An implementation of a forward analysis to solve a org.checkerframework.dataflow problem given a
- * control flow graph and a transfer function.
+ * control flow graph and a forward transfer function.
  *
- * @param <V> The abstract value type to be tracked by the analysis
- * @param <S> The store type used in the analysis
- * @param <T> The transfer function type that is used to approximated runtime behavior
+ * @param <V> the abstract value type to be tracked by the analysis
+ * @param <S> the store type used in the analysis
+ * @param <T> the transfer function type that is used to approximate runtime behavior
  */
 public class ForwardAnalysisImpl<
                 V extends AbstractValue<V>,
@@ -99,7 +99,6 @@ public class ForwardAnalysisImpl<
 
         try {
             init(cfg);
-
             while (!worklist.isEmpty()) {
                 Block b = worklist.poll();
                 performAnalysisBlock(b);
@@ -117,7 +116,6 @@ public class ForwardAnalysisImpl<
             case REGULAR_BLOCK:
                 {
                     RegularBlock rb = (RegularBlock) b;
-
                     // Apply transfer function to contents
                     TransferInput<V, S> inputBefore = getInputBefore(rb);
                     assert inputBefore != null : "@AssumeAssertion(nullness): invariant";
@@ -133,22 +131,17 @@ public class ForwardAnalysisImpl<
                     }
                     assert currentInput != null : "@AssumeAssertion(nullness): invariant";
                     // Loop will run at least once, making transferResult non-null
-
                     // Propagate store to successors
                     Block succ = rb.getSuccessor();
-
                     assert succ != null
                             : "@AssumeAssertion(nullness): regular basic block without non-exceptional successor unexpected";
-
                     propagateStoresTo(
                             succ, lastNode, currentInput, rb.getFlowRule(), addToWorklistAgain);
                     break;
                 }
-
             case EXCEPTION_BLOCK:
                 {
                     ExceptionBlock eb = (ExceptionBlock) b;
-
                     // Apply transfer function to content
                     TransferInput<V, S> inputBefore = getInputBefore(eb);
                     assert inputBefore != null : "@AssumeAssertion(nullness): invariant";
@@ -156,7 +149,6 @@ public class ForwardAnalysisImpl<
                     Node node = eb.getNode();
                     TransferResult<V, S> transferResult = callTransferFunction(node, currentInput);
                     boolean addToWorklistAgain = updateNodeValues(node, transferResult);
-
                     // Propagate store to successor
                     Block succ = eb.getSuccessor();
                     if (succ != null) {
@@ -166,7 +158,6 @@ public class ForwardAnalysisImpl<
                         propagateStoresTo(
                                 succ, node, currentInput, eb.getFlowRule(), addToWorklistAgain);
                     }
-
                     // Propagate store to exceptional successors
                     for (Map.Entry<TypeMirror, Set<Block>> e :
                             eb.getExceptionalSuccessors().entrySet()) {
@@ -194,25 +185,20 @@ public class ForwardAnalysisImpl<
                     }
                     break;
                 }
-
             case CONDITIONAL_BLOCK:
                 {
                     ConditionalBlock cb = (ConditionalBlock) b;
-
                     // Get store before
                     TransferInput<V, S> inputBefore = getInputBefore(cb);
                     assert inputBefore != null : "@AssumeAssertion(nullness): invariant";
                     TransferInput<V, S> input = inputBefore.copy();
-
                     // Propagate store to successor
                     Block thenSucc = cb.getThenSuccessor();
                     Block elseSucc = cb.getElseSuccessor();
-
                     propagateStoresTo(thenSucc, null, input, cb.getThenFlowRule(), false);
                     propagateStoresTo(elseSucc, null, input, cb.getElseFlowRule(), false);
                     break;
                 }
-
             case SPECIAL_BLOCK:
                 {
                     // Special basic blocks are empty and cannot throw exceptions,
@@ -226,11 +212,8 @@ public class ForwardAnalysisImpl<
                     }
                     break;
                 }
-
             default:
-                throw new BugInCF(
-                        "ForwardAnalysisImpl::performAnalysis() unexpected block type: "
-                                + b.getType());
+                throw new BugInCF("Unexpected block type: " + b.getType());
         }
     }
 
@@ -286,8 +269,8 @@ public class ForwardAnalysisImpl<
                 case REGULAR_BLOCK:
                     {
                         RegularBlock rb = (RegularBlock) block;
-                        // Apply transfer function to contents until
-                        // we found the node we are looking for.
+                        // Apply transfer function to contents until we found the node we are
+                        // looking for.
                         TransferInput<V, S> store = transferInput;
                         TransferResult<V, S> transferResult;
                         for (Node n : rb.getContents()) {
@@ -311,19 +294,17 @@ public class ForwardAnalysisImpl<
                         }
                         // This point should never be reached. If the block of 'node' is
                         // 'block', then 'node' must be part of the contents of 'block'.
-                        throw new BugInCF(
-                                "ForwardAnalysisImpl::runAnalysisFor() this point should never be reached!");
+                        throw new BugInCF("This point should never be reached.");
                     }
                 case EXCEPTION_BLOCK:
                     {
                         ExceptionBlock eb = (ExceptionBlock) block;
-                        // Apply transfer function to content
+                        // Apply the transfer function to content
                         if (eb.getNode() != node) {
                             throw new BugInCF(
-                                    "ForwardAnalysisImpl::runAnalysisFor() it is expected node is equal to the node"
-                                            + "in excetion block, but get: node: "
+                                    "Node should be equal to eb.getNode(). But get: node: "
                                             + node
-                                            + "\teBlock.getNode(): "
+                                            + "\teb.getNode(): "
                                             + eb.getNode());
                         }
                         if (before) {
@@ -336,9 +317,7 @@ public class ForwardAnalysisImpl<
                     }
                 default:
                     // Only regular blocks and exceptional blocks can hold nodes.
-                    throw new BugInCF(
-                            "ForwardAnalysisImpl::runAnalysisFor() unexpected block type: "
-                                    + block.getType());
+                    throw new BugInCF("Unexpected block type: " + block.getType());
             }
         } finally {
             currentNode = oldCurrentNode;
@@ -472,7 +451,7 @@ public class ForwardAnalysisImpl<
      * Add a store before the basic block {@code b} by merging with the existing stores for that
      * location.
      *
-     * @param b the basic block
+     * @param b a basic block
      * @param node the node of the basic block {@code b}
      * @param s the store being added
      * @param kind the kind of store {@code s}
@@ -484,7 +463,6 @@ public class ForwardAnalysisImpl<
         S thenStore = getStoreBefore(b, Store.Kind.THEN);
         S elseStore = getStoreBefore(b, Store.Kind.ELSE);
         boolean shouldWiden = false;
-
         if (blockCount != null) {
             Integer count = blockCount.get(b);
             if (count == null) {
@@ -497,7 +475,6 @@ public class ForwardAnalysisImpl<
                 blockCount.put(b, count + 1);
             }
         }
-
         switch (kind) {
             case THEN:
                 {
@@ -537,26 +514,22 @@ public class ForwardAnalysisImpl<
                     }
                 } else {
                     boolean storeChanged = false;
-
                     S newThenStore = mergeStores(s, thenStore, shouldWiden);
                     if (!newThenStore.equals(thenStore)) {
                         thenStores.put(b, newThenStore);
                         storeChanged = true;
                     }
-
                     S newElseStore = mergeStores(s, elseStore, shouldWiden);
                     if (!newElseStore.equals(elseStore)) {
                         elseStores.put(b, newElseStore);
                         storeChanged = true;
                     }
-
                     if (storeChanged) {
                         inputs.put(b, new TransferInput<>(node, this, newThenStore, newElseStore));
                         addBlockToWorklist = true;
                     }
                 }
         }
-
         if (addBlockToWorklist) {
             addToWorklist(b);
         }
@@ -583,7 +556,7 @@ public class ForwardAnalysisImpl<
     /**
      * Return the store corresponding to the location right before the basic block {@code b}.
      *
-     * @param b the block
+     * @param b a block
      * @param kind the kind of store which will be returned
      * @return the store corresponding to the location right before the basic block {@code b}
      */
@@ -594,15 +567,15 @@ public class ForwardAnalysisImpl<
             case ELSE:
                 return readFromStore(elseStores, b);
             default:
-                throw new BugInCF("unexpected Store Kind: " + kind);
+                throw new BugInCF("Unexpected Store Kind: " + kind);
         }
     }
 
     /**
-     * Return the transfer input corresponding to the location right before the basic block {@code
+     * Returns the transfer input corresponding to the location right before the basic block {@code
      * b}.
      *
-     * @param b the Block
+     * @param b a block
      * @return the transfer input corresponding to the location right before the basic block {@code
      *     b}
      */

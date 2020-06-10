@@ -21,11 +21,11 @@ import org.checkerframework.javacutil.BugInCF;
 
 /**
  * An implementation of a backward analysis to solve a org.checkerframework.dataflow problem given a
- * control flow graph and a transfer function.
+ * control flow graph and a backward transfer function.
  *
- * @param <V> The abstract value type to be tracked by the analysis
- * @param <S> The store type used in the analysis
- * @param <T> The transfer function type that is used to approximated runtime behavior
+ * @param <V> the abstract value type to be tracked by the analysis
+ * @param <S> the store type used in the analysis
+ * @param <T> the transfer function type that is used to approximate runtime behavior
  */
 public class BackwardAnalysisImpl<
                 V extends AbstractValue<V>,
@@ -37,8 +37,8 @@ public class BackwardAnalysisImpl<
     protected final IdentityHashMap<Block, S> outStores;
 
     /**
-     * Exception store of an Exception Block, propagated by exceptional successors of its Exception
-     * Block, and merged with the normal TransferResult.
+     * Exception store of an exception block, propagated by exceptional successors of its exception
+     * block, and merged with the normal {@link TransferResult}.
      */
     protected final IdentityHashMap<ExceptionBlock, S> exceptionStores;
 
@@ -73,7 +73,7 @@ public class BackwardAnalysisImpl<
     public void performAnalysis(ControlFlowGraph cfg) {
         if (isRunning) {
             throw new BugInCF(
-                    "BackwardAnalysisImpl::performAnalysis() shouldn't be called when the analysis is running.");
+                    "performAnalysis() shouldn't be called when the analysis is running.");
         }
         isRunning = true;
         try {
@@ -132,7 +132,7 @@ public class BackwardAnalysisImpl<
                     Node node = eb.getNode();
                     TransferResult<V, S> transferResult = callTransferFunction(node, currentInput);
                     boolean addToWorklistAgain = updateNodeValues(node, transferResult);
-                    // Merge transferResult with exceptionStore if exist one
+                    // Merge transferResult with exceptionStore if there exists one
                     S exceptionStore = exceptionStores.get(eb);
                     S mergedStore =
                             exceptionStore != null
@@ -177,9 +177,7 @@ public class BackwardAnalysisImpl<
                     break;
                 }
             default:
-                throw new BugInCF(
-                        "BackwardAnalysisImpl::performAnalysis() unexpected block type: "
-                                + b.getType());
+                throw new BugInCF("Unexpected block type: " + b.getType());
         }
     }
 
@@ -218,11 +216,8 @@ public class BackwardAnalysisImpl<
         assert transferFunction != null : "@AssumeAssertion(nullness): invariant";
         S normalInitialStore = transferFunction.initialNormalExitStore(underlyingAST, returnNodes);
         S exceptionalInitialStore = transferFunction.initialExceptionalExitStore(underlyingAST);
-        // exceptionExitBlock and regularExitBlock will always be non-null, as
-        // CFGBuilder#CFGTranslationPhaseTwo#process() will always create these two exit blocks on a
-        // CFG whether it has exit blocks or not according to the underlying AST.
-        // Here the workaround is using the inner protected Map in worklist to decide whether a
-        // given cfg has a regularExitBlock and/or an exceptionExitBlock
+        // If regularExitBlock or exceptionExitBlock is reachable in the control flow graph, then
+        // initialize it as a start point of the analysis.
         if (worklist.depthFirstOrder.get(regularExitBlock) != null) {
             worklist.add(regularExitBlock);
             inputs.put(regularExitBlock, new TransferInput<>(null, this, normalInitialStore));
@@ -235,12 +230,10 @@ public class BackwardAnalysisImpl<
             outStores.put(exceptionExitBlock, exceptionalInitialStore);
         }
         if (worklist.isEmpty()) {
-            throw new BugInCF(
-                    "BackwardAnalysisImpl::initInitialInputs() worklist should has at least one exit block as start point.");
+            throw new BugInCF("Worklist should has at least one exit block as start point.");
         }
         if (inputs.isEmpty() || outStores.isEmpty()) {
-            throw new BugInCF(
-                    "BackwardAnalysisImpl::initInitialInputs() should has at least one input and outStore at beginning.");
+            throw new BugInCF("There should has at least one input and outStore at the beginning.");
         }
     }
 
@@ -253,7 +246,7 @@ public class BackwardAnalysisImpl<
             boolean addToWorklistAgain) {
         if (flowRule != FlowRule.EACH_TO_EACH) {
             throw new BugInCF(
-                    "backward analysis always propagate EACH to EACH, because there is no control flow.");
+                    "Backward analysis always propagate EACH to EACH, because there is no control flow.");
         }
 
         addStoreAfter(pred, node, currentInput.getRegularStore(), addToWorklistAgain);
@@ -270,20 +263,19 @@ public class BackwardAnalysisImpl<
      *     Worklist}
      */
     protected void addStoreAfter(Block pred, @Nullable Node node, S s, boolean addBlockToWorklist) {
-        // If Block {@code pred} is an ExceptionBlock, decide whether the
-        // block of passing node is an exceptional successor of Block {@code pred}
+        // If the block pred is an exception block, decide whether the block of passing node is an
+        // exceptional successor of the block pred
         if (pred instanceof ExceptionBlock
                 && ((ExceptionBlock) pred).getSuccessor() != null
                 && node != null) {
             @Nullable Block succBlock = ((ExceptionBlock) pred).getSuccessor();
             @Nullable Block block = node.getBlock();
             if (succBlock != null && block != null && succBlock.getId() == block.getId()) {
-                // If the block of passing node is an exceptional successor of Block {@code pred},
-                // propagate store to the {@code exceptionStores}
-                // Currently it doesn't track the label of an exceptional edge from Exception Block
-                // to its exceptional successors in backward direction, instead, all exception
-                // stores of exceptional successors of an Exception Block will merge to one
-                // exception store at the Exception Block
+                // If the block of passing node is an exceptional successor of Block pred, propagate
+                // store to the exceptionStores. Currently it doesn't track the label of an
+                // exceptional edge from exception block to its exceptional successors in backward
+                // direction. Instead, all exception stores of exceptional successors of an
+                // exception block will merge to one exception store at the exception block
                 ExceptionBlock ebPred = (ExceptionBlock) pred;
                 S exceptionStore = exceptionStores.get(ebPred);
                 S newExceptionStore =
@@ -308,7 +300,7 @@ public class BackwardAnalysisImpl<
     }
 
     /**
-     * Return the store corresponding to the location right after the basic block {@code b}.
+     * Returns the store corresponding to the location right after the basic block {@code b}.
      *
      * @param b the given block
      * @return the store right after the given block
@@ -358,19 +350,17 @@ public class BackwardAnalysisImpl<
                         }
                         // This point should never be reached. If the block of 'node' is
                         // 'block', then 'node' must be part of the contents of 'block'.
-                        throw new BugInCF(
-                                "BackwardAnalysisImpl::runAnalysisFor() This point should never be reached!");
+                        throw new BugInCF("This point should never be reached.");
                     }
                 case EXCEPTION_BLOCK:
                     {
-                        ExceptionBlock eBlock = (ExceptionBlock) block;
-                        if (eBlock.getNode() != node) {
+                        ExceptionBlock eb = (ExceptionBlock) block;
+                        if (eb.getNode() != node) {
                             throw new BugInCF(
-                                    "BackwardAnalysisImpl::runAnalysisFor() it is expected node is equal to the node"
-                                            + "in exception block, but get: node: "
+                                    "Node should be equal to eb.getNode(). But get: node: "
                                             + node
-                                            + "\teBlock.getNode(): "
-                                            + eBlock.getNode());
+                                            + "\teb.getNode(): "
+                                            + eb.getNode());
                         }
                         if (!before) {
                             return transferInput.getRegularStore();
@@ -379,16 +369,14 @@ public class BackwardAnalysisImpl<
                         TransferResult<V, S> transferResult =
                                 callTransferFunction(node, transferInput);
                         // Merge transfer result with the exception store of this exceptional block
-                        S exceptionStore = exceptionStores.get(eBlock);
+                        S exceptionStore = exceptionStores.get(eb);
                         return exceptionStore == null
                                 ? transferResult.getRegularStore()
                                 : transferResult.getRegularStore().leastUpperBound(exceptionStore);
                     }
                 default:
                     // Only regular blocks and exceptional blocks can hold nodes.
-                    throw new BugInCF(
-                            "BackwardAnalysisImpl::runAnalysisFor() unexpected block type: "
-                                    + block.getType());
+                    throw new BugInCF("Unexpected block type: " + block.getType());
             }
 
         } finally {

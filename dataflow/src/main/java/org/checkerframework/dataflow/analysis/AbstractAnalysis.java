@@ -11,7 +11,10 @@ import java.util.Objects;
 import java.util.PriorityQueue;
 import java.util.Set;
 import javax.lang.model.element.Element;
-import org.checkerframework.checker.nullness.qual.*;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNull;
+import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
+import org.checkerframework.checker.nullness.qual.MonotonicNonNull;
+import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.cfg.ControlFlowGraph;
 import org.checkerframework.dataflow.cfg.block.Block;
 import org.checkerframework.dataflow.cfg.block.SpecialBlock;
@@ -82,9 +85,10 @@ public abstract class AbstractAnalysis<
     protected @Nullable TransferInput<V, S> currentInput;
 
     /**
-     * @return the tree that is currently being looked at. The transfer function can set this tree
-     *     to make sure that calls to {@code getValue} will not return information for this given
-     *     tree.
+     * Returns the tree that is currently being looked at. The transfer function can set this tree
+     * to make sure that calls to {@code getValue} will not return information for this given tree.
+     *
+     * @return the tree that is currently being looked at
      */
     public @Nullable Tree getCurrentTree() {
         return currentTree;
@@ -105,7 +109,7 @@ public abstract class AbstractAnalysis<
      *
      * @param direction direction of the analysis
      */
-    public AbstractAnalysis(Direction direction) {
+    protected AbstractAnalysis(Direction direction) {
         this.direction = direction;
         this.inputs = new IdentityHashMap<>();
         this.worklist = new Worklist(this.direction);
@@ -166,7 +170,7 @@ public abstract class AbstractAnalysis<
     @Override
     public @Nullable V getValue(Node n) {
         if (isRunning) {
-            // we do not yet have a org.checkerframework.dataflow fact about the current node
+            // we don't have a org.checkerframework.dataflow fact about the current node yet
             if (currentNode == null
                     || currentNode == n
                     || (currentTree != null && currentTree == n.getTree())) {
@@ -186,7 +190,7 @@ public abstract class AbstractAnalysis<
     }
 
     /**
-     * Return all current node values.
+     * Returns all current node values.
      *
      * @return {@link #nodeValues}
      */
@@ -251,7 +255,7 @@ public abstract class AbstractAnalysis<
      * @return the abstract value for the given tree
      */
     public @Nullable V getValue(Tree t) {
-        // we do not yet have a org.checkerframework.dataflow fact about the current node
+        // we don't have a org.checkerframework.dataflow fact about the current node yet
         if (t == currentTree) {
             return null;
         }
@@ -276,7 +280,7 @@ public abstract class AbstractAnalysis<
 
     /**
      * Get the {@link MethodTree} of the current CFG if the argument {@link Tree} maps to a {@link
-     * Node} in the CFG or null otherwise.
+     * Node} in the CFG or {@code null} otherwise.
      *
      * @param t the given tree
      * @return the contained method tree of the given tree
@@ -290,7 +294,7 @@ public abstract class AbstractAnalysis<
 
     /**
      * Get the {@link ClassTree} of the current CFG if the argument {@link Tree} maps to a {@link
-     * Node} in the CFG or null otherwise.
+     * Node} in the CFG or {@code null} otherwise.
      *
      * @param t the given tree
      * @return the contained class tree of the given tree
@@ -373,13 +377,11 @@ public abstract class AbstractAnalysis<
     protected boolean updateNodeValues(Node node, TransferResult<V, S> transferResult) {
         V newVal = transferResult.getResultValue();
         boolean nodeValueChanged = false;
-
         if (newVal != null) {
             V oldVal = nodeValues.get(node);
             nodeValues.put(node, newVal);
             nodeValueChanged = !Objects.equals(oldVal, newVal);
         }
-
         return nodeValueChanged || transferResult.storeChanged();
     }
 
@@ -397,9 +399,10 @@ public abstract class AbstractAnalysis<
     }
 
     /**
-     * Add a basic block to the Worklist. If {@code b} is already present, the method does nothing.
+     * Add a basic block to {@link #worklist}. If {@code b} is already present, the method does
+     * nothing.
      *
-     * @param b the block to add to the Worklist
+     * @param b the block to add to {@link #worklist}
      */
     protected void addToWorklist(Block b) {
         // TODO: use a more efficient way to check if b is already present
@@ -445,7 +448,7 @@ public abstract class AbstractAnalysis<
         protected final PriorityQueue<Block> queue;
 
         /**
-         * The work list.
+         * Create a Worklist.
          *
          * @param direction the direction (forward or backward)
          */
@@ -462,7 +465,7 @@ public abstract class AbstractAnalysis<
         }
 
         /**
-         * Process the control flow graph, add the Blocks to {@link #depthFirstOrder}.
+         * Process the control flow graph, add the blocks to {@link #depthFirstOrder}.
          *
          * @param cfg the control flow graph to process
          */
@@ -500,7 +503,7 @@ public abstract class AbstractAnalysis<
         }
 
         /**
-         * Add Block to {@link #queue}.
+         * Add the given block to {@link #queue}.
          *
          * @param block the block to add to {@link #queue}
          */

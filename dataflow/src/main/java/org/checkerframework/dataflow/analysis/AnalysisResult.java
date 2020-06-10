@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.lang.model.element.Element;
+import javax.swing.*;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.cfg.block.Block;
 import org.checkerframework.dataflow.cfg.block.ExceptionBlock;
@@ -165,9 +166,6 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
      * @return the abstract value for {@link Node} {@code n}, or {@code null} if no information is
      *     available Returns the abstract value for {@link Node} {@code n}, or {@code null} if no
      *     information is available.
-     * @param n a node
-     * @return the abstract value for {@link Node} {@code n}, or {@code null} if no information is
-     *     available
      */
     public @Nullable V getValue(Node n) {
         return nodeValues.get(n);
@@ -225,20 +223,20 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
     }
 
     /**
-     * Return the corresponding {@link AssignmentNode} for a given {@link UnaryTree}.
+     * Returns the corresponding {@link AssignmentNode} for a given {@link UnaryTree}.
      *
      * @param tree a unary tree
      * @return the corresponding assignment node
      */
     public AssignmentNode getAssignForUnaryTree(UnaryTree tree) {
         if (!unaryAssignNodeLookup.containsKey(tree)) {
-            throw new Error(tree + " is not in unaryAssignNodeLookup");
+            throw new BugInCF(tree + " is not in unaryAssignNodeLookup");
         }
         return unaryAssignNodeLookup.get(tree);
     }
 
     /**
-     * Returns the store immediately before a given tree.
+     * Returns the store immediately before a given {@link Tree}.
      *
      * @param tree a tree
      * @return the store immediately before a given {@link Tree}
@@ -271,7 +269,7 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
     }
 
     /**
-     * Return the regular store immediately before a given {@link Block}.
+     * Returns the regular store immediately before a given {@link Block}.
      *
      * @param bb a block
      * @return the store right before the given block
@@ -297,7 +295,7 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
                         firstNode = null;
                 }
                 if (firstNode == null) {
-                    // This block doesn't contains any node, return store in transfer input
+                    // This block doesn't contains any node, return the store in the transfer input
                     return transferInput.getRegularStore();
                 }
                 return analysis.runAnalysisFor(
@@ -310,7 +308,7 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
     }
 
     /**
-     * Return the regular store immediately after a given block.
+     * Returns the regular store immediately after a given block.
      *
      * @param bb a block
      * @return the store after the given block
@@ -322,30 +320,22 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
         Analysis<V, S, ?> analysis = transferInput.analysis;
         switch (analysis.getDirection()) {
             case FORWARD:
-                {
-                    Node lastNode = getLastNode(bb);
-                    if (lastNode == null) {
-                        // This block doesn't contains any node, return store in transfer input
-                        return transferInput.getRegularStore();
-                    }
-                    return analysis.runAnalysisFor(
-                            lastNode, false, transferInput, nodeValues, analysisCaches);
-                }
-            case BACKWARD:
-                {
+                Node lastNode = getLastNode(bb);
+                if (lastNode == null) {
+                    // This block doesn't contains any node, return the store in the transfer input
                     return transferInput.getRegularStore();
                 }
+                return analysis.runAnalysisFor(
+                        lastNode, false, transferInput, nodeValues, analysisCaches);
+            case BACKWARD:
+                return transferInput.getRegularStore();
             default:
-                {
-                    throw new BugInCF(
-                            "AnalysisResult::getStoreAfter: unknown direction: "
-                                    + analysis.getDirection());
-                }
+                throw new BugInCF("Unknown direction: " + analysis.getDirection());
         }
     }
 
     /**
-     * Returns the last node of a block, or null if none.
+     * Returns the last node of the given block, or {@code null} if none.
      *
      * @param bb the block
      * @return the last node of this block or {@code null}
@@ -361,7 +351,7 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
             case EXCEPTION_BLOCK:
                 return ((ExceptionBlock) bb).getNode();
             default:
-                throw new Error("Unrecognized block type: " + bb.getType());
+                throw new BugInCF("Unrecognized block type: " + bb.getType());
         }
     }
 
@@ -446,7 +436,7 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
             IdentityHashMap<Node, V> nodeValues,
             Map<TransferInput<V, S>, IdentityHashMap<Node, TransferResult<V, S>>> analysisCaches) {
         if (transferInput.analysis == null) {
-            throw new BugInCF("transferInput contains null analysis!");
+            throw new BugInCF("Analysis in transferInput cannot be null.");
         }
         return transferInput.analysis.runAnalysisFor(
                 node, before, transferInput, nodeValues, analysisCaches);
