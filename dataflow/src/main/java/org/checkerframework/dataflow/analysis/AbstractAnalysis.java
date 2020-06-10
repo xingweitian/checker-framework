@@ -82,9 +82,10 @@ public abstract class AbstractAnalysis<
     protected @Nullable TransferInput<V, S> currentInput;
 
     /**
-     * @return the tree that is currently being looked at. The transfer function can set this tree
-     *     to make sure that calls to {@code getValue} will not return information for this given
-     *     tree.
+     * Returns the tree that is currently being looked at. The transfer function can set this tree
+     * to make sure that calls to {@code getValue} will not return information for this given tree.
+     *
+     * @return the tree that is currently being looked at
      */
     public @Nullable Tree getCurrentTree() {
         return currentTree;
@@ -105,7 +106,7 @@ public abstract class AbstractAnalysis<
      *
      * @param direction direction of the analysis
      */
-    public AbstractAnalysis(Direction direction) {
+    protected AbstractAnalysis(Direction direction) {
         this.direction = direction;
         this.inputs = new IdentityHashMap<>();
         this.worklist = new Worklist(this.direction);

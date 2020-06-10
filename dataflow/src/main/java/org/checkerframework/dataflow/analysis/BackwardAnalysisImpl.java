@@ -37,8 +37,8 @@ public class BackwardAnalysisImpl<
     protected final IdentityHashMap<Block, S> outStores;
 
     /**
-     * Exception store of an Exception Block, propagated by exceptional successors of its Exception
-     * Block, and merged with the normal TransferResult.
+     * Exception store of an exception block, propagated by exceptional successors of its exception
+     * block, and merged with the normal TransferResult.
      */
     protected final IdentityHashMap<ExceptionBlock, S> exceptionStores;
 
@@ -132,7 +132,7 @@ public class BackwardAnalysisImpl<
                     Node node = eb.getNode();
                     TransferResult<V, S> transferResult = callTransferFunction(node, currentInput);
                     boolean addToWorklistAgain = updateNodeValues(node, transferResult);
-                    // Merge transferResult with exceptionStore if exist one
+                    // Merge transferResult with exceptionStore if there exists one
                     S exceptionStore = exceptionStores.get(eb);
                     S mergedStore =
                             exceptionStore != null
@@ -218,11 +218,8 @@ public class BackwardAnalysisImpl<
         assert transferFunction != null : "@AssumeAssertion(nullness): invariant";
         S normalInitialStore = transferFunction.initialNormalExitStore(underlyingAST, returnNodes);
         S exceptionalInitialStore = transferFunction.initialExceptionalExitStore(underlyingAST);
-        // exceptionExitBlock and regularExitBlock will always be non-null, as
-        // CFGBuilder#CFGTranslationPhaseTwo#process() will always create these two exit blocks on a
-        // CFG whether it has exit blocks or not according to the underlying AST.
-        // Here the workaround is using the inner protected Map in worklist to decide whether a
-        // given cfg has a regularExitBlock and/or an exceptionExitBlock
+        // If regularExitBlock or exceptionExitBlock is reachable in the control flow graph, then
+        // initialize it as a start point of the analysis.
         if (worklist.depthFirstOrder.get(regularExitBlock) != null) {
             worklist.add(regularExitBlock);
             inputs.put(regularExitBlock, new TransferInput<>(null, this, normalInitialStore));
@@ -270,20 +267,19 @@ public class BackwardAnalysisImpl<
      *     Worklist}
      */
     protected void addStoreAfter(Block pred, @Nullable Node node, S s, boolean addBlockToWorklist) {
-        // If Block {@code pred} is an ExceptionBlock, decide whether the
-        // block of passing node is an exceptional successor of Block {@code pred}
+        // If block pred is an exception block, decide whether the block of passing node is an
+        // exceptional successor of the block pred
         if (pred instanceof ExceptionBlock
                 && ((ExceptionBlock) pred).getSuccessor() != null
                 && node != null) {
             @Nullable Block succBlock = ((ExceptionBlock) pred).getSuccessor();
             @Nullable Block block = node.getBlock();
             if (succBlock != null && block != null && succBlock.getId() == block.getId()) {
-                // If the block of passing node is an exceptional successor of Block {@code pred},
-                // propagate store to the {@code exceptionStores}
-                // Currently it doesn't track the label of an exceptional edge from Exception Block
-                // to its exceptional successors in backward direction, instead, all exception
-                // stores of exceptional successors of an Exception Block will merge to one
-                // exception store at the Exception Block
+                // If the block of passing node is an exceptional successor of Block pred, propagate
+                // store to the exceptionStores. Currently it doesn't track the label of an
+                // exceptional edge from exception block to its exceptional successors in backward
+                // direction. Instead, all exception stores of exceptional successors of an
+                // exception block will merge to one exception store at the exception block
                 ExceptionBlock ebPred = (ExceptionBlock) pred;
                 S exceptionStore = exceptionStores.get(ebPred);
                 S newExceptionStore =
@@ -359,7 +355,7 @@ public class BackwardAnalysisImpl<
                         // This point should never be reached. If the block of 'node' is
                         // 'block', then 'node' must be part of the contents of 'block'.
                         throw new BugInCF(
-                                "BackwardAnalysisImpl::runAnalysisFor() This point should never be reached!");
+                                "BackwardAnalysisImpl::runAnalysisFor() This point should never be reached.");
                     }
                 case EXCEPTION_BLOCK:
                     {
