@@ -223,7 +223,7 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
     }
 
     /**
-     * Return the corresponding {@link AssignmentNode} for a given {@link UnaryTree}.
+     * Returns the corresponding {@link AssignmentNode} for a given {@link UnaryTree}.
      *
      * @param tree a unary tree
      * @return the corresponding assignment node
@@ -236,7 +236,7 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
     }
 
     /**
-     * Returns the store immediately before a given tree.
+     * Returns the store immediately before a given {@link Tree}.
      *
      * @param tree a tree
      * @return the store immediately before a given {@link Tree}
@@ -269,7 +269,7 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
     }
 
     /**
-     * Return the regular store immediately before a given {@link Block}.
+     * Returns the regular store immediately before a given {@link Block}.
      *
      * @param bb a block
      * @return the store right before the given block
@@ -308,7 +308,7 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
     }
 
     /**
-     * Return the regular store immediately after a given block.
+     * Returns the regular store immediately after a given block.
      *
      * @param bb a block
      * @return the store after the given block
@@ -330,9 +330,7 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
             case BACKWARD:
                 return transferInput.getRegularStore();
             default:
-                throw new BugInCF(
-                        "AnalysisResult::getStoreAfter: unknown direction: "
-                                + analysis.getDirection());
+                throw new BugInCF("Unknown direction: " + analysis.getDirection());
         }
     }
 

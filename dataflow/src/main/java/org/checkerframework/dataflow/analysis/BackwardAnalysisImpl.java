@@ -376,9 +376,7 @@ public class BackwardAnalysisImpl<
                     }
                 default:
                     // Only regular blocks and exceptional blocks can hold nodes.
-                    throw new BugInCF(
-                            "BackwardAnalysisImpl::runAnalysisFor() unexpected block type: "
-                                    + block.getType());
+                    throw new BugInCF("Unexpected block type: " + block.getType());
             }
 
         } finally {
