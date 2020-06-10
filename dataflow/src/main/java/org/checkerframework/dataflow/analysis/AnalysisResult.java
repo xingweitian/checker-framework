@@ -233,7 +233,7 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
      */
     public AssignmentNode getAssignForUnaryTree(UnaryTree tree) {
         if (!unaryAssignNodeLookup.containsKey(tree)) {
-            throw new Error(tree + " is not in unaryAssignNodeLookup");
+            throw new BugInCF(tree + " is not in unaryAssignNodeLookup");
         }
         return unaryAssignNodeLookup.get(tree);
     }
@@ -323,25 +323,19 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
         Analysis<V, S, ?> analysis = transferInput.analysis;
         switch (analysis.getDirection()) {
             case FORWARD:
-                {
-                    Node lastNode = getLastNode(bb);
-                    if (lastNode == null) {
-                        // This block doesn't contains any node, return store in transfer input
-                        return transferInput.getRegularStore();
-                    }
-                    return analysis.runAnalysisFor(
-                            lastNode, false, transferInput, nodeValues, analysisCaches);
-                }
-            case BACKWARD:
-                {
+                Node lastNode = getLastNode(bb);
+                if (lastNode == null) {
+                    // This block doesn't contains any node, return the store in the transfer input
                     return transferInput.getRegularStore();
                 }
+                return analysis.runAnalysisFor(
+                        lastNode, false, transferInput, nodeValues, analysisCaches);
+            case BACKWARD:
+                return transferInput.getRegularStore();
             default:
-                {
-                    throw new BugInCF(
-                            "AnalysisResult::getStoreAfter: unknown direction: "
-                                    + analysis.getDirection());
-                }
+                throw new BugInCF(
+                        "AnalysisResult::getStoreAfter: unknown direction: "
+                                + analysis.getDirection());
         }
     }
 
@@ -447,7 +441,7 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
             IdentityHashMap<Node, V> nodeValues,
             Map<TransferInput<V, S>, IdentityHashMap<Node, TransferResult<V, S>>> analysisCaches) {
         if (transferInput.analysis == null) {
-            throw new BugInCF("transferInput contains null analysis!");
+            throw new BugInCF("Analysis in transferInput cannot be null.");
         }
         return transferInput.analysis.runAnalysisFor(
                 node, before, transferInput, nodeValues, analysisCaches);

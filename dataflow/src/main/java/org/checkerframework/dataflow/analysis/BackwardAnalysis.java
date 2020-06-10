@@ -21,7 +21,7 @@ public interface BackwardAnalysis<
      * analysis, the output store contains the analyzed flow information from the exit block to the
      * entry block.
      *
-     * @return the output store at the entry block of a given CFG
+     * @return the output store at the entry block of a given control flow graph
      */
     @Nullable S getEntryStore();
 }

@@ -244,7 +244,7 @@ public abstract class AbstractCFGVisualizer<
             case SPECIAL_BLOCK:
                 return Collections.emptyList();
             default:
-                throw new Error("Unrecognized basic block type: " + bb.getType());
+                throw new BugInCF("Unrecognized basic block type: " + bb.getType());
         }
     }
 
@@ -369,7 +369,7 @@ public abstract class AbstractCFGVisualizer<
             case EXCEPTIONAL_EXIT:
                 return "<exceptional-exit>" + separator;
             default:
-                throw new Error("Unrecognized special block type: " + sbb.getType());
+                throw new BugInCF("Unrecognized special block type: " + sbb.getType());
         }
     }
 

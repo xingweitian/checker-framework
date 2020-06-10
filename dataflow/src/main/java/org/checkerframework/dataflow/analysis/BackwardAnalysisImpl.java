@@ -21,7 +21,7 @@ import org.checkerframework.javacutil.BugInCF;
 
 /**
  * An implementation of a backward analysis to solve a org.checkerframework.dataflow problem given a
- * control flow graph and a transfer function.
+ * control flow graph and a backward transfer function.
  *
  * @param <V> the abstract value type to be tracked by the analysis
  * @param <S> the store type used in the analysis
@@ -72,8 +72,7 @@ public class BackwardAnalysisImpl<
     @Override
     public void performAnalysis(ControlFlowGraph cfg) {
         if (isRunning) {
-            throw new BugInCF(
-                    "BackwardAnalysisImpl::performAnalysis() shouldn't be called when the analysis is running.");
+            throw new BugInCF("performAnalysis shouldn't be called when the analysis is running.");
         }
         isRunning = true;
         try {
@@ -177,9 +176,7 @@ public class BackwardAnalysisImpl<
                     break;
                 }
             default:
-                throw new BugInCF(
-                        "BackwardAnalysisImpl::performAnalysis() unexpected block type: "
-                                + b.getType());
+                throw new BugInCF("Unexpected block type: " + b.getType());
         }
     }
 
@@ -232,12 +229,10 @@ public class BackwardAnalysisImpl<
             outStores.put(exceptionExitBlock, exceptionalInitialStore);
         }
         if (worklist.isEmpty()) {
-            throw new BugInCF(
-                    "BackwardAnalysisImpl::initInitialInputs() worklist should has at least one exit block as start point.");
+            throw new BugInCF("Worklist should has at least one exit block as start point.");
         }
         if (inputs.isEmpty() || outStores.isEmpty()) {
-            throw new BugInCF(
-                    "BackwardAnalysisImpl::initInitialInputs() should has at least one input and outStore at beginning.");
+            throw new BugInCF("There should has at least one input and outStore at the beginning.");
         }
     }
 
@@ -250,7 +245,7 @@ public class BackwardAnalysisImpl<
             boolean addToWorklistAgain) {
         if (flowRule != FlowRule.EACH_TO_EACH) {
             throw new BugInCF(
-                    "backward analysis always propagate EACH to EACH, because there is no control flow.");
+                    "Backward analysis always propagate EACH to EACH, because there is no control flow.");
         }
 
         addStoreAfter(pred, node, currentInput.getRegularStore(), addToWorklistAgain);

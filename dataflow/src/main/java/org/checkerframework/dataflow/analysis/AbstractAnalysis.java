@@ -167,7 +167,7 @@ public abstract class AbstractAnalysis<
     @Override
     public @Nullable V getValue(Node n) {
         if (isRunning) {
-            // we do not yet have a org.checkerframework.dataflow fact about the current node
+            // we don't have a org.checkerframework.dataflow fact about the current node yet
             if (currentNode == null
                     || currentNode == n
                     || (currentTree != null && currentTree == n.getTree())) {
@@ -252,7 +252,7 @@ public abstract class AbstractAnalysis<
      * @return the abstract value for the given tree
      */
     public @Nullable V getValue(Tree t) {
-        // we do not yet have a org.checkerframework.dataflow fact about the current node
+        // we don't have a org.checkerframework.dataflow fact about the current node yet
         if (t == currentTree) {
             return null;
         }
@@ -277,7 +277,7 @@ public abstract class AbstractAnalysis<
 
     /**
      * Get the {@link MethodTree} of the current CFG if the argument {@link Tree} maps to a {@link
-     * Node} in the CFG or null otherwise.
+     * Node} in the CFG or {@code null} otherwise.
      *
      * @param t the given tree
      * @return the contained method tree of the given tree
@@ -291,7 +291,7 @@ public abstract class AbstractAnalysis<
 
     /**
      * Get the {@link ClassTree} of the current CFG if the argument {@link Tree} maps to a {@link
-     * Node} in the CFG or null otherwise.
+     * Node} in the CFG or {@code null} otherwise.
      *
      * @param t the given tree
      * @return the contained class tree of the given tree
