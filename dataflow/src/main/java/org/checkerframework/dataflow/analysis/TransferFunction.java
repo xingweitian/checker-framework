@@ -16,15 +16,17 @@ import org.checkerframework.dataflow.cfg.node.NodeVisitor;
  *       an incoming store, and produces a {@link RegularTransferResult}.
  * </ul>
  *
- * <p><em>Note</em>: Initial store method(s) is different between forward and backward transfer
- * function. Thus, in this general interface it doesn't define any initial store method(s), and
- * leave this to sub-interface {@link ForwardTransferFunction} and {@link BackwardTransferFunction}.
+ * <p><em>Note</em>: Initial store method(s) are different between forward and backward transfer
+ * functions. Thus, this interface doesn't define any initial store method(s). {@link
+ * ForwardTransferFunction} and {@link BackwardTransferFunction} will create their own initial store
+ * method(s).
  *
  * <p><em>Important</em>: The individual transfer functions ( {@code visit*}) are allowed to use
  * (and modify) the stores contained in the argument passed; the ownership is transferred from the
  * caller to that function.
  *
- * @param <S> the {@link Store} used to keep track of intermediate results
+ * @param <V> type of the abstract value that is tracked
+ * @param <S> the store type used in the analysis
  */
 public interface TransferFunction<V extends AbstractValue<V>, S extends Store<S>>
         extends NodeVisitor<TransferResult<V, S>, TransferInput<V, S>> {}

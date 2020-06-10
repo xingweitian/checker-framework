@@ -7,8 +7,8 @@ import org.checkerframework.dataflow.cfg.node.LocalVariableNode;
 import org.checkerframework.dataflow.cfg.node.Node;
 
 /**
- * General interface of a forward transfer function for the abstract interpretation used for the
- * forward flow analysis.
+ * Interface of a forward transfer function for the abstract interpretation used for the forward
+ * flow analysis.
  *
  * <p>A forward transfer function consists of the following components:
  *
@@ -31,8 +31,8 @@ public interface ForwardTransferFunction<V extends AbstractValue<V>, S extends S
         extends TransferFunction<V, S> {
 
     /**
-     * Return the initial store to be used by the org.checkerframework.dataflow analysis. {@code
-     * parameters} is only set if the underlying AST is a method.
+     * Returns the initial store to be used by the org.checkerframework.dataflow analysis. {@code
+     * parameters} is non-null if the underlying AST is a method.
      *
      * @param underlyingAST an abstract syntax tree
      * @param parameters a list of local variable nodes

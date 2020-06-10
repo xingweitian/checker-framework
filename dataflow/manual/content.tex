@@ -359,12 +359,12 @@ single store.
 
 \begin{verbatim}
 package class org.checkerframework.dataflow.analysis;
-abstract TransferResult<A extends AbstractValue<A>,
+abstract TransferResult<V extends AbstractValue<V>,
         S extends Store<S>>
-class ConditionalTransferResult<A extends AbstractValue<A>,
+class ConditionalTransferResult<V extends AbstractValue<V>,
         S extends Store<S>>
     extends TransferResult<A, S>
-class RegularTransferResult<A extends AbstractValue<A>,
+class RegularTransferResult<V extends AbstractValue<V>,
         S extends Store<S>>
     extends TransferResult<A, S>
 \end{verbatim}
@@ -495,7 +495,7 @@ or after any Tree.
 
 \begin{verbatim}
 package org.checkerframework.dataflow.analysis;
-class AnalysisResult<A extends AbstractValue<A>,
+class AnalysisResult<V extends AbstractValue<V>,
         S extends Store<S>>
 \end{verbatim}
 

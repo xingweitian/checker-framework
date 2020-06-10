@@ -22,7 +22,8 @@ import org.checkerframework.javacutil.BugInCF;
 import org.checkerframework.javacutil.ElementUtils;
 
 /**
- * Common code base for {@link BackwardAnalysis} and {@link ForwardAnalysis}.
+ * Implementation of common features for {@link BackwardAnalysisImpl} and {@link
+ * ForwardAnalysisImpl}.
  *
  * @param <V> the abstract value type to be tracked by the analysis
  * @param <S> the store type used in the analysis
@@ -99,7 +100,8 @@ public abstract class AbstractAnalysis<
     }
 
     /**
-     * Common code base for {@link BackwardAnalysis} and {@link ForwardAnalysis}.
+     * Implementation of common features for {@link BackwardAnalysisImpl} and {@link
+     * ForwardAnalysisImpl}.
      *
      * @param direction direction of the analysis
      */
@@ -115,14 +117,14 @@ public abstract class AbstractAnalysis<
     protected abstract void initInitialInputs();
 
     /**
-     * Propagate the stores in currentInput to the next block in the direction of analysis,
-     * according to the flowRule.
+     * Propagate the stores in {@code currentInput} to the next block in the direction of analysis,
+     * according to the {@code flowRule}.
      *
      * @param nextBlock the target block to propagate the stores to
      * @param node the node of the target block
      * @param currentInput the current transfer input
      * @param flowRule the flow rule being used
-     * @param addToWorklistAgain whether the block should be added to {@code Worklist} again
+     * @param addToWorklistAgain whether the block should be added to {@link #worklist} again
      */
     protected abstract void propagateStoresTo(
             Block nextBlock,
@@ -130,29 +132,6 @@ public abstract class AbstractAnalysis<
             TransferInput<V, S> currentInput,
             Store.FlowRule flowRule,
             boolean addToWorklistAgain);
-
-    /**
-     * Runs the analysis again within the block of {@code node} and returns the store at the
-     * location of {@code node}. If {@code before} is true, then the store immediately before the
-     * {@link Node} {@code node} is returned. Otherwise, the store after {@code node} is returned.
-     * If {@code analysisCaches} is not null, this method uses a cache. {@code analysisCaches} is a
-     * map of a block of node to the cached analysis result. If the cache for {@code transferInput}
-     * is not in {@code analysisCaches}, this method create new cache and store it in {@code
-     * analysisCaches}. The cache is a map of a node to the analysis result of the node.
-     *
-     * @param node the node to analyze
-     * @param before the boolean value to indicate which store to return
-     * @param transferInput the transfer input of the block of this node
-     * @param nodeValues abstract values of nodes
-     * @param analysisCaches caches of analysis results
-     * @return the store at the location of node after running the analysis
-     */
-    protected abstract S runAnalysisFor(
-            Node node,
-            boolean before,
-            TransferInput<V, S> transferInput,
-            IdentityHashMap<Node, V> nodeValues,
-            Map<TransferInput<V, S>, IdentityHashMap<Node, TransferResult<V, S>>> analysisCaches);
 
     @Override
     public boolean isRunning() {
@@ -168,7 +147,7 @@ public abstract class AbstractAnalysis<
     public AnalysisResult<V, S> getResult() {
         if (isRunning) {
             throw new BugInCF(
-                    "AbstractAnalysis::getResult() should not be called when analysis is running!");
+                    "AbstractAnalysis::getResult() shouldn't be called when the analysis is running.");
         }
         assert cfg != null : "@AssumeAssertion(nullness): invariant";
         return new AnalysisResult<>(
@@ -187,24 +166,21 @@ public abstract class AbstractAnalysis<
     @Override
     public @Nullable V getValue(Node n) {
         if (isRunning) {
-            // We do not yet have a org.checkerframework.dataflow fact about the current node
+            // we do not yet have a org.checkerframework.dataflow fact about the current node
             if (currentNode == null
                     || currentNode == n
                     || (currentTree != null && currentTree == n.getTree())) {
                 return null;
             }
-            // Check that 'n' is a subnode of 'node'. Check immediate operands
+            // check that 'n' is a subnode of 'node'. Check immediate operands
             // first for efficiency.
             assert !n.isLValue() : "Did not expect an lvalue, but got " + n;
-
-            // Check that 'n' is a subnode of 'node'. Check immediate operands
-            // first for efficiency.
             if (currentNode == n
                     || (!currentNode.getOperands().contains(n)
                             && !currentNode.getTransitiveOperands().contains(n))) {
                 return null;
             }
-            return nodeValues.get(n);
+            // fall through when the current node is not 'n', and 'n' is not a subnode.
         }
         return nodeValues.get(n);
     }
@@ -275,7 +251,7 @@ public abstract class AbstractAnalysis<
      * @return the abstract value for the given tree
      */
     public @Nullable V getValue(Tree t) {
-        // We do not yet have a org.checkerframework.dataflow fact about the current node
+        // we do not yet have a org.checkerframework.dataflow fact about the current node
         if (t == currentTree) {
             return null;
         }
@@ -345,7 +321,7 @@ public abstract class AbstractAnalysis<
         TransferResult<V, S> transferResult = node.accept(transferFunction, store);
         currentNode = null;
         if (node instanceof AssignmentNode) {
-            // Store the flow-refined value effectively for final local variables
+            // store the flow-refined value effectively for final local variables
             AssignmentNode assignment = (AssignmentNode) node;
             Node lhst = assignment.getTarget();
             if (lhst instanceof LocalVariableNode) {
@@ -502,6 +478,8 @@ public abstract class AbstractAnalysis<
         }
 
         /**
+         * See {@link PriorityQueue#isEmpty}.
+         *
          * @see PriorityQueue#isEmpty
          * @return true if {@link #queue} is empty else false
          */
@@ -531,6 +509,8 @@ public abstract class AbstractAnalysis<
         }
 
         /**
+         * See {@link PriorityQueue#poll}.
+         *
          * @see PriorityQueue#poll
          * @return the head of {@link #queue}
          */

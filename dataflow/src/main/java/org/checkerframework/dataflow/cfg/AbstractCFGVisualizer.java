@@ -33,12 +33,15 @@ import org.checkerframework.javacutil.BugInCF;
  * {@link CFGVisualizer} are already implemented in this abstract class, but can be overridden if
  * necessary.
  *
+ * @param <V> the abstract value type to be tracked by the analysis
+ * @param <S> the store type used in the analysis
+ * @param <T> the transfer function type that is used to approximate runtime behavior
  * @see DOTCFGVisualizer
  * @see StringCFGVisualizer
  */
 public abstract class AbstractCFGVisualizer<
-                A extends AbstractValue<A>, S extends Store<S>, T extends TransferFunction<A, S>>
-        implements CFGVisualizer<A, S, T> {
+                V extends AbstractValue<V>, S extends Store<S>, T extends TransferFunction<V, S>>
+        implements CFGVisualizer<V, S, T> {
 
     /**
      * Initialized in {@link #init(Map)}. If its value is {@code true}, {@link CFGVisualizer}
@@ -71,7 +74,7 @@ public abstract class AbstractCFGVisualizer<
      * @return the representation of the control flow graph
      */
     protected String visualizeGraph(
-            ControlFlowGraph cfg, Block entry, @Nullable Analysis<A, S, T> analysis) {
+            ControlFlowGraph cfg, Block entry, @Nullable Analysis<V, S, T> analysis) {
         return visualizeGraphHeader()
                 + visualizeGraphWithoutHeaderAndFooter(cfg, entry, analysis)
                 + visualizeGraphFooter();
@@ -86,7 +89,7 @@ public abstract class AbstractCFGVisualizer<
      * @return the String representation of the control flow graph
      */
     protected String visualizeGraphWithoutHeaderAndFooter(
-            ControlFlowGraph cfg, Block entry, @Nullable Analysis<A, S, T> analysis) {
+            ControlFlowGraph cfg, Block entry, @Nullable Analysis<V, S, T> analysis) {
         Set<Block> visited = new HashSet<>();
         StringBuilder sbGraph = new StringBuilder();
         Queue<Block> workList = new ArrayDeque<>();
@@ -176,7 +179,7 @@ public abstract class AbstractCFGVisualizer<
      * @return the String representation of the block
      */
     protected String visualizeBlockHelper(
-            Block bb, @Nullable Analysis<A, S, T> analysis, String escapeString) {
+            Block bb, @Nullable Analysis<V, S, T> analysis, String escapeString) {
         StringBuilder sbBlock = new StringBuilder();
         sbBlock.append(loopOverBlockContents(bb, analysis, escapeString));
 
@@ -215,7 +218,7 @@ public abstract class AbstractCFGVisualizer<
      * @return the String representation of the contents of the block
      */
     protected String loopOverBlockContents(
-            Block bb, @Nullable Analysis<A, S, T> analysis, String separator) {
+            Block bb, @Nullable Analysis<V, S, T> analysis, String separator) {
 
         List<Node> contents = addBlockContent(bb);
         StringJoiner sjBlockContents = new StringJoiner(separator);
@@ -256,11 +259,11 @@ public abstract class AbstractCFGVisualizer<
      * @return the String representation of the transfer input of the block
      */
     protected String visualizeBlockTransferInputBeforeHelper(
-            Block bb, Analysis<A, S, T> analysis, String escapeString) {
+            Block bb, Analysis<V, S, T> analysis, String escapeString) {
 
         if (analysis == null) {
             throw new BugInCF(
-                    "analysis should be non-null when visualizing the transfer input of a block.");
+                    "analysis must be non-null when visualizing the transfer input of a block.");
         }
 
         S regularStore;
@@ -274,7 +277,7 @@ public abstract class AbstractCFGVisualizer<
         Direction analysisDirection = analysis.getDirection();
 
         if (analysisDirection == Direction.FORWARD) {
-            TransferInput<A, S> input = analysis.getInput(bb);
+            TransferInput<V, S> input = analysis.getInput(bb);
             assert input != null : "@AssumeAssertion(nullness): invariant";
             isTwoStores = input.containsTwoStores();
             regularStore = input.getRegularStore();
@@ -309,7 +312,7 @@ public abstract class AbstractCFGVisualizer<
      * @return the String representation of the transfer input of the block
      */
     protected String visualizeBlockTransferInputAfterHelper(
-            Block bb, Analysis<A, S, T> analysis, String escapeString) {
+            Block bb, Analysis<V, S, T> analysis, String escapeString) {
         if (analysis == null) {
             throw new BugInCF(
                     "analysis should be non-null when visualizing the transfer input of a block.");
@@ -328,7 +331,7 @@ public abstract class AbstractCFGVisualizer<
         if (analysisDirection == Direction.FORWARD) {
             regularStore = analysis.getResult().getStoreAfter(bb);
         } else {
-            TransferInput<A, S> input = analysis.getInput(bb);
+            TransferInput<V, S> input = analysis.getInput(bb);
             assert input != null : "@AssumeAssertion(nullness): invariant";
             isTwoStores = input.containsTwoStores();
             regularStore = input.getRegularStore();
@@ -406,7 +409,7 @@ public abstract class AbstractCFGVisualizer<
      * @return the String representation of the nodes
      */
     protected abstract String visualizeNodes(
-            Set<Block> blocks, ControlFlowGraph cfg, @Nullable Analysis<A, S, T> analysis);
+            Set<Block> blocks, ControlFlowGraph cfg, @Nullable Analysis<V, S, T> analysis);
 
     /**
      * Generate the String representation of an edge.
