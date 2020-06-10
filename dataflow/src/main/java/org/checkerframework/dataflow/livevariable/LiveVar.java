@@ -7,7 +7,10 @@ import org.checkerframework.dataflow.cfg.node.Node;
 /** The live variable class. */
 public class LiveVar implements AbstractValue<LiveVar> {
 
-    /** The live node. */
+    /**
+     * The live node which can be a {@link org.checkerframework.dataflow.cfg.node.LocalVariableNode}
+     * or {@link org.checkerframework.dataflow.cfg.node.FieldAccessNode}.
+     */
     protected final Node liveNode;
 
     @Override
@@ -16,7 +19,7 @@ public class LiveVar implements AbstractValue<LiveVar> {
     }
 
     /**
-     * Create a new LiveVar.
+     * Create a new live variable for {@code n}.
      *
      * @param n a Node
      */

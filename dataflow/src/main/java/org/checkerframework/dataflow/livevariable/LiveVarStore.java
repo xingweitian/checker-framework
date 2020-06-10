@@ -36,7 +36,7 @@ public class LiveVarStore implements Store<LiveVarStore> {
     }
 
     /**
-     * Add {@code variable} into {@code liveVarSet}.
+     * Add {@code variable} into {@link #liveVarSet}.
      *
      * @param variable a LiveVar
      */
@@ -45,16 +45,16 @@ public class LiveVarStore implements Store<LiveVarStore> {
     }
 
     /**
-     * Remove {@code variable} from {@code liveVarSet}.
+     * Remove {@code variable} from {@link #liveVarSet}.
      *
-     * @param variable a LiveVar
+     * @param variable a live variable
      */
     public void killLiveVar(LiveVar variable) {
         liveVarSet.remove(variable);
     }
 
     /**
-     * Add the LiveVars in expression to liveVarSet.
+     * Add the live variables in expression to {@link #liveVarSet}.
      *
      * @param expression a Node
      */
