@@ -35,6 +35,10 @@ public interface Block {
      */
     long getId();
 
-    /** @return the predecessors of this basic block */
+    /**
+     * Returns the predecessors of this basic block.
+     *
+     * @return the predecessors of this basic block
+     */
     Set<BlockImpl> getPredecessors();
 }
