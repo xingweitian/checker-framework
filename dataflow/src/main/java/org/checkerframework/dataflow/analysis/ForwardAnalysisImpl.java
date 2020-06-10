@@ -30,9 +30,9 @@ import org.checkerframework.javacutil.Pair;
  * An implementation of a forward analysis to solve a org.checkerframework.dataflow problem given a
  * control flow graph and a transfer function.
  *
- * @param <V> The abstract value type to be tracked by the analysis
- * @param <S> The store type used in the analysis
- * @param <T> The transfer function type that is used to approximated runtime behavior
+ * @param <V> the abstract value type to be tracked by the analysis
+ * @param <S> the store type used in the analysis
+ * @param <T> the transfer function type that is used to approximate runtime behavior
  */
 public class ForwardAnalysisImpl<
                 V extends AbstractValue<V>,

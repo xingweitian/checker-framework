@@ -187,7 +187,7 @@ public abstract class AbstractAnalysis<
     }
 
     /**
-     * Return all current node values.
+     * Returns all current node values.
      *
      * @return {@link #nodeValues}
      */
@@ -374,13 +374,11 @@ public abstract class AbstractAnalysis<
     protected boolean updateNodeValues(Node node, TransferResult<V, S> transferResult) {
         V newVal = transferResult.getResultValue();
         boolean nodeValueChanged = false;
-
         if (newVal != null) {
             V oldVal = nodeValues.get(node);
             nodeValues.put(node, newVal);
             nodeValueChanged = !Objects.equals(oldVal, newVal);
         }
-
         return nodeValueChanged || transferResult.storeChanged();
     }
 
@@ -398,9 +396,10 @@ public abstract class AbstractAnalysis<
     }
 
     /**
-     * Add a basic block to the Worklist. If {@code b} is already present, the method does nothing.
+     * Add a basic block to {@link #worklist}. If {@code b} is already present, the method does
+     * nothing.
      *
-     * @param b the block to add to the Worklist
+     * @param b the block to add to {@link #worklist}
      */
     protected void addToWorklist(Block b) {
         // TODO: use a more efficient way to check if b is already present
@@ -446,7 +445,7 @@ public abstract class AbstractAnalysis<
         protected final PriorityQueue<Block> queue;
 
         /**
-         * The work list.
+         * Create a Worklist.
          *
          * @param direction the direction (forward or backward)
          */
@@ -463,7 +462,7 @@ public abstract class AbstractAnalysis<
         }
 
         /**
-         * Process the control flow graph, add the Blocks to {@link #depthFirstOrder}.
+         * Process the control flow graph, add the blocks to {@link #depthFirstOrder}.
          *
          * @param cfg the control flow graph to process
          */
@@ -501,7 +500,7 @@ public abstract class AbstractAnalysis<
         }
 
         /**
-         * Add Block to {@link #queue}.
+         * Add the given block to {@link #queue}.
          *
          * @param block the block to add to {@link #queue}
          */

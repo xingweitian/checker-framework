@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import javax.lang.model.element.Element;
+import javax.swing.*;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.cfg.block.Block;
 import org.checkerframework.dataflow.cfg.block.ExceptionBlock;
@@ -297,7 +298,7 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
                         firstNode = null;
                 }
                 if (firstNode == null) {
-                    // This block doesn't contains any node, return store in transfer input
+                    // This block doesn't contains any node, return the store in the transfer input
                     return transferInput.getRegularStore();
                 }
                 return analysis.runAnalysisFor(
@@ -345,7 +346,7 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
     }
 
     /**
-     * Returns the last node of a block, or null if none.
+     * Returns the last node of the given block, or {@code null} if none.
      *
      * @param bb the block
      * @return the last node of this block or {@code null}
@@ -361,7 +362,7 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
             case EXCEPTION_BLOCK:
                 return ((ExceptionBlock) bb).getNode();
             default:
-                throw new Error("Unrecognized block type: " + bb.getType());
+                throw new BugInCF("Unrecognized block type: " + bb.getType());
         }
     }
 
