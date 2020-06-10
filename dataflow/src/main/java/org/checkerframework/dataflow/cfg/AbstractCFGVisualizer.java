@@ -312,7 +312,7 @@ public abstract class AbstractCFGVisualizer<
      * @return the String representation of the transfer input of the block
      */
     protected String visualizeBlockTransferInputAfterHelper(
-            Block bb, Analysis<A, S, T> analysis, String escapeString) {
+            Block bb, Analysis<V, S, T> analysis, String escapeString) {
         if (analysis == null) {
             throw new BugInCF(
                     "analysis should be non-null when visualizing the transfer input of a block.");
@@ -331,7 +331,7 @@ public abstract class AbstractCFGVisualizer<
         if (analysisDirection == Direction.FORWARD) {
             regularStore = analysis.getResult().getStoreAfter(bb);
         } else {
-            TransferInput<A, S> input = analysis.getInput(bb);
+            TransferInput<V, S> input = analysis.getInput(bb);
             assert input != null : "@AssumeAssertion(nullness): invariant";
             isTwoStores = input.containsTwoStores();
             regularStore = input.getRegularStore();
