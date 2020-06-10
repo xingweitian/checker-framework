@@ -6,7 +6,6 @@ import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 import java.util.Set;
 import javax.lang.model.element.Element;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -138,7 +137,7 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
     private static void mergeTreeLookup(
             IdentityHashMap<Tree, Set<Node>> treeLookup,
             IdentityHashMap<Tree, Set<Node>> otherTreeLookup) {
-        for (Entry<Tree, Set<Node>> entry : otherTreeLookup.entrySet()) {
+        for (Map.Entry<Tree, Set<Node>> entry : otherTreeLookup.entrySet()) {
             Set<Node> hit = treeLookup.get(entry.getKey());
             if (hit == null) {
                 treeLookup.put(entry.getKey(), entry.getValue());
@@ -162,6 +161,10 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
      * available. Note that if the analysis has not finished yet, this value might not represent the
      * final value for this node.
      *
+     * @param n a node
+     * @return the abstract value for {@link Node} {@code n}, or {@code null} if no information is
+     *     available Returns the abstract value for {@link Node} {@code n}, or {@code null} if no
+     *     information is available.
      * @param n a node
      * @return the abstract value for {@link Node} {@code n}, or {@code null} if no information is
      *     available
@@ -235,10 +238,10 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
     }
 
     /**
-     * Return the store immediately before a given tree.
+     * Returns the store immediately before a given tree.
      *
      * @param tree a tree
-     * @return the store before the given tree
+     * @return the store immediately before a given {@link Tree}
      */
     public @Nullable S getStoreBefore(Tree tree) {
         Set<Node> nodes = getNodesForTree(tree);
@@ -258,10 +261,10 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
     }
 
     /**
-     * Return the store immediately before a given node.
+     * Returns the store immediately before a given {@link Node}.
      *
      * @param node a node
-     * @return the store before the given node
+     * @return the store immediately before a given {@link Node}
      */
     public @Nullable S getStoreBefore(Node node) {
         return runAnalysisFor(node, true);
@@ -363,10 +366,10 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
     }
 
     /**
-     * Return the store immediately after a given tree.
+     * Returns the store immediately after a given {@link Tree}.
      *
      * @param tree a tree
-     * @return the store after the given tree
+     * @return the store immediately after a given {@link Tree}
      */
     public @Nullable S getStoreAfter(Tree tree) {
         Set<Node> nodes = getNodesForTree(tree);
@@ -386,10 +389,10 @@ public class AnalysisResult<V extends AbstractValue<V>, S extends Store<S>> {
     }
 
     /**
-     * Return the store immediately after a given node.
+     * Returns the store immediately after a given {@link Node}.
      *
      * @param node a node
-     * @return the store after the given node
+     * @return the store immediately after a given {@link Node}
      */
     public @Nullable S getStoreAfter(Node node) {
         return runAnalysisFor(node, false);
