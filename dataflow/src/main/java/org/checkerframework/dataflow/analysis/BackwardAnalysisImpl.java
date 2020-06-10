@@ -38,7 +38,7 @@ public class BackwardAnalysisImpl<
 
     /**
      * Exception store of an exception block, propagated by exceptional successors of its exception
-     * block, and merged with the normal TransferResult.
+     * block, and merged with the normal {@link TransferResult}.
      */
     protected final IdentityHashMap<ExceptionBlock, S> exceptionStores;
 
@@ -72,7 +72,8 @@ public class BackwardAnalysisImpl<
     @Override
     public void performAnalysis(ControlFlowGraph cfg) {
         if (isRunning) {
-            throw new BugInCF("performAnalysis shouldn't be called when the analysis is running.");
+            throw new BugInCF(
+                    "performAnalysis() shouldn't be called when the analysis is running.");
         }
         isRunning = true;
         try {
@@ -262,7 +263,7 @@ public class BackwardAnalysisImpl<
      *     Worklist}
      */
     protected void addStoreAfter(Block pred, @Nullable Node node, S s, boolean addBlockToWorklist) {
-        // If block pred is an exception block, decide whether the block of passing node is an
+        // If the block pred is an exception block, decide whether the block of passing node is an
         // exceptional successor of the block pred
         if (pred instanceof ExceptionBlock
                 && ((ExceptionBlock) pred).getSuccessor() != null
@@ -299,7 +300,7 @@ public class BackwardAnalysisImpl<
     }
 
     /**
-     * Return the store corresponding to the location right after the basic block {@code b}.
+     * Returns the store corresponding to the location right after the basic block {@code b}.
      *
      * @param b the given block
      * @return the store right after the given block
@@ -349,19 +350,17 @@ public class BackwardAnalysisImpl<
                         }
                         // This point should never be reached. If the block of 'node' is
                         // 'block', then 'node' must be part of the contents of 'block'.
-                        throw new BugInCF(
-                                "BackwardAnalysisImpl::runAnalysisFor() This point should never be reached.");
+                        throw new BugInCF("This point should never be reached.");
                     }
                 case EXCEPTION_BLOCK:
                     {
-                        ExceptionBlock eBlock = (ExceptionBlock) block;
-                        if (eBlock.getNode() != node) {
+                        ExceptionBlock eb = (ExceptionBlock) block;
+                        if (eb.getNode() != node) {
                             throw new BugInCF(
-                                    "BackwardAnalysisImpl::runAnalysisFor() it is expected node is equal to the node"
-                                            + "in exception block, but get: node: "
+                                    "Node should be equal to eb.getNode(). But get: node: "
                                             + node
-                                            + "\teBlock.getNode(): "
-                                            + eBlock.getNode());
+                                            + "\teb.getNode(): "
+                                            + eb.getNode());
                         }
                         if (!before) {
                             return transferInput.getRegularStore();
@@ -370,7 +369,7 @@ public class BackwardAnalysisImpl<
                         TransferResult<V, S> transferResult =
                                 callTransferFunction(node, transferInput);
                         // Merge transfer result with the exception store of this exceptional block
-                        S exceptionStore = exceptionStores.get(eBlock);
+                        S exceptionStore = exceptionStores.get(eb);
                         return exceptionStore == null
                                 ? transferResult.getRegularStore()
                                 : transferResult.getRegularStore().leastUpperBound(exceptionStore);
