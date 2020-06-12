@@ -4,8 +4,7 @@ The Nullness Checker now treats System.getProperty soundly.  Use
 -Alint=permitClearProperty to disable special treatment of System.getProperty
 and to permit undefining built-in system properties.
 
-Dataflow:
- * The Dataflow framework now supports the backward analysis
+The Dataflow Framework now also supports backward analysis.
 
 Implementation details:
  * Changed the types of some fields and methods from array to List:
@@ -14,12 +13,12 @@ Implementation details:
    QualifierDefaults.STANDARD_CLIMB_DEFAULTS_BOTTOM
    QualifierDefaults.STANDARD_UNCHECKED_DEFAULTS_TOP
    QualifierDefaults.STANDARD_UNCHECKED_DEFAULTS_BOTTOM
- * Changed Analysis from class to interface, Added AbstractAnalysis,
+ * Dataflow Framework: Analysis is now an interface, added AbstractAnalysis,
    ForwardAnalysis, ForwardTransferFunction, ForwardAnalysisImpl,
    BackwardAnalysis, BackwardTransferFunction, BackwardAnalysisImpl.
-   This means you need to change your code in the following way:
-     extends Analysis<V, S, T> => extends ForwardAnalysisImpl<V, S, T>
-     implements TransferFunction<V, S> => implements ForwardTransferFunction<V, S>
+   Existing code is easy to adapt:
+     `extends Analysis<V, S, T>` => `extends ForwardAnalysisImpl<V, S, T>`
+     `implements TransferFunction<V, S>` => `implements ForwardTransferFunction<V, S>`
 
 ---------------------------------------------------------------------------
 
