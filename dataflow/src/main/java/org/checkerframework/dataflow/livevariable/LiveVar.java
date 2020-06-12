@@ -4,14 +4,19 @@ import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.analysis.AbstractValue;
 import org.checkerframework.dataflow.cfg.node.Node;
 
-/** The live variable class. */
+/**
+ * An implementation of an abstract value using for live variable analysis. A value holds the
+ * information of a live variable. To run live variable analysis, see {@link
+ * org.checkerframework.dataflow.cfg.playground.LiveVariablePlayground}.
+ */
 public class LiveVar implements AbstractValue<LiveVar> {
 
     /**
-     * The live node which can be a {@link org.checkerframework.dataflow.cfg.node.LocalVariableNode}
-     * or {@link org.checkerframework.dataflow.cfg.node.FieldAccessNode}.
+     * A live variable is represented by a node, which can be a {@link
+     * org.checkerframework.dataflow.cfg.node.LocalVariableNode} or {@link
+     * org.checkerframework.dataflow.cfg.node.FieldAccessNode}.
      */
-    protected final Node liveNode;
+    protected final Node liveVariable;
 
     @Override
     public LiveVar leastUpperBound(LiveVar other) {
@@ -19,17 +24,17 @@ public class LiveVar implements AbstractValue<LiveVar> {
     }
 
     /**
-     * Create a new live variable for {@code n}.
+     * Create a new live variable.
      *
-     * @param n a Node
+     * @param n a node
      */
     public LiveVar(Node n) {
-        this.liveNode = n;
+        this.liveVariable = n;
     }
 
     @Override
     public int hashCode() {
-        return this.liveNode.hashCode();
+        return this.liveVariable.hashCode();
     }
 
     @Override
@@ -37,13 +42,12 @@ public class LiveVar implements AbstractValue<LiveVar> {
         if (!(obj instanceof LiveVar)) {
             return false;
         }
-
         LiveVar other = (LiveVar) obj;
-        return this.liveNode.equals(other.liveNode);
+        return this.liveVariable.equals(other.liveVariable);
     }
 
     @Override
     public String toString() {
-        return this.liveNode.toString();
+        return this.liveVariable.toString();
     }
 }

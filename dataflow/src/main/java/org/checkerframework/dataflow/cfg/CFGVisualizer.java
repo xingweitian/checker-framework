@@ -145,7 +145,7 @@ public interface CFGVisualizer<
      * @param value the live node to be visualized
      * @return the String representation of live variables' name
      */
-    String visualizeLiveVarStoreVal(Object value);
+    String visualizeStoreVal(Object value);
 
     /**
      * Called by {@code CFAbstractStore} to visualize any information after the invocation of {@code

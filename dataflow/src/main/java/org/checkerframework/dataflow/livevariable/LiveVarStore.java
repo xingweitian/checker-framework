@@ -15,10 +15,14 @@ import org.checkerframework.dataflow.cfg.node.TernaryExpressionNode;
 import org.checkerframework.dataflow.cfg.node.TypeCastNode;
 import org.checkerframework.dataflow.cfg.node.UnaryOperationNode;
 
-/** The live variable store class. */
+/**
+ * An implementation of a store using for live variable analysis. A store contains information of
+ * live variables computed by an analysis so far. To run live variable analysis, see {@link
+ * org.checkerframework.dataflow.cfg.playground.LiveVariablePlayground}.
+ */
 public class LiveVarStore implements Store<LiveVarStore> {
 
-    /** A set of live variables. */
+    /** A set of live variable abstract values. */
     private final Set<LiveVar> liveVarSet;
 
     /** Create a new LiveVarStore. */
@@ -29,23 +33,23 @@ public class LiveVarStore implements Store<LiveVarStore> {
     /**
      * Create a new LiveVarStore.
      *
-     * @param liveVarSet a set of LiveVar
+     * @param liveVarSet a set of live variable abstract values
      */
     public LiveVarStore(Set<LiveVar> liveVarSet) {
         this.liveVarSet = liveVarSet;
     }
 
     /**
-     * Add {@code variable} into {@link #liveVarSet}.
+     * Add the information of a live variable into {@link #liveVarSet}.
      *
-     * @param variable a LiveVar
+     * @param variable a live variable
      */
     public void putLiveVar(LiveVar variable) {
         liveVarSet.add(variable);
     }
 
     /**
-     * Remove {@code variable} from {@link #liveVarSet}.
+     * Remove the information of a live variable from {@link #liveVarSet}.
      *
      * @param variable a live variable
      */
@@ -54,9 +58,9 @@ public class LiveVarStore implements Store<LiveVarStore> {
     }
 
     /**
-     * Add the live variables in expression to {@link #liveVarSet}.
+     * Add the information of live variables in an expression to {@link #liveVarSet}.
      *
-     * @param expression a Node
+     * @param expression a node
      */
     public void addUseInExpression(Node expression) {
         if (expression instanceof BinaryOperationNode) {
@@ -86,11 +90,9 @@ public class LiveVarStore implements Store<LiveVarStore> {
 
     @Override
     public boolean equals(@Nullable Object obj) {
-
         if (!(obj instanceof LiveVarStore)) {
             return false;
         }
-
         LiveVarStore other = (LiveVarStore) obj;
         return other.liveVarSet.equals(this.liveVarSet);
     }
@@ -130,13 +132,10 @@ public class LiveVarStore implements Store<LiveVarStore> {
         if (liveVarSet.isEmpty()) {
             return "No live variables.";
         }
-
         StringBuilder sbStoreVal = new StringBuilder();
-
         for (LiveVar liveVar : liveVarSet) {
-            sbStoreVal.append(viz.visualizeLiveVarStoreVal(liveVar.liveNode));
+            sbStoreVal.append(viz.visualizeStoreVal(liveVar.liveVariable));
         }
-
         return sbStoreVal.toString();
     }
 

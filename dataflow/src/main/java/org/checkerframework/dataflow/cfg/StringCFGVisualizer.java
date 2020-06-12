@@ -143,7 +143,7 @@ public class StringCFGVisualizer<
     }
 
     @Override
-    public String visualizeLiveVarStoreVal(Object value) {
+    public String visualizeStoreVal(Object value) {
         return value.toString() + " ";
     }
 

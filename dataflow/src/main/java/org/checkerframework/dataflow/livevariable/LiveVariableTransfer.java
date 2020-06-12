@@ -15,7 +15,10 @@ import org.checkerframework.dataflow.cfg.node.ObjectCreationNode;
 import org.checkerframework.dataflow.cfg.node.ReturnNode;
 import org.checkerframework.dataflow.cfg.node.StringConcatenateAssignmentNode;
 
-/** The live variable transfer function. */
+/**
+ * An implementation of a transfer function using for live variable analysis. To run live variable
+ * analysis, see {@link org.checkerframework.dataflow.cfg.playground.LiveVariablePlayground}.
+ */
 public class LiveVariableTransfer
         extends AbstractNodeVisitor<
                 TransferResult<LiveVar, LiveVarStore>, TransferInput<LiveVar, LiveVarStore>>
@@ -35,7 +38,7 @@ public class LiveVariableTransfer
     @Override
     public RegularTransferResult<LiveVar, LiveVarStore> visitNode(
             Node n, TransferInput<LiveVar, LiveVarStore> p) {
-        return new RegularTransferResult<>(null, p.getRegularStore().copy());
+        return new RegularTransferResult<>(null, p.getRegularStore());
     }
 
     @Override
@@ -84,10 +87,10 @@ public class LiveVariableTransfer
     }
 
     /**
-     * Update live variable information in an assignment.
+     * Update the information of live variables from an assignment statement.
      *
-     * @param variable the variable that should be removed from the store
-     * @param expression the expression that should be added to the store
+     * @param variable the variable that should be killed
+     * @param expression the expression in which the variables should be added
      * @param store the live variable store
      */
     private void processLiveVarInAssignment(Node variable, Node expression, LiveVarStore store) {
