@@ -9,7 +9,12 @@ import org.checkerframework.dataflow.livevariable.LiveVariableTransfer;
 
 /** The playground of live variable analysis. */
 public class LiveVariablePlayground {
-    /** Run live variable for a specific file and create a PDF of the CFG in the end. */
+
+    /**
+     * Run live variable analysis for a specific file and create a PDF of the CFG in the end.
+     *
+     * @param args input arguments
+     */
     public static void main(String[] args) {
 
         /* Configuration: change as appropriate */
