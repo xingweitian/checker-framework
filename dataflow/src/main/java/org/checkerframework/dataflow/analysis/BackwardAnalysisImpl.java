@@ -162,8 +162,8 @@ public class BackwardAnalysisImpl<
                     // thus there is no need to perform any analysis.
                     SpecialBlock sb = (SpecialBlock) b;
                     final SpecialBlockType sType = sb.getSpecialType();
-                    // storage the store at entry
                     if (sType == SpecialBlockType.ENTRY) {
+                        // storage the store at entry
                         storeAtEntry = outStores.get(sb);
                     } else {
                         assert sType == SpecialBlockType.EXIT
