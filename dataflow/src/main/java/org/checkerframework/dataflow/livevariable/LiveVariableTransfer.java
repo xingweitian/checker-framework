@@ -38,7 +38,7 @@ public class LiveVariableTransfer
     @Override
     public RegularTransferResult<LiveVar, LiveVarStore> visitNode(
             Node n, TransferInput<LiveVar, LiveVarStore> p) {
-        return new RegularTransferResult<>(null, p.getRegularStore());
+        return new RegularTransferResult<>(null, p.getRegularStore().copy());
     }
 
     @Override
