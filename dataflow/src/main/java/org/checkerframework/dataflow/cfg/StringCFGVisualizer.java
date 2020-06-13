@@ -143,11 +143,6 @@ public class StringCFGVisualizer<
     }
 
     @Override
-    public String visualizeStoreVal(Object value) {
-        return value.toString() + " ";
-    }
-
-    @Override
     public String visualizeStoreHeader(String classCanonicalName) {
         return classCanonicalName + " (" + lineSeparator;
     }

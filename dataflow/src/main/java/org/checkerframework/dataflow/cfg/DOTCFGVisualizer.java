@@ -283,11 +283,6 @@ public class DOTCFGVisualizer<
         return storeEntryIndent + keyName + " = " + value + leftJustifiedTerminator;
     }
 
-    @Override
-    public String visualizeStoreVal(Object value) {
-        return storeEntryIndent + escapeDoubleQuotes(value);
-    }
-
     /**
      * Escape the double quotes from the input String, replacing {@code "} by {@code \"}.
      *
