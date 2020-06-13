@@ -8,10 +8,10 @@ import org.checkerframework.dataflow.cfg.block.Block;
 import org.checkerframework.dataflow.cfg.node.Node;
 
 /**
- * This interface defines a dataflow analysis, given a control flow graph and a backward transfer
- * function. A dataflow analysis has a direction, either forward or backward. The direction of
- * corresponding transfer function is consistent with the analysis, i.e. a forward analysis has a
- * forward transfer function, and a backward analysis has a backward transfer function.
+ * This interface defines a dataflow analysis, given a control flow graph and a transfer function. A
+ * dataflow analysis has a direction, either forward or backward. The direction of corresponding
+ * transfer function is consistent with the analysis, i.e. a forward analysis has a forward transfer
+ * function, and a backward analysis has a backward transfer function.
  *
  * @param <V> the abstract value type to be tracked by the analysis
  * @param <S> the store type used in the analysis
@@ -107,9 +107,8 @@ public interface Analysis<
      * available. Note that if the analysis has not finished yet, this value might not represent the
      * final value for this node.
      *
-     * @param n a {@link Node}
-     * @return the abstract value for {@link Node} {@code n}, or {@code null} if no information is
-     *     available
+     * @param n n a node
+     * @return the abstract value for node {@code n}, or {@code null} if no information is available
      */
     @Nullable V getValue(Node n);
 

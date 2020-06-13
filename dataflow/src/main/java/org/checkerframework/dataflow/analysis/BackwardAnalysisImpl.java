@@ -162,8 +162,8 @@ public class BackwardAnalysisImpl<
                     // thus there is no need to perform any analysis.
                     SpecialBlock sb = (SpecialBlock) b;
                     final SpecialBlockType sType = sb.getSpecialType();
-                    // storage the store at entry
                     if (sType == SpecialBlockType.ENTRY) {
+                        // storage the store at entry
                         storeAtEntry = outStores.get(sb);
                     } else {
                         assert sType == SpecialBlockType.EXIT
@@ -230,10 +230,10 @@ public class BackwardAnalysisImpl<
             outStores.put(exceptionExitBlock, exceptionalInitialStore);
         }
         if (worklist.isEmpty()) {
-            throw new BugInCF("Worklist should has at least one exit block as start point.");
+            throw new BugInCF("The worklist needs at least one exit block as starting point.");
         }
         if (inputs.isEmpty() || outStores.isEmpty()) {
-            throw new BugInCF("There should has at least one input and outStore at the beginning.");
+            throw new BugInCF("At least one input and one output store are required.");
         }
     }
 
@@ -246,7 +246,7 @@ public class BackwardAnalysisImpl<
             boolean addToWorklistAgain) {
         if (flowRule != FlowRule.EACH_TO_EACH) {
             throw new BugInCF(
-                    "Backward analysis always propagate EACH to EACH, because there is no control flow.");
+                    "Backward analysis always propagates EACH to EACH, because there is no control flow.");
         }
 
         addStoreAfter(pred, node, currentInput.getRegularStore(), addToWorklistAgain);

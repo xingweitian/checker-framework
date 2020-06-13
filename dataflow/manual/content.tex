@@ -1426,12 +1426,11 @@ to define a particular analysis.
 Roughly, a dataflow analysis in the framework works as follows. Given
 the abstract syntax tree of a method, the framework computes the
 corresponding control-flow graph as described in
-\autoref{sec:cfg}. Then, a simple forward iterative algorithm is used
-to compute a fix-point, by iteratively applying a set of transfer
-functions to the nodes in the CFG\@.  These transfer functions are
-specific to the particular analysis and are used to approximate the
-runtime behavior of different statements and expressions.  Moreover,
-the backward analysis is also supported in the dataflow framework.
+\autoref{sec:cfg}. Then, a simple forward or backward iterative
+algorithm is used to compute a fix-point, by iteratively applying a
+set of transfer functions to the nodes in the CFG\@.  These transfer
+functions are specific to the particular analysis and are used to
+approximate the runtime behavior of different statements and expressions.
 
 An analysis result contains two parts:
 
