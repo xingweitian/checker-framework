@@ -5,7 +5,7 @@ import org.checkerframework.dataflow.analysis.BackwardAnalysisImpl;
 import org.checkerframework.dataflow.cfg.CFGVisualizeLauncher;
 import org.checkerframework.dataflow.livevariable.LiveVar;
 import org.checkerframework.dataflow.livevariable.LiveVarStore;
-import org.checkerframework.dataflow.livevariable.LiveVariableTransfer;
+import org.checkerframework.dataflow.livevariable.LiveVarTransfer;
 
 /** The playground of live variable analysis. */
 public class LiveVariablePlayground {
@@ -24,8 +24,8 @@ public class LiveVariablePlayground {
         String clazz = "Test"; // name of the class to consider
 
         // Run the analysis and create a PDF file
-        LiveVariableTransfer transfer = new LiveVariableTransfer();
-        BackwardAnalysis<LiveVar, LiveVarStore, LiveVariableTransfer> backwardAnalysis =
+        LiveVarTransfer transfer = new LiveVarTransfer();
+        BackwardAnalysis<LiveVar, LiveVarStore, LiveVarTransfer> backwardAnalysis =
                 new BackwardAnalysisImpl<>(transfer);
         CFGVisualizeLauncher cfgVisualizeLauncher = new CFGVisualizeLauncher();
         cfgVisualizeLauncher.generateDOTofCFG(

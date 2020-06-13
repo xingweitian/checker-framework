@@ -15,11 +15,8 @@ import org.checkerframework.dataflow.cfg.node.ObjectCreationNode;
 import org.checkerframework.dataflow.cfg.node.ReturnNode;
 import org.checkerframework.dataflow.cfg.node.StringConcatenateAssignmentNode;
 
-/**
- * An implementation of a transfer function using for live variable analysis. To run live variable
- * analysis, see {@link org.checkerframework.dataflow.cfg.playground.LiveVariablePlayground}.
- */
-public class LiveVariableTransfer
+/** A live variable transfer function. */
+public class LiveVarTransfer
         extends AbstractNodeVisitor<
                 TransferResult<LiveVar, LiveVarStore>, TransferInput<LiveVar, LiveVarStore>>
         implements BackwardTransferFunction<LiveVar, LiveVarStore> {

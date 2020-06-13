@@ -14,12 +14,9 @@ import org.checkerframework.dataflow.cfg.node.Node;
 import org.checkerframework.dataflow.cfg.node.TernaryExpressionNode;
 import org.checkerframework.dataflow.cfg.node.TypeCastNode;
 import org.checkerframework.dataflow.cfg.node.UnaryOperationNode;
+import org.checkerframework.javacutil.BugInCF;
 
-/**
- * An implementation of a store using for live variable analysis. A store contains information of
- * live variables computed by an analysis so far. To run live variable analysis, see {@link
- * org.checkerframework.dataflow.cfg.playground.LiveVariablePlayground}.
- */
+/** A live variable store contains a set of live variables represented by nodes. */
 public class LiveVarStore implements Store<LiveVarStore> {
 
     /** A set of live variable abstract values. */
@@ -63,10 +60,10 @@ public class LiveVarStore implements Store<LiveVarStore> {
      * @param expression a node
      */
     public void addUseInExpression(Node expression) {
-        if (expression instanceof BinaryOperationNode) {
-            BinaryOperationNode binaryNode = (BinaryOperationNode) expression;
-            addUseInExpression(binaryNode.getLeftOperand());
-            addUseInExpression(binaryNode.getRightOperand());
+        // TODO Do we need a AbstractNodeScanner to do the following job?
+        if (expression instanceof LocalVariableNode || expression instanceof FieldAccessNode) {
+            LiveVar liveVar = new LiveVar(expression);
+            putLiveVar(liveVar);
         } else if (expression instanceof UnaryOperationNode) {
             UnaryOperationNode unaryNode = (UnaryOperationNode) expression;
             addUseInExpression(unaryNode.getOperand());
@@ -81,10 +78,10 @@ public class LiveVarStore implements Store<LiveVarStore> {
         } else if (expression instanceof InstanceOfNode) {
             InstanceOfNode instanceOfNode = (InstanceOfNode) expression;
             addUseInExpression(instanceOfNode.getOperand());
-        } else if (expression instanceof LocalVariableNode
-                || expression instanceof FieldAccessNode) {
-            LiveVar liveVar = new LiveVar(expression);
-            putLiveVar(liveVar);
+        } else if (expression instanceof BinaryOperationNode) {
+            BinaryOperationNode binaryNode = (BinaryOperationNode) expression;
+            addUseInExpression(binaryNode.getLeftOperand());
+            addUseInExpression(binaryNode.getRightOperand());
         }
     }
 
@@ -119,7 +116,7 @@ public class LiveVarStore implements Store<LiveVarStore> {
     /** It should not be called since it is not used by the backward analysis. */
     @Override
     public LiveVarStore widenedUpperBound(LiveVarStore previous) {
-        throw new RuntimeException("wub of LiveVarStore get called!");
+        throw new BugInCF("wub of LiveVarStore get called!");
     }
 
     @Override
@@ -134,7 +131,7 @@ public class LiveVarStore implements Store<LiveVarStore> {
         }
         StringBuilder sbStoreVal = new StringBuilder();
         for (LiveVar liveVar : liveVarSet) {
-            sbStoreVal.append(viz.visualizeStoreVal(liveVar.liveVariable));
+            sbStoreVal.append(viz.visualizeStoreKeyVal("live variable", liveVar.liveVariable));
         }
         return sbStoreVal.toString();
     }

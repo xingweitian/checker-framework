@@ -3,12 +3,9 @@ package org.checkerframework.dataflow.livevariable;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.analysis.AbstractValue;
 import org.checkerframework.dataflow.cfg.node.Node;
+import org.checkerframework.javacutil.BugInCF;
 
-/**
- * An implementation of an abstract value using for live variable analysis. A value holds the
- * information of a live variable. To run live variable analysis, see {@link
- * org.checkerframework.dataflow.cfg.playground.LiveVariablePlayground}.
- */
+/** A live variable wrapper turning node into abstract value. */
 public class LiveVar implements AbstractValue<LiveVar> {
 
     /**
@@ -20,7 +17,7 @@ public class LiveVar implements AbstractValue<LiveVar> {
 
     @Override
     public LiveVar leastUpperBound(LiveVar other) {
-        throw new RuntimeException("lub of LiveVar get called!");
+        throw new BugInCF("lub of LiveVar get called!");
     }
 
     /**
