@@ -813,7 +813,7 @@ subprojects {
                 dependsOn('nullnessExtraTests', 'commandLineTests', 'tutorialTests')
             }
 
-            if(project.name.is('dataflow')) {
+            if(project.name.is('dataflow') && isJava8) {
                 dependsOn('liveVariableTest')
             }
         }
