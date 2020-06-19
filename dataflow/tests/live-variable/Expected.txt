@@ -1,0 +1,90 @@
+2 -> 3 EACH_TO_EACH
+3 -> 4 EACH_TO_EACH
+4 -> 8 THEN_TO_BOTH
+4 -> 10 ELSE_TO_BOTH
+8 -> 0 EACH_TO_EACH
+10 -> 0 EACH_TO_EACH
+
+2:
+Process order: 1
+Before: No live variables.
+~~~~~~~~~
+<entry>
+
+~~~~~~~~~
+After: No live variables.
+
+3:
+Process order: 2
+Before: No live variables.
+~~~~~~~~~
+a   [ VariableDeclaration ]
+1   [ IntegerLiteral ]
+a = 1   [ Assignment ]
+b   [ VariableDeclaration ]
+2   [ IntegerLiteral ]
+b = 2   [ Assignment ]
+c   [ VariableDeclaration ]
+3   [ IntegerLiteral ]
+c = 3   [ Assignment ]
+a   [ LocalVariable ]
+0   [ IntegerLiteral ]
+(a > 0)   [ GreaterThan ]
+~~~~~~~~~
+After:   live variable = a
+  live variable = b
+  live variable = c
+
+
+0:
+Process order: 6
+Before: No live variables.
+~~~~~~~~~
+<exit>
+
+~~~~~~~~~
+After: No live variables.
+
+4:
+Process order: 3
+Before:   live variable = a
+  live variable = b
+  live variable = c
+
+~~~~~~~~~
+ConditionalBlock: then: 8, else: 10
+~~~~~~~~~
+After:   live variable = a
+  live variable = b
+  live variable = c
+
+
+10:
+Process order: 5
+Before:   live variable = a
+  live variable = b
+
+~~~~~~~~~
+e   [ VariableDeclaration ]
+a   [ LocalVariable ]
+b   [ LocalVariable ]
+(a + b)   [ NumericalAddition ]
+e = (a + b)   [ Assignment ]
+~~~~~~~~~
+After: No live variables.
+
+8:
+Process order: 4
+Before:   live variable = a
+  live variable = c
+
+~~~~~~~~~
+d   [ VariableDeclaration ]
+a   [ LocalVariable ]
+c   [ LocalVariable ]
+(a + c)   [ NumericalAddition ]
+d = (a + c)   [ Assignment ]
+~~~~~~~~~
+After: No live variables.
+
+
