@@ -100,7 +100,7 @@ public abstract class AbstractCFGVisualizer<
             cur = workList.poll();
         }
         sbGraph.append(visualizeNodes(visited, cfg, analysis));
-        return sbGraph.toString();
+        return sbGraph.toString().trim();
     }
 
     /**
@@ -203,7 +203,7 @@ public abstract class AbstractCFGVisualizer<
                 sbBlock.append(visualizeBlockTransferInputAfter(bb, analysis));
             }
         }
-        if (!centered || verbose) {
+        if (!centered) {
             sbBlock.append(escapeString);
         }
         return sbBlock.toString();
@@ -271,7 +271,7 @@ public abstract class AbstractCFGVisualizer<
         boolean isTwoStores = false;
 
         StringBuilder sbStore = new StringBuilder();
-        sbStore.append("Before: ");
+        sbStore.append("Before:");
 
         Direction analysisDirection = analysis.getDirection();
 
@@ -323,7 +323,7 @@ public abstract class AbstractCFGVisualizer<
         boolean isTwoStores = false;
 
         StringBuilder sbStore = new StringBuilder();
-        sbStore.append("After: ");
+        sbStore.append("After:");
 
         Direction analysisDirection = analysis.getDirection();
 

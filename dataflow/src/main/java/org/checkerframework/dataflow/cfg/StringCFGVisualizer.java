@@ -1,10 +1,6 @@
 package org.checkerframework.dataflow.cfg;
 
-import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.analysis.AbstractValue;
@@ -41,7 +37,13 @@ public class StringCFGVisualizer<
         IdentityHashMap<Block, List<Integer>> processOrder = getProcessOrder(cfg);
 
         // Generate all the Nodes.
-        for (@KeyFor("processOrder") Block v : blocks) {
+        Iterator<Block> iter = blocks.iterator();
+        boolean lastNode = false;
+        while (iter.hasNext()) {
+            @KeyFor("processOrder") Block v = iter.next();
+            if (!iter.hasNext()) {
+                lastNode = true;
+            }
             sbStringNodes.append(v.getId()).append(":").append(lineSeparator);
             if (verbose) {
                 sbStringNodes
@@ -49,10 +51,12 @@ public class StringCFGVisualizer<
                         .append(lineSeparator);
             }
             String strBlock = visualizeBlock(v, analysis);
-            if (strBlock.length() == 0) {
-                sbStringNodes.append(lineSeparator);
-            } else {
+            if (strBlock.length() != 0 && !lastNode) {
                 sbStringNodes.append(strBlock).append(lineSeparator);
+            } else if (strBlock.length() != 0) {
+                sbStringNodes.append(strBlock);
+            } else if (!lastNode) {
+                sbStringNodes.append(lineSeparator);
             }
         }
         return sbStringNodes.toString();
