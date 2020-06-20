@@ -36,15 +36,6 @@ After:   live variable = a
   live variable = c
 
 
-0:
-Process order: 6
-Before: No live variables.
-~~~~~~~~~
-<exit>
-
-~~~~~~~~~
-After: No live variables.
-
 4:
 Process order: 3
 Before:   live variable = a
@@ -58,6 +49,20 @@ After:   live variable = a
   live variable = b
   live variable = c
 
+
+8:
+Process order: 4
+Before:   live variable = a
+  live variable = c
+
+~~~~~~~~~
+d   [ VariableDeclaration ]
+a   [ LocalVariable ]
+c   [ LocalVariable ]
+(a + c)   [ NumericalAddition ]
+d = (a + c)   [ Assignment ]
+~~~~~~~~~
+After: No live variables.
 
 10:
 Process order: 5
@@ -73,17 +78,12 @@ e = (a + b)   [ Assignment ]
 ~~~~~~~~~
 After: No live variables.
 
-8:
-Process order: 4
-Before:   live variable = a
-  live variable = c
-
+0:
+Process order: 6
+Before: No live variables.
 ~~~~~~~~~
-d   [ VariableDeclaration ]
-a   [ LocalVariable ]
-c   [ LocalVariable ]
-(a + c)   [ NumericalAddition ]
-d = (a + c)   [ Assignment ]
+<exit>
+
 ~~~~~~~~~
 After: No live variables.
 
