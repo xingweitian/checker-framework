@@ -1,7 +1,6 @@
 package org.checkerframework.dataflow.cfg;
 
 import java.util.*;
-import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.analysis.AbstractValue;
 import org.checkerframework.dataflow.analysis.Analysis;
@@ -40,7 +39,7 @@ public class StringCFGVisualizer<
         Iterator<Block> iter = blocks.iterator();
         boolean lastNode = false;
         while (iter.hasNext()) {
-            @KeyFor("processOrder") Block v = iter.next();
+            Block v = iter.next();
             if (!iter.hasNext()) {
                 lastNode = true;
             }
