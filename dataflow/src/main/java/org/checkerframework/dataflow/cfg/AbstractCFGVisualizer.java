@@ -99,7 +99,7 @@ public abstract class AbstractCFGVisualizer<
             cur = workList.poll();
         }
         sbGraph.append(visualizeNodes(visited, cfg, analysis));
-        return sbGraph.toString().trim();
+        return sbGraph.toString();
     }
 
     /**
