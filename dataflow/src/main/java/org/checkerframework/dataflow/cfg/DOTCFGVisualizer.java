@@ -278,7 +278,7 @@ public class DOTCFGVisualizer<
 
     @Override
     public String visualizeStoreFooter() {
-        return ")";
+        return ")" + leftJustifiedTerminator;
     }
 
     /**

@@ -145,7 +145,7 @@ public class StringCFGVisualizer<
 
     @Override
     public String visualizeStoreFooter() {
-        return ")";
+        return ")" + lineSeparator;
     }
 
     /**
