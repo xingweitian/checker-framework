@@ -84,7 +84,8 @@ public class StringCFGVisualizer<
         return "ConditionalBlock: then: "
                 + cbb.getThenSuccessor().getId()
                 + ", else: "
-                + cbb.getElseSuccessor().getId();
+                + cbb.getElseSuccessor().getId()
+                + lineSeparator;
     }
 
     @Override
@@ -99,15 +100,7 @@ public class StringCFGVisualizer<
 
     @Override
     public String visualizeBlockNode(Node t, @Nullable Analysis<V, S, T> analysis) {
-        StringBuilder sbBlockNode = new StringBuilder();
-        sbBlockNode.append(t.toString()).append("   [ ").append(getNodeSimpleName(t)).append(" ]");
-        if (analysis != null) {
-            V value = analysis.getValue(t);
-            if (value != null) {
-                sbBlockNode.append(" > ").append(value.toString());
-            }
-        }
-        return sbBlockNode.toString();
+        return super.visualizeBlockNodeHelper(t, analysis, false);
     }
 
     @Override

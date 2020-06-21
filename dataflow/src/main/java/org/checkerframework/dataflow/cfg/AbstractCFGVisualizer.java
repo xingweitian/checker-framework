@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.Set;
-import java.util.StringJoiner;
 import javax.lang.model.type.TypeMirror;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -183,12 +182,9 @@ public abstract class AbstractCFGVisualizer<
         StringBuilder sbBlock = new StringBuilder();
         sbBlock.append(loopOverBlockContents(bb, analysis, escapeString));
 
-        // Handle case where no contents are present.
-        boolean centered = false;
         if (sbBlock.length() == 0) {
             if (bb.getType() == Block.BlockType.SPECIAL_BLOCK) {
                 sbBlock.append(visualizeSpecialBlock((SpecialBlock) bb));
-                centered = true;
             } else if (bb.getType() == Block.BlockType.CONDITIONAL_BLOCK) {
                 sbBlock.append(visualizeConditionalBlock((ConditionalBlock) bb));
             } else {
@@ -202,9 +198,6 @@ public abstract class AbstractCFGVisualizer<
             if (verbose) {
                 sbBlock.append(visualizeBlockTransferInputAfter(bb, analysis));
             }
-        }
-        if (!centered) {
-            sbBlock.append(escapeString);
         }
         return sbBlock.toString();
     }
@@ -221,11 +214,42 @@ public abstract class AbstractCFGVisualizer<
             Block bb, @Nullable Analysis<V, S, T> analysis, String separator) {
 
         List<Node> contents = addBlockContent(bb);
-        StringJoiner sjBlockContents = new StringJoiner(separator);
+        StringBuilder sbBlockContents = new StringBuilder();
         for (Node t : contents) {
-            sjBlockContents.add(visualizeBlockNode(t, analysis));
+            sbBlockContents.append(visualizeBlockNode(t, analysis)).append(separator);
         }
-        return sjBlockContents.toString();
+        return sbBlockContents.toString();
+    }
+
+    /**
+     * Helper method to visualize a node based on the analysis.
+     *
+     * @param t a node
+     * @param analysis the current analysis
+     * @param needEscape need to escape double quotes
+     * @return the visualization of the given node
+     */
+    protected String visualizeBlockNodeHelper(
+            Node t, @Nullable Analysis<V, S, T> analysis, boolean needEscape) {
+        StringBuilder sbBlockNode = new StringBuilder();
+        if (needEscape) {
+            sbBlockNode.append(escapeDoubleQuotes(t));
+        } else {
+            sbBlockNode.append(t.toString());
+        }
+        sbBlockNode.append("   [ ").append(getNodeSimpleName(t)).append(" ]");
+        if (analysis != null) {
+            V value = analysis.getValue(t);
+            if (value != null) {
+                sbBlockNode.append("    > ");
+                if (needEscape) {
+                    sbBlockNode.append(escapeDoubleQuotes(value));
+                } else {
+                    sbBlockNode.append(value.toString());
+                }
+            }
+        }
+        return sbBlockNode.toString();
     }
 
     /**
@@ -296,7 +320,7 @@ public abstract class AbstractCFGVisualizer<
             sbStore.append(", else=");
             sbStore.append(visualizeStore(elseStore));
         }
-        sbStore.append(escapeString).append("~~~~~~~~~").append(escapeString);
+        sbStore.append("~~~~~~~~~").append(escapeString);
         return sbStore.toString();
     }
 
@@ -348,7 +372,7 @@ public abstract class AbstractCFGVisualizer<
             sbStore.append(", else=");
             sbStore.append(visualizeStore(elseStore));
         }
-        sbStore.insert(0, escapeString + "~~~~~~~~~" + escapeString);
+        sbStore.insert(0, "~~~~~~~~~" + escapeString);
         return sbStore.toString();
     }
 
@@ -455,5 +479,25 @@ public abstract class AbstractCFGVisualizer<
     protected String getNodeSimpleName(Node t) {
         String name = t.getClass().getSimpleName();
         return name.replace("Node", "");
+    }
+
+    /**
+     * Escape the double quotes from the input String, replacing {@code "} by {@code \"}.
+     *
+     * @param str the string to be escaped
+     * @return the escaped version of the string
+     */
+    protected String escapeDoubleQuotes(final String str) {
+        return str.replace("\"", "\\\"");
+    }
+
+    /**
+     * Escape the double quotes from the string representation of the given object.
+     *
+     * @param obj an object
+     * @return an escaped version of the string representation of the object
+     */
+    protected String escapeDoubleQuotes(final Object obj) {
+        return escapeDoubleQuotes(String.valueOf(obj));
     }
 }
