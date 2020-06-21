@@ -45,9 +45,9 @@ public class StringCFGVisualizer<
             }
             sbStringNodes.append(v.getId()).append(":").append(lineSeparator);
             if (verbose) {
-                sbStringNodes
-                        .append(getProcessOrderSimpleString(processOrder.get(v)))
-                        .append(lineSeparator);
+                List<Integer> order = processOrder.get(v);
+                assert order != null : "@AssumeAssertion(nullness)";
+                sbStringNodes.append(getProcessOrderSimpleString(order)).append(lineSeparator);
             }
             String strBlock = visualizeBlock(v, analysis);
             if (strBlock.length() != 0 && !lastNode) {
