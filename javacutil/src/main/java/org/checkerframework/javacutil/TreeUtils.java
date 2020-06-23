@@ -393,12 +393,12 @@ public final class TreeUtils {
      * <p>Otherwise, null is returned.
      *
      * @param treePath the tree path
-     * @param extendedResult if extended result is needed. Current extended result: pseudo
-     *     assignment of method invocation receiver
+     * @param conservative if conservative result is needed. Conservative result does not include
+     *     pseudo assignment of method invocation receiver
      * @return the assignment context as described, {@code null} otherwise
      */
     public static @Nullable Tree getAssignmentContext(
-            final TreePath treePath, boolean extendedResult) {
+            final TreePath treePath, boolean conservative) {
         TreePath parentPath = treePath.getParentPath();
 
         if (parentPath == null) {
@@ -442,7 +442,9 @@ public final class TreeUtils {
                 if (grandParentPath != null
                         && grandParentPath.getLeaf() instanceof MethodInvocationTree) {
 
-                    if (extendedResult) {
+                    // do not use foo().bar() scheme as assignment context when conservative, since
+                    // assignedTo for that is not implemented yet
+                    if (conservative) {
                         MethodInvocationTree grandTree =
                                 (MethodInvocationTree) grandParentPath.getLeaf();
 
