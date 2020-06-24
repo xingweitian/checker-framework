@@ -423,13 +423,13 @@ public abstract class AbstractQualifierPolymorphism implements QualifierPolymorp
         /**
          * Reduces lower bounds r1 with upper bounds r2.
          *
-         * @param r1 a map from {@link AnnotationMirror} to {@link AnnotationMirrorSet}
-         * @param r2 a map from {@link AnnotationMirror} to {@link AnnotationMirrorSet}
+         * @param r1 a map from {@link AnnotationMirror} to {@link AnnotationMirror}
+         * @param r2 a map from {@link AnnotationMirror} to {@link AnnotationMirror}
          * @return the reduced {@link AnnotationMirrorMap}
          */
-        private AnnotationMirrorMap<AnnotationMirrorSet> reduceWithUpperBounds(
-                AnnotationMirrorMap<AnnotationMirrorSet> r1,
-                AnnotationMirrorMap<AnnotationMirrorSet> r2) {
+        private AnnotationMirrorMap<AnnotationMirror> reduceWithUpperBounds(
+                AnnotationMirrorMap<AnnotationMirror> r1,
+                AnnotationMirrorMap<AnnotationMirror> r2) {
 
             if (r1 == null || r1.isEmpty()) {
                 return r2;
@@ -438,29 +438,27 @@ public abstract class AbstractQualifierPolymorphism implements QualifierPolymorp
                 return r1;
             }
 
-            AnnotationMirrorMap<AnnotationMirrorSet> res = new AnnotationMirrorMap<>();
+            AnnotationMirrorMap<AnnotationMirror> res = new AnnotationMirrorMap<>();
             // Ensure that all qualifiers from r1 and r2 are visited.
             AnnotationMirrorSet r2remain = new AnnotationMirrorSet();
             r2remain.addAll(r2.keySet());
-            for (Map.Entry<AnnotationMirror, AnnotationMirrorSet> kv1 : r1.entrySet()) {
+            for (Map.Entry<AnnotationMirror, AnnotationMirror> kv1 : r1.entrySet()) {
                 AnnotationMirror key1 = kv1.getKey();
-                AnnotationMirrorSet a1Annos = kv1.getValue();
-                AnnotationMirrorSet a2Annos = r2.get(key1);
-                if (a2Annos != null && !a2Annos.isEmpty()) {
+                AnnotationMirror a1Anno = kv1.getValue();
+                AnnotationMirror a2Anno = r2.get(key1);
+                if (a2Anno != null) {
                     r2remain.remove(key1);
-                    AnnotationMirrorSet subres = new AnnotationMirrorSet();
+                    AnnotationMirror subres = null;
                     for (AnnotationMirror top : topQuals) {
-                        AnnotationMirror a1 = qualHierarchy.findAnnotationInHierarchy(a1Annos, top);
-                        AnnotationMirror a2 = qualHierarchy.findAnnotationInHierarchy(a2Annos, top);
-                        if (a1 != null) {
-                            subres.add(a1);
-                        } else if (a2 != null) {
-                            subres.add(a2);
+                        if (qualHierarchy.isSubtype(a1Anno, top)) {
+                            subres = a1Anno;
+                        } else if (qualHierarchy.isSubtype(a2Anno, top)) {
+                            subres = a2Anno;
                         }
                     }
                     res.put(key1, subres);
                 } else {
-                    res.put(key1, a1Annos);
+                    res.put(key1, a1Anno);
                 }
             }
             for (AnnotationMirror key2 : r2remain) {
@@ -560,7 +558,7 @@ public abstract class AbstractQualifierPolymorphism implements QualifierPolymorp
          * @param polyType AnnotatedTypeMirror that may have polymorphic qualifiers
          * @return {@code visit(type, polyType, false)}
          */
-        private AnnotationMirrorMap<AnnotationMirrorSet> visit(
+        private AnnotationMirrorMap<AnnotationMirror> visit(
                 AnnotatedTypeMirror type, AnnotatedTypeMirror polyType) {
             return visit(type, polyType, false);
         }
