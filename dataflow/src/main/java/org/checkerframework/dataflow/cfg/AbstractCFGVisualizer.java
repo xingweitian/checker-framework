@@ -183,12 +183,9 @@ public abstract class AbstractCFGVisualizer<
         StringBuilder sbBlock = new StringBuilder();
         sbBlock.append(loopOverBlockContents(bb, analysis, escapeString));
 
-        // Handle case where no contents are present.
-        boolean centered = false;
         if (sbBlock.length() == 0) {
             if (bb.getType() == Block.BlockType.SPECIAL_BLOCK) {
                 sbBlock.append(visualizeSpecialBlock((SpecialBlock) bb));
-                centered = true;
             } else if (bb.getType() == Block.BlockType.CONDITIONAL_BLOCK) {
                 sbBlock.append(visualizeConditionalBlock((ConditionalBlock) bb));
             } else {
@@ -202,9 +199,6 @@ public abstract class AbstractCFGVisualizer<
             if (verbose) {
                 sbBlock.append(visualizeBlockTransferInputAfter(bb, analysis));
             }
-        }
-        if (!centered || verbose) {
-            sbBlock.append(escapeString);
         }
         return sbBlock.toString();
     }
@@ -221,7 +215,8 @@ public abstract class AbstractCFGVisualizer<
             Block bb, @Nullable Analysis<V, S, T> analysis, String separator) {
 
         List<Node> contents = addBlockContent(bb);
-        StringJoiner sjBlockContents = new StringJoiner(separator);
+        StringJoiner sjBlockContents = new StringJoiner(separator, "", separator);
+        sjBlockContents.setEmptyValue("");
         for (Node t : contents) {
             sjBlockContents.add(visualizeBlockNode(t, analysis));
         }
@@ -271,7 +266,7 @@ public abstract class AbstractCFGVisualizer<
         boolean isTwoStores = false;
 
         StringBuilder sbStore = new StringBuilder();
-        sbStore.append("Before: ");
+        sbStore.append("Before:");
 
         Direction analysisDirection = analysis.getDirection();
 
@@ -296,7 +291,7 @@ public abstract class AbstractCFGVisualizer<
             sbStore.append(", else=");
             sbStore.append(visualizeStore(elseStore));
         }
-        sbStore.append(escapeString).append("~~~~~~~~~").append(escapeString);
+        sbStore.append("~~~~~~~~~").append(escapeString);
         return sbStore.toString();
     }
 
@@ -323,7 +318,7 @@ public abstract class AbstractCFGVisualizer<
         boolean isTwoStores = false;
 
         StringBuilder sbStore = new StringBuilder();
-        sbStore.append("After: ");
+        sbStore.append("After:");
 
         Direction analysisDirection = analysis.getDirection();
 
@@ -348,7 +343,7 @@ public abstract class AbstractCFGVisualizer<
             sbStore.append(", else=");
             sbStore.append(visualizeStore(elseStore));
         }
-        sbStore.insert(0, escapeString + "~~~~~~~~~" + escapeString);
+        sbStore.insert(0, "~~~~~~~~~" + escapeString);
         return sbStore.toString();
     }
 

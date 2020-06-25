@@ -2,10 +2,10 @@ package org.checkerframework.dataflow.cfg;
 
 import java.util.HashMap;
 import java.util.IdentityHashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.analysis.AbstractValue;
 import org.checkerframework.dataflow.analysis.Analysis;
@@ -25,7 +25,7 @@ public class StringCFGVisualizer<
     @Override
     public Map<String, Object> visualize(
             ControlFlowGraph cfg, Block entry, @Nullable Analysis<V, S, T> analysis) {
-        String stringGraph = visualizeGraph(cfg, entry, analysis);
+        String stringGraph = visualizeGraph(cfg, entry, analysis).trim();
         Map<String, Object> res = new HashMap<>();
         res.put("stringGraph", stringGraph);
         return res;
@@ -41,18 +41,30 @@ public class StringCFGVisualizer<
         IdentityHashMap<Block, List<Integer>> processOrder = getProcessOrder(cfg);
 
         // Generate all the Nodes.
-        for (@KeyFor("processOrder") Block v : blocks) {
+        Iterator<Block> iter = blocks.iterator();
+        boolean lastBlock = false;
+        while (iter.hasNext()) {
+            Block v = iter.next();
+            if (!iter.hasNext()) {
+                lastBlock = true;
+            }
             sbStringNodes.append(v.getId()).append(":").append(lineSeparator);
             if (verbose) {
-                sbStringNodes
-                        .append(getProcessOrderSimpleString(processOrder.get(v)))
-                        .append(lineSeparator);
+                List<Integer> order = processOrder.get(v);
+                assert order != null : "@AssumeAssertion(nullness)";
+                sbStringNodes.append(getProcessOrderSimpleString(order)).append(lineSeparator);
             }
             String strBlock = visualizeBlock(v, analysis);
-            if (strBlock.length() == 0) {
-                sbStringNodes.append(lineSeparator);
+            if (strBlock.length() != 0) {
+                if (!lastBlock) {
+                    sbStringNodes.append(strBlock).append(lineSeparator);
+                } else {
+                    sbStringNodes.append(strBlock);
+                }
             } else {
-                sbStringNodes.append(strBlock).append(lineSeparator);
+                if (!lastBlock) {
+                    sbStringNodes.append(lineSeparator);
+                }
             }
         }
         return sbStringNodes.toString();
@@ -81,7 +93,8 @@ public class StringCFGVisualizer<
         return "ConditionalBlock: then: "
                 + cbb.getThenSuccessor().getId()
                 + ", else: "
-                + cbb.getElseSuccessor().getId();
+                + cbb.getElseSuccessor().getId()
+                + lineSeparator;
     }
 
     @Override
@@ -149,7 +162,7 @@ public class StringCFGVisualizer<
 
     @Override
     public String visualizeStoreFooter() {
-        return ")";
+        return ")" + lineSeparator;
     }
 
     /**
