@@ -42,11 +42,11 @@ public class StringCFGVisualizer<
 
         // Generate all the Nodes.
         Iterator<Block> iter = blocks.iterator();
-        boolean lastNode = false;
+        boolean lastBlock = false;
         while (iter.hasNext()) {
             Block v = iter.next();
             if (!iter.hasNext()) {
-                lastNode = true;
+                lastBlock = true;
             }
             sbStringNodes.append(v.getId()).append(":").append(lineSeparator);
             if (verbose) {
@@ -55,12 +55,16 @@ public class StringCFGVisualizer<
                 sbStringNodes.append(getProcessOrderSimpleString(order)).append(lineSeparator);
             }
             String strBlock = visualizeBlock(v, analysis);
-            if (strBlock.length() != 0 && !lastNode) {
-                sbStringNodes.append(strBlock).append(lineSeparator);
-            } else if (strBlock.length() != 0) {
-                sbStringNodes.append(strBlock);
-            } else if (!lastNode) {
-                sbStringNodes.append(lineSeparator);
+            if (strBlock.length() != 0) {
+                if (!lastBlock) {
+                    sbStringNodes.append(strBlock).append(lineSeparator);
+                } else {
+                    sbStringNodes.append(strBlock);
+                }
+            } else {
+                if (!lastBlock) {
+                    sbStringNodes.append(lineSeparator);
+                }
             }
         }
         return sbStringNodes.toString();

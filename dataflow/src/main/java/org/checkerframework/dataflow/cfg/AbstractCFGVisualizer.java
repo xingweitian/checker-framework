@@ -1,14 +1,6 @@
 package org.checkerframework.dataflow.cfg;
 
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.IdentityHashMap;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
+import java.util.*;
 import javax.lang.model.type.TypeMirror;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -214,11 +206,12 @@ public abstract class AbstractCFGVisualizer<
             Block bb, @Nullable Analysis<V, S, T> analysis, String separator) {
 
         List<Node> contents = addBlockContent(bb);
-        StringBuilder sbBlockContents = new StringBuilder();
+        StringJoiner sjBlockContents = new StringJoiner(separator, "", separator);
+        sjBlockContents.setEmptyValue("");
         for (Node t : contents) {
-            sbBlockContents.append(visualizeBlockNode(t, analysis)).append(separator);
+            sjBlockContents.add(visualizeBlockNode(t, analysis));
         }
-        return sbBlockContents.toString();
+        return sjBlockContents.toString();
     }
 
     /**
