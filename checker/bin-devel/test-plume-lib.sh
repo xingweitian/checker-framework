@@ -45,7 +45,12 @@ for PACKAGE in "${PACKAGES[@]}"; do
   echo "PACKAGE=${PACKAGE}"
   PACKAGEDIR="/tmp/${PACKAGE}"
   rm -rf "${PACKAGEDIR}"
-  "/tmp/$USER/plume-scripts/git-clone-related" plume-lib "${PACKAGE}" "${PACKAGEDIR}"
+  if  [[ "${PACKAGE}" == "options" ]] || [[ "${PACKAGE}" == "plume-util" ]]; then
+      ORGANIZATION="opprop"
+  else
+      ORGANIZATION="plume-lib"
+  fi
+  "/tmp/$USER/plume-scripts/git-clone-related" "${ORGANIZATION}" "${PACKAGE}" "${PACKAGEDIR}"
   echo "About to call ./gradlew --console=plain -PcfLocal assemble"
   (cd "${PACKAGEDIR}" && ./gradlew --console=plain -PcfLocal assemble)
 done

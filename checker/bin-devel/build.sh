@@ -27,14 +27,14 @@ else
 fi
 
 # Clone the annotated JDK into ../jdk .
-"/tmp/$USER/plume-scripts/git-clone-related" typetools jdk ../jdk --depth 1
+"/tmp/$USER/plume-scripts/git-clone-related" opprop jdk ../jdk --depth 1
 
 AFU="${AFU:-../annotation-tools/annotation-file-utilities}"
 # Don't use `AT=${AFU}/..` which causes a git failure.
 AT=$(dirname "${AFU}")
 
 ## Build annotation-tools (Annotation File Utilities)
-"/tmp/$USER/plume-scripts/git-clone-related" typetools annotation-tools "${AT}"
+"/tmp/$USER/plume-scripts/git-clone-related" opprop annotation-tools "${AT}"
 if [ ! -d ../annotation-tools ] ; then
   ln -s "${AT}" ../annotation-tools
 fi
@@ -45,7 +45,7 @@ echo "... done: (cd ${AT} && ./.travis-build-without-test.sh)"
 
 
 ## Build stubparser
-"/tmp/$USER/plume-scripts/git-clone-related" typetools stubparser
+"/tmp/$USER/plume-scripts/git-clone-related" opprop stubparser
 echo "Running:  (cd ../stubparser/ && ./.travis-build-without-test.sh)"
 (cd ../stubparser/ && ./.travis-build-without-test.sh)
 echo "... done: (cd ../stubparser/ && ./.travis-build-without-test.sh)"
