@@ -9,10 +9,12 @@ import com.sun.tools.classfile.ConstantPool.InvalidIndex;
 import com.sun.tools.classfile.ConstantPool.UnexpectedEntry;
 import com.sun.tools.classfile.Method;
 import com.sun.tools.classfile.RuntimeAnnotations_attribute;
+
+import org.checkerframework.javacutil.PluginUtil;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
-import org.checkerframework.javacutil.PluginUtil;
 
 public class ReferenceInfoUtil {
 

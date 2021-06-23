@@ -1,12 +1,7 @@
 package org.checkerframework.common.value;
 
 import com.sun.source.tree.*;
-import java.util.*;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
+
 import org.checkerframework.checker.signature.qual.BinaryName;
 import org.checkerframework.checker.signature.qual.Identifier;
 import org.checkerframework.common.value.qual.ArrayLen;
@@ -20,6 +15,14 @@ import org.checkerframework.javacutil.AnnotationUtils;
 import org.checkerframework.javacutil.ElementUtils;
 import org.checkerframework.javacutil.TreeUtils;
 import org.checkerframework.javacutil.TypesUtils;
+
+import java.util.*;
+
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
 
 /** The TreeAnnotator for this AnnotatedTypeFactory. It adds/replaces annotations. */
 class ValueTreeAnnotator extends TreeAnnotator {

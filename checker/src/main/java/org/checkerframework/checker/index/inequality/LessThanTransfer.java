@@ -1,11 +1,5 @@
 package org.checkerframework.checker.index.inequality;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Set;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.type.TypeKind;
 import org.checkerframework.checker.index.IndexAbstractTransfer;
 import org.checkerframework.common.value.ValueAnnotatedTypeFactory;
 import org.checkerframework.common.value.ValueCheckerUtils;
@@ -21,6 +15,14 @@ import org.checkerframework.framework.flow.CFAnalysis;
 import org.checkerframework.framework.flow.CFStore;
 import org.checkerframework.framework.flow.CFValue;
 import org.checkerframework.framework.util.FlowExpressionParseUtil;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.type.TypeKind;
 
 /**
  * Implements 3 refinement rules:

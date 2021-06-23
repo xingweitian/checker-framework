@@ -1,7 +1,8 @@
 package org.checkerframework.framework.util.defaults;
 
-import java.util.TreeSet;
 import org.checkerframework.javacutil.SystemUtil;
+
+import java.util.TreeSet;
 
 /**
  * An ordered set of Defaults (see {@link org.checkerframework.framework.util.defaults.Default}).

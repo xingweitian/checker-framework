@@ -5,20 +5,23 @@ import com.sun.tools.javac.main.JavaCompiler;
 import com.sun.tools.javac.util.Context;
 import com.sun.tools.javac.util.List;
 import com.sun.tools.javac.util.Options;
-import java.io.File;
-import java.io.IOException;
-import java.io.OutputStream;
-import java.io.PrintStream;
-import java.util.HashMap;
-import java.util.Map;
-import javax.tools.JavaFileManager;
-import javax.tools.JavaFileObject;
+
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.analysis.AbstractValue;
 import org.checkerframework.dataflow.analysis.Analysis;
 import org.checkerframework.dataflow.analysis.Store;
 import org.checkerframework.dataflow.analysis.TransferFunction;
 import org.checkerframework.dataflow.cfg.CFGProcessor.CFGProcessResult;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.OutputStream;
+import java.io.PrintStream;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.tools.JavaFileManager;
+import javax.tools.JavaFileObject;
 
 /**
  * Launcher to generate the DOT or String representation of the control flow graph of a given method
@@ -202,7 +205,8 @@ public class CFGVisualizeLauncher {
 
         if (res == null) {
             printError(
-                    "internal error in type processor! method typeProcessOver() doesn't get called.");
+                    "internal error in type processor! method typeProcessOver() doesn't get"
+                            + " called.");
             System.exit(1);
         }
 
@@ -272,7 +276,8 @@ public class CFGVisualizeLauncher {
         System.out.println(
                 "Generate the control flow graph of a Java method, represented as a DOT graph.");
         System.out.println(
-                "Parameters: <inputfile> <outputdir> [-method <name>] [-class <name>] [-pdf] [-verbose]");
+                "Parameters: <inputfile> <outputdir> [-method <name>] [-class <name>] [-pdf]"
+                        + " [-verbose]");
         System.out.println("    -pdf:     Also generate the PDF by invoking 'dot'.");
         System.out.println(
                 "    -method:  The method to generate the CFG for (defaults to 'test').");

@@ -1,7 +1,5 @@
 package lubglb;
 
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.util.Elements;
 import lubglb.quals.A;
 import lubglb.quals.B;
 import lubglb.quals.C;
@@ -9,11 +7,15 @@ import lubglb.quals.D;
 import lubglb.quals.E;
 import lubglb.quals.F;
 import lubglb.quals.Poly;
+
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.common.basetype.BaseTypeVisitor;
 import org.checkerframework.framework.type.QualifierHierarchy;
 import org.checkerframework.javacutil.AnnotationBuilder;
 import org.checkerframework.javacutil.AnnotationUtils;
+
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.util.Elements;
 
 // Type hierarchy:
 //    A       <-- @DefaultQualifierInHierarchy

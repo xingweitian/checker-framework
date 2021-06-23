@@ -1,12 +1,14 @@
 package org.checkerframework.framework.type;
 
+import org.checkerframework.javacutil.AnnotationUtils;
+import org.checkerframework.javacutil.BugInCF;
+
 import java.util.Collection;
 import java.util.Map;
 import java.util.Set;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.type.TypeKind;
-import org.checkerframework.javacutil.AnnotationUtils;
-import org.checkerframework.javacutil.BugInCF;
 
 /**
  * Represents a type qualifier hierarchy.
@@ -217,7 +219,8 @@ public abstract class QualifierHierarchy {
         assertSameSize(annos1, annos2);
         if (annos1.isEmpty()) {
             throw new BugInCF(
-                    "QualifierHierarchy.greatestLowerBounds: tried to determine GLB with empty sets");
+                    "QualifierHierarchy.greatestLowerBounds: tried to determine GLB with empty"
+                            + " sets");
         }
 
         Set<AnnotationMirror> result = AnnotationUtils.createAnnotationSet();

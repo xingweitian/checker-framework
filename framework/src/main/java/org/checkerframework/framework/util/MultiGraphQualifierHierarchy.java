@@ -1,15 +1,5 @@
 package org.checkerframework.framework.util;
 
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Set;
-import java.util.StringJoiner;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Name;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
@@ -20,6 +10,18 @@ import org.checkerframework.framework.type.poly.QualifierPolymorphism;
 import org.checkerframework.javacutil.AnnotationBuilder;
 import org.checkerframework.javacutil.AnnotationUtils;
 import org.checkerframework.javacutil.BugInCF;
+
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
+import java.util.StringJoiner;
+
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Name;
 
 /**
  * Represents the type qualifier hierarchy of a type system that supports multiple separate subtype
@@ -481,16 +483,17 @@ public class MultiGraphQualifierHierarchy extends QualifierHierarchy {
 
         if (a == null) {
             throw new BugInCF(
-                    "MultiGraphQualifierHierarchy found an unqualified type.  Please ensure that "
-                            + "your defaulting rules cover all cases and/or "
-                            + "use a @DefaultQualifierInHierarchy annotation.  "
-                            + "Also ensure that overrides of addComputedTypeAnnotations call super.");
+                    "MultiGraphQualifierHierarchy found an unqualified type.  Please ensure that"
+                        + " your defaulting rules cover all cases and/or use a"
+                        + " @DefaultQualifierInHierarchy annotation.  Also ensure that overrides of"
+                        + " addComputedTypeAnnotations call super.");
         } else {
             // System.out.println("MultiGraphQH: " + this);
             throw new BugInCF(
                     "MultiGraphQualifierHierarchy found the unrecognized qualifier: "
                             + a
-                            + ". Please ensure that the qualifier is correctly included in the subtype hierarchy.");
+                            + ". Please ensure that the qualifier is correctly included in the"
+                            + " subtype hierarchy.");
         }
     }
 
@@ -578,8 +581,8 @@ public class MultiGraphQualifierHierarchy extends QualifierHierarchy {
                     }
                 } else {
                     throw new BugInCF(
-                            "MultiGraphQualifierHierarchy.addPolyRelations: "
-                                    + "incorrect or missing top qualifier given in polymorphic qualifier "
+                            "MultiGraphQualifierHierarchy.addPolyRelations: incorrect or missing"
+                                    + " top qualifier given in polymorphic qualifier "
                                     + polyQualifier
                                     + "; declTop = "
                                     + declTop
@@ -708,7 +711,8 @@ public class MultiGraphQualifierHierarchy extends QualifierHierarchy {
                                 + a1
                                 + " and "
                                 + a2
-                                + ". Please ensure that the checker knows about all type qualifiers.");
+                                + ". Please ensure that the checker knows about all type"
+                                + " qualifiers.");
             }
         }
         return requireSingleton(outset, a1, a2, /*lub=*/ true);

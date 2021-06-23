@@ -1,13 +1,15 @@
 package org.checkerframework.common.value;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.TreeSet;
-import javax.lang.model.element.AnnotationMirror;
 import org.checkerframework.common.value.util.Range;
 import org.checkerframework.framework.util.MultiGraphQualifierHierarchy;
 import org.checkerframework.javacutil.AnnotationBuilder;
 import org.checkerframework.javacutil.AnnotationUtils;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.TreeSet;
+
+import javax.lang.model.element.AnnotationMirror;
 
 /** The qualifier hierarchy for the Value type system. */
 final class ValueQualifierHierarchy extends MultiGraphQualifierHierarchy {

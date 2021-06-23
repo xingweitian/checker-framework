@@ -1,5 +1,6 @@
 import org.checkerframework.framework.qual.DefaultQualifier;
 import org.checkerframework.framework.qual.TypeUseLocation;
+
 import testchecker.quals.*;
 
 // Test defaulting behavior, e.g. that local variables, casts, and instanceof
@@ -140,7 +141,8 @@ class Defaulting {
             value = H1S1.class,
             locations = {TypeUseLocation.RECEIVER})
     public class ReceiverDefaulting {
-        public ReceiverDefaulting() {};
+        public ReceiverDefaulting() {}
+        ;
 
         public void m() {}
     }

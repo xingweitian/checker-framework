@@ -1,5 +1,8 @@
 package org.checkerframework.framework.test;
 
+import org.checkerframework.javacutil.BugInCF;
+import org.checkerframework.javacutil.SystemUtil;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,8 +12,6 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.checkerframework.javacutil.BugInCF;
-import org.checkerframework.javacutil.SystemUtil;
 
 /**
  * Used to create an instance of TestConfiguration, TestConfigurationBuilder follows the standard

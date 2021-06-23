@@ -1,5 +1,8 @@
 package org.checkerframework.framework.test;
 
+import org.checkerframework.javacutil.SystemUtil;
+import org.junit.Assert;
+
 import java.io.BufferedWriter;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
@@ -17,12 +20,11 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 import java.util.Set;
+
 import javax.tools.Diagnostic;
 import javax.tools.JavaCompiler;
 import javax.tools.JavaFileObject;
 import javax.tools.ToolProvider;
-import org.checkerframework.javacutil.SystemUtil;
-import org.junit.Assert;
 
 public class TestUtilities {
 

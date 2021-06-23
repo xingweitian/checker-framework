@@ -4,8 +4,7 @@ import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.Tree;
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
-import java.util.Map;
-import javax.lang.model.element.ExecutableElement;
+
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.dataflow.cfg.node.LocalVariableNode;
 import org.checkerframework.dataflow.cfg.node.MethodInvocationNode;
@@ -16,6 +15,10 @@ import org.checkerframework.framework.qual.IgnoreInWholeProgramInference;
 import org.checkerframework.framework.type.AnnotatedTypeFactory;
 import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedDeclaredType;
 import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedExecutableType;
+
+import java.util.Map;
+
+import javax.lang.model.element.ExecutableElement;
 
 /**
  * Interface for a whole-program inference implementation.

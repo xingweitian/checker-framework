@@ -11,10 +11,7 @@ import com.sun.source.tree.NewClassTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.TreePathScanner;
-import java.util.ArrayList;
-import java.util.EnumSet;
-import java.util.List;
-import javax.lang.model.element.Element;
+
 import org.checkerframework.dataflow.qual.Deterministic;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.Pure.Kind;
@@ -22,6 +19,12 @@ import org.checkerframework.dataflow.qual.SideEffectFree;
 import org.checkerframework.javacutil.AnnotationProvider;
 import org.checkerframework.javacutil.Pair;
 import org.checkerframework.javacutil.TreeUtils;
+
+import java.util.ArrayList;
+import java.util.EnumSet;
+import java.util.List;
+
+import javax.lang.model.element.Element;
 
 /**
  * A visitor that determines the purity (as defined by {@link

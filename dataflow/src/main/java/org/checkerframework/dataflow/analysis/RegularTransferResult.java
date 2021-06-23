@@ -1,9 +1,11 @@
 package org.checkerframework.dataflow.analysis;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.Map;
 import java.util.StringJoiner;
+
 import javax.lang.model.type.TypeMirror;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * Implementation of a {@link TransferResult} with just one non-exceptional store. The result of

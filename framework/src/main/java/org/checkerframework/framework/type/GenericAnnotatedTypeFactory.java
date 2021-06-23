@@ -15,26 +15,7 @@ import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.UnaryTree;
 import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
-import java.lang.annotation.Annotation;
-import java.util.ArrayDeque;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Queue;
-import java.util.Set;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
+
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.dataflow.analysis.AnalysisResult;
@@ -102,6 +83,28 @@ import org.checkerframework.javacutil.Pair;
 import org.checkerframework.javacutil.TreeUtils;
 import org.checkerframework.javacutil.UserError;
 import org.plumelib.reflection.Signatures;
+
+import java.lang.annotation.Annotation;
+import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Queue;
+import java.util.Set;
+
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
 
 /**
  * A factory that extends {@link AnnotatedTypeFactory} to optionally use flow-sensitive qualifier
@@ -607,9 +610,9 @@ public abstract class GenericAnnotatedTypeFactory<
     protected void checkForDefaultQualifierInHierarchy(QualifierDefaults defs) {
         if (!defs.hasDefaultsForCheckedCode()) {
             throw new BugInCF(
-                    "GenericAnnotatedTypeFactory.createQualifierDefaults: "
-                            + "@DefaultQualifierInHierarchy or @DefaultFor(TypeUseLocation.OTHERWISE) not found. "
-                            + "Every checker must specify a default qualifier. "
+                    "GenericAnnotatedTypeFactory.createQualifierDefaults:"
+                        + " @DefaultQualifierInHierarchy or @DefaultFor(TypeUseLocation.OTHERWISE)"
+                        + " not found. Every checker must specify a default qualifier. "
                             + getSortedQualifierNames());
         }
 
@@ -1395,8 +1398,8 @@ public abstract class GenericAnnotatedTypeFactory<
                     res = getAnnotatedType(lhsTree);
                 } else {
                     throw new BugInCF(
-                            "GenericAnnotatedTypeFactory: Unexpected tree passed to getAnnotatedTypeLhs. "
-                                    + "lhsTree: "
+                            "GenericAnnotatedTypeFactory: Unexpected tree passed to"
+                                    + " getAnnotatedTypeLhs. lhsTree: "
                                     + lhsTree
                                     + " Tree.Kind: "
                                     + lhsTree.getKind());
@@ -1755,7 +1758,8 @@ public abstract class GenericAnnotatedTypeFactory<
             String cfgviz = checker.getOption("cfgviz");
             if (cfgviz == null) {
                 throw new UserError(
-                        "-Acfgviz specified without arguments, should be -Acfgviz=VizClassName[,opts,...]");
+                        "-Acfgviz specified without arguments, should be"
+                                + " -Acfgviz=VizClassName[,opts,...]");
             }
             String[] opts = cfgviz.split(",");
             String vizClassName = opts[0];

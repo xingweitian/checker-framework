@@ -1,7 +1,8 @@
 package flowexpression;
 
-import java.util.Collection;
 import testlib.flowexpression.qual.FlowExp;
+
+import java.util.Collection;
 
 public class UsePrivate {
     void test(Private app_ppts, Private test_ppts) {

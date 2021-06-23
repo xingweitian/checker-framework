@@ -1,7 +1,5 @@
 package testlib.flowexpression;
 
-import java.util.List;
-import javax.lang.model.element.AnnotationMirror;
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.framework.type.QualifierHierarchy;
@@ -10,8 +8,13 @@ import org.checkerframework.framework.util.MultiGraphQualifierHierarchy.MultiGra
 import org.checkerframework.framework.util.dependenttypes.DependentTypesHelper;
 import org.checkerframework.javacutil.AnnotationBuilder;
 import org.checkerframework.javacutil.AnnotationUtils;
+
 import testlib.flowexpression.qual.FEBot;
 import testlib.flowexpression.qual.FETop;
+
+import java.util.List;
+
+import javax.lang.model.element.AnnotationMirror;
 
 public class FlowExpressionAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
     private AnnotationMirror TOP, BOTTOM;

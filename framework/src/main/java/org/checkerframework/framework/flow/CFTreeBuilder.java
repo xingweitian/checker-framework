@@ -8,14 +8,17 @@ import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.TypeTag;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.util.List;
+
+import org.checkerframework.framework.type.AnnotatedTypeMirror;
+import org.checkerframework.javacutil.TypeAnnotationUtils;
+import org.checkerframework.javacutil.trees.TreeBuilder;
+
 import java.util.Set;
+
 import javax.annotation.processing.ProcessingEnvironment;
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.type.TypeVariable;
 import javax.lang.model.type.WildcardType;
-import org.checkerframework.framework.type.AnnotatedTypeMirror;
-import org.checkerframework.javacutil.TypeAnnotationUtils;
-import org.checkerframework.javacutil.trees.TreeBuilder;
 
 /**
  * The TreeBuilder permits the creation of new AST Trees using the non-public Java compiler API

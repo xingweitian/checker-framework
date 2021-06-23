@@ -1,10 +1,11 @@
 package tests;
 
-import java.io.File;
-import java.util.List;
 import org.checkerframework.checker.nullness.NullnessChecker;
 import org.checkerframework.framework.test.CheckerFrameworkPerDirectoryTest;
 import org.junit.runners.Parameterized.Parameters;
+
+import java.io.File;
+import java.util.List;
 
 /** JUnit tests for the Nullness checker. */
 public class NullnessFbcTest extends CheckerFrameworkPerDirectoryTest {

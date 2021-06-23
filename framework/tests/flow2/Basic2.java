@@ -1,7 +1,9 @@
-import java.util.List;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.framework.test.*;
+
 import testlib.util.*;
+
+import java.util.List;
 
 class Basic2 {
 
@@ -206,7 +208,8 @@ class Basic2 {
         final String f1;
         CF c;
 
-        void nonpure() {};
+        void nonpure() {}
+        ;
 
         CF(@Odd String p1) {
             f1 = p1;

@@ -1,10 +1,12 @@
 package tests;
 
-import java.io.File;
-import java.util.List;
 import org.checkerframework.framework.test.FrameworkPerDirectoryTest;
 import org.junit.runners.Parameterized.Parameters;
+
 import testlib.nontopdefault.NTDChecker;
+
+import java.io.File;
+import java.util.List;
 
 /** Tests the NonTopDefault Checker. */
 public class NonTopDefaultTest extends FrameworkPerDirectoryTest {

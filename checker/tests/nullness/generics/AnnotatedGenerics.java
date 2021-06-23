@@ -13,7 +13,8 @@ class AnnotatedGenerics {
         }
         Test<Iterable<String>> l = new Test<>();
         // :: error: (iterating.over.nullable)
-        for (String s : l.get()) ;
+        for (String s : l.get())
+            ;
     }
 
     public static void testNonNullTypeVariable() {
@@ -23,9 +24,11 @@ class AnnotatedGenerics {
             }
         }
         Test<@Nullable Iterable<String>> l = new Test<>();
-        for (String s : l.get()) ;
+        for (String s : l.get())
+            ;
         Test<Iterable<String>> n = new Test<>();
-        for (String s : n.get()) ;
+        for (String s : n.get())
+            ;
     }
 
     static class MyClass<T> implements MyIterator<@Nullable T> {

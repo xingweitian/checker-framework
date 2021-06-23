@@ -1,8 +1,5 @@
 package org.checkerframework.checker.nullness;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
-import javax.lang.model.element.AnnotationMirror;
 import org.checkerframework.checker.nullness.qual.KeyFor;
 import org.checkerframework.dataflow.analysis.FlowExpressions;
 import org.checkerframework.dataflow.analysis.FlowExpressions.Receiver;
@@ -12,6 +9,11 @@ import org.checkerframework.dataflow.cfg.node.MethodInvocationNode;
 import org.checkerframework.dataflow.cfg.node.Node;
 import org.checkerframework.framework.flow.CFAbstractTransfer;
 import org.checkerframework.javacutil.AnnotationUtils;
+
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import javax.lang.model.element.AnnotationMirror;
 
 /**
  * KeyForTransfer ensures that java.util.Map.put and containsKey cause the appropriate @KeyFor

@@ -2,17 +2,7 @@ package org.checkerframework.common.wholeprograminference;
 
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.sun.tools.javac.code.TypeAnnotationPosition;
-import java.io.File;
-import java.io.IOException;
-import java.lang.annotation.Target;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
-import javax.lang.model.type.TypeKind;
+
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.signature.qual.BinaryName;
 import org.checkerframework.common.basetype.BaseTypeChecker;
@@ -31,12 +21,26 @@ import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedTypeVari
 import org.checkerframework.framework.type.GenericAnnotatedTypeFactory;
 import org.checkerframework.javacutil.Pair;
 import org.checkerframework.javacutil.UserError;
+
 import scenelib.annotations.Annotation;
 import scenelib.annotations.el.AClass;
 import scenelib.annotations.el.AScene;
 import scenelib.annotations.el.ATypeElement;
 import scenelib.annotations.el.InnerTypeLocation;
 import scenelib.annotations.io.IndexFileParser;
+
+import java.io.File;
+import java.io.IOException;
+import java.lang.annotation.Target;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
+
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
+import javax.lang.model.type.TypeKind;
 
 /**
  * This class stores annotations for fields, method return types, and method parameters.

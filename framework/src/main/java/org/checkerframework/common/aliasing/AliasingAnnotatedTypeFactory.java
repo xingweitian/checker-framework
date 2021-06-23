@@ -1,10 +1,7 @@
 package org.checkerframework.common.aliasing;
 
 import com.sun.source.tree.NewArrayTree;
-import java.lang.annotation.Annotation;
-import java.util.Map;
-import java.util.Set;
-import javax.lang.model.element.AnnotationMirror;
+
 import org.checkerframework.common.aliasing.qual.LeakedToResult;
 import org.checkerframework.common.aliasing.qual.MaybeAliased;
 import org.checkerframework.common.aliasing.qual.MaybeLeaked;
@@ -24,6 +21,12 @@ import org.checkerframework.framework.util.MultiGraphQualifierHierarchy;
 import org.checkerframework.framework.util.MultiGraphQualifierHierarchy.MultiGraphFactory;
 import org.checkerframework.javacutil.AnnotationBuilder;
 import org.checkerframework.javacutil.AnnotationUtils;
+
+import java.lang.annotation.Annotation;
+import java.util.Map;
+import java.util.Set;
+
+import javax.lang.model.element.AnnotationMirror;
 
 /** Annotated type factory for the Aliasing Checker. */
 public class AliasingAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {

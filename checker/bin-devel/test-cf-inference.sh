@@ -20,4 +20,4 @@ source "$SCRIPTDIR"/build.sh
 
 export AFU="${AFU:-$(cd ../annotation-tools/annotation-file-utilities >/dev/null 2>&1 && pwd -P)}"
 export PATH=$AFU/scripts:$PATH
-(cd ../checker-framework-inference && ./.travis-build.sh)
+(cd ../checker-framework-inference && ./.ci-build.sh)

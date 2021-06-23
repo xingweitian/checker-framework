@@ -3,6 +3,7 @@ package org.checkerframework.framework.type;
 // The imports from com.sun are all @jdk.Exported and therefore somewhat safe to use.
 // Try to avoid using non-@jdk.Exported classes.
 
+import com.sun.source.tree.AnnotatedTypeTree;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.source.tree.AssignmentTree;
 import com.sun.source.tree.ClassTree;
@@ -16,6 +17,7 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.NewClassTree;
+import com.sun.source.tree.ParameterizedTypeTree;
 import com.sun.source.tree.ReturnTree;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
@@ -24,38 +26,7 @@ import com.sun.source.tree.VariableTree;
 import com.sun.source.util.TreePath;
 import com.sun.source.util.Trees;
 import com.sun.tools.javac.code.Type;
-import java.lang.annotation.Annotation;
-import java.lang.annotation.ElementType;
-import java.lang.annotation.Target;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-import javax.annotation.processing.ProcessingEnvironment;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Name;
-import javax.lang.model.element.PackageElement;
-import javax.lang.model.element.TypeElement;
-import javax.lang.model.element.VariableElement;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.IntersectionType;
-import javax.lang.model.type.PrimitiveType;
-import javax.lang.model.type.TypeKind;
-import javax.lang.model.type.TypeMirror;
-import javax.lang.model.type.TypeVariable;
-import javax.lang.model.type.WildcardType;
-import javax.lang.model.util.Elements;
-import javax.lang.model.util.Types;
+
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.common.basetype.BaseTypeVisitor;
@@ -107,6 +78,40 @@ import org.checkerframework.javacutil.TreeUtils;
 import org.checkerframework.javacutil.TypesUtils;
 import org.checkerframework.javacutil.UserError;
 import org.checkerframework.javacutil.trees.DetachedVarSymbol;
+
+import java.lang.annotation.Annotation;
+import java.lang.annotation.ElementType;
+import java.lang.annotation.Target;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.annotation.processing.ProcessingEnvironment;
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Name;
+import javax.lang.model.element.PackageElement;
+import javax.lang.model.element.TypeElement;
+import javax.lang.model.element.VariableElement;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.IntersectionType;
+import javax.lang.model.type.PrimitiveType;
+import javax.lang.model.type.TypeKind;
+import javax.lang.model.type.TypeMirror;
+import javax.lang.model.type.TypeVariable;
+import javax.lang.model.type.WildcardType;
+import javax.lang.model.util.Elements;
+import javax.lang.model.util.Types;
 
 /**
  * The methods of this class take an element or AST node, and return the annotated type as an {@link
@@ -290,13 +295,15 @@ public class AnnotatedTypeFactory implements AnnotationProvider {
             if (copyElements) {
                 if (!(canonical == null && canonicalName != null && ignorableElements != null)) {
                     throw new BugInCF(
-                            "Bad Alias for %s: [canonical=%s] copyElements=%s canonicalName=%s ignorableElements=%s",
+                            "Bad Alias for %s: [canonical=%s] copyElements=%s canonicalName=%s"
+                                    + " ignorableElements=%s",
                             aliasName, canonical, copyElements, canonicalName, ignorableElements);
                 }
             } else {
                 if (!(canonical != null && canonicalName == null && ignorableElements == null)) {
                     throw new BugInCF(
-                            "Bad Alias for %s: canonical=%s copyElements=%s [canonicalName=%s ignorableElements=%s]",
+                            "Bad Alias for %s: canonical=%s copyElements=%s [canonicalName=%s"
+                                    + " ignorableElements=%s]",
                             aliasName, canonical, copyElements, canonicalName, ignorableElements);
                 }
             }
@@ -618,7 +625,8 @@ public class AnnotatedTypeFactory implements AnnotationProvider {
 
             MethodValChecker methodValChecker = checker.getSubchecker(MethodValChecker.class);
             assert methodValChecker != null
-                    : "AnnotatedTypeFactory: reflection resolution was requested, but MethodValChecker isn't a subchecker.";
+                    : "AnnotatedTypeFactory: reflection resolution was requested, but"
+                            + " MethodValChecker isn't a subchecker.";
             MethodValAnnotatedTypeFactory methodValATF =
                     (MethodValAnnotatedTypeFactory) methodValChecker.getAnnotationProvider();
 
@@ -723,16 +731,19 @@ public class AnnotatedTypeFactory implements AnnotationProvider {
                     throw new BugInCF(
                             "AnnotatedTypeFactory: "
                                     + typeQualifier
-                                    + " is polymorphic and specifies super qualifiers. "
-                                    + "Remove the @org.checkerframework.framework.qual.SubtypeOf or @org.checkerframework.framework.qual.PolymorphicQualifier annotation from it.");
+                                    + " is polymorphic and specifies super qualifiers. Remove the"
+                                    + " @org.checkerframework.framework.qual.SubtypeOf or"
+                                    + " @org.checkerframework.framework.qual.PolymorphicQualifier"
+                                    + " annotation from it.");
                 }
                 continue;
             }
             if (typeQualifier.getAnnotation(SubtypeOf.class) == null) {
                 throw new BugInCF(
-                        "AnnotatedTypeFactory: %s does not specify its super qualifiers.%n"
-                                + "Add an @org.checkerframework.framework.qual.SubtypeOf annotation to it,%n"
-                                + "or if it is an alias, exclude it from `createSupportedTypeQualifiers()`.%n",
+                        "AnnotatedTypeFactory: %s does not specify its super qualifiers.%nAdd an"
+                                + " @org.checkerframework.framework.qual.SubtypeOf annotation to"
+                                + " it,%nor if it is an alias, exclude it from"
+                                + " `createSupportedTypeQualifiers()`.%n",
                         typeQualifier);
             }
             Class<? extends Annotation>[] superQualifiers =
@@ -1156,6 +1167,11 @@ public class AnnotatedTypeFactory implements AnnotationProvider {
     /**
      * Returns the set of qualifiers that are the upper bounds for a use of the type.
      *
+     * <p>For a specific type system, the type declaration bound is retrieved in the following
+     * precedence: (1) the annotation on the type declaration bound (2) if an annotation with
+     * {@code @UpperBoundFor} mentions the type or the type kind, use that annotation (3) the top
+     * annotation
+     *
      * @param type a type whose upper bounds to obtain
      */
     public Set<AnnotationMirror> getTypeDeclarationBounds(TypeMirror type) {
@@ -1478,7 +1494,7 @@ public class AnnotatedTypeFactory implements AnnotationProvider {
             addAnnotationFromFieldInvariant(type, owner, (VariableElement) element);
         }
         addComputedTypeAnnotations(element, type);
-        if (viewpointAdapter != null) {
+        if (viewpointAdapter != null && type.getKind() != TypeKind.EXECUTABLE) {
             viewpointAdapter.viewpointAdaptMember(owner, element, type);
         }
     }
@@ -1767,7 +1783,8 @@ public class AnnotatedTypeFactory implements AnnotationProvider {
                 TypeElement typeElt = ElementUtils.enclosingClass(element);
                 if (typeElt == null) {
                     throw new BugInCF(
-                            "AnnotatedTypeFactory.getImplicitReceiver: enclosingClass()==null for element: "
+                            "AnnotatedTypeFactory.getImplicitReceiver: enclosingClass()==null for"
+                                    + " element: "
                                     + element);
                 }
                 if (tree.getKind() == Kind.NEW_CLASS) {
@@ -2104,14 +2121,16 @@ public class AnnotatedTypeFactory implements AnnotationProvider {
             ExpressionTree tree, ExecutableElement methodElt, AnnotatedTypeMirror receiverType) {
 
         AnnotatedExecutableType memberType = getAnnotatedType(methodElt); // get unsubstituted type
+        // Perform viewpoint adaption before type argument substitution.
+
         methodFromUsePreSubstitution(tree, memberType);
+        if (viewpointAdapter != null) {
+            viewpointAdapter.viewpointAdaptMethod(receiverType, methodElt, memberType);
+        }
 
         AnnotatedExecutableType methodType =
                 AnnotatedTypes.asMemberOf(types, this, receiverType, methodElt, memberType);
         List<AnnotatedTypeMirror> typeargs = new ArrayList<>(methodType.getTypeVariables().size());
-        if (viewpointAdapter != null) {
-            viewpointAdapter.viewpointAdaptMethod(receiverType, methodElt, methodType);
-        }
 
         Map<TypeVariable, AnnotatedTypeMirror> typeVarMapping =
                 AnnotatedTypes.findTypeArguments(processingEnv, this, tree, methodElt, methodType);
@@ -2120,9 +2139,9 @@ public class AnnotatedTypeFactory implements AnnotationProvider {
             for (AnnotatedTypeVariable tv : methodType.getTypeVariables()) {
                 if (typeVarMapping.get(tv.getUnderlyingType()) == null) {
                     throw new BugInCF(
-                            "AnnotatedTypeFactory.methodFromUse:"
-                                    + "mismatch between declared method type variables and the inferred method type arguments. "
-                                    + "Method type variables: "
+                            "AnnotatedTypeFactory.methodFromUse:mismatch between declared method"
+                                + " type variables and the inferred method type arguments. Method"
+                                + " type variables: "
                                     + methodType.getTypeVariables()
                                     + "; "
                                     + "Inferred method type arguments: "
@@ -2244,24 +2263,42 @@ public class AnnotatedTypeFactory implements AnnotationProvider {
         ExecutableElement ctor = TreeUtils.constructor(tree);
         AnnotatedTypeMirror type = fromNewClass(tree);
         addComputedTypeAnnotations(tree, type);
+
         AnnotatedExecutableType con = getAnnotatedType(ctor); // get unsubstituted type
-        constructorFromUsePreSubstitution(tree, con);
 
-        con = AnnotatedTypes.asMemberOf(types, this, type, ctor, con);
+        if (tree.getClassBody() != null) {
+            // The artificial constructor for an anonymous class only contains an invocation of the
+            // corresponding super class constructor. The artificial constructor does not have all
+            // the type annotations the super class constructor has, but conceptually it should have
+            // the same type annotations. Instead of copying all the annotations over, we simply use
+            // the super constructor element for the anonymous class constructor.
+            ExecutableElement superCtor = TreeUtils.anonymousSuperConstructor(tree);
+            AnnotatedExecutableType superCtorType = getAnnotatedType(superCtor);
 
-        if (tree.getArguments().size() == con.getParameterTypes().size() + 1
-                && isSyntheticArgument(tree.getArguments().get(0))) {
-            // happens for anonymous constructors of inner classes
-            List<AnnotatedTypeMirror> actualParams = new ArrayList<>();
-            actualParams.add(getAnnotatedType(tree.getArguments().get(0)));
-            actualParams.addAll(con.getParameterTypes());
-            con.setParameterTypes(actualParams);
+            if (tree.getArguments().size() == superCtorType.getParameterTypes().size() + 1) {
+                // In JDK 8, an anonymous class instantiation with enclosing expression passes
+                // the enclosing expression as the first argument (i.e. synthetic argument),
+                // while the super constructor parameters does not have the counterpart.
+                // Therefore, we get the first parameter of the anonymous constructor and manually
+                // add it to the parameter list at index 0.
+                List<AnnotatedTypeMirror> actualParams =
+                        new ArrayList<>(superCtorType.getParameterTypes().size() + 1);
+                actualParams.add(con.getParameterTypes().get(0));
+                actualParams.addAll(superCtorType.getParameterTypes());
+                superCtorType.setParameterTypes(actualParams);
+            }
+            con = superCtorType;
+            ctor = superCtor;
         }
 
-        List<AnnotatedTypeMirror> typeargs = new ArrayList<>(con.getTypeVariables().size());
+        constructorFromUsePreSubstitution(tree, con);
         if (viewpointAdapter != null) {
             viewpointAdapter.viewpointAdaptConstructor(type, ctor, con);
         }
+
+        con = AnnotatedTypes.asMemberOf(types, this, type, ctor, con);
+
+        List<AnnotatedTypeMirror> typeargs = new ArrayList<>(con.getTypeVariables().size());
 
         Map<TypeVariable, AnnotatedTypeMirror> typeVarMapping =
                 AnnotatedTypes.findTypeArguments(processingEnv, this, tree, ctor, con);
@@ -2298,15 +2335,17 @@ public class AnnotatedTypeFactory implements AnnotationProvider {
         return ret;
     }
 
-    /** Returns the return type of the method {@code m} at the return statement {@code r}. */
+    /**
+     * Returns the return type of the method {@code m} at the return statement {@code r}.
+     *
+     * @param m the tree of the method
+     * @param r the {@code ReturnTree} where to get the method return type
+     * @return the return type of the method {@code m} at the return statement {@code r}
+     */
     public AnnotatedTypeMirror getMethodReturnType(MethodTree m, ReturnTree r) {
         AnnotatedExecutableType methodType = getAnnotatedType(m);
         AnnotatedTypeMirror ret = methodType.getReturnType();
         return ret;
-    }
-
-    private boolean isSyntheticArgument(Tree tree) {
-        return tree.toString().contains("<*nullchk*>");
     }
 
     /**
@@ -2363,9 +2402,26 @@ public class AnnotatedTypeFactory implements AnnotationProvider {
                     (AnnotatedDeclaredType) toAnnotatedType(TreeUtils.typeOf(newClassTree), false);
             // If newClassTree creates an anonymous class, then annotations in this location:
             //   new @HERE Class() {}
-            // are on not on the identifier newClassTree, but rather on the modifier newClassTree.
+            // are not on the identifier newClassTree, but rather on the modifier newClassTree.
             List<? extends AnnotationTree> annos =
                     newClassTree.getClassBody().getModifiers().getAnnotations();
+
+            // If newClassTree creates an anonymous class from an inner class or inner interface,
+            // then annotations in this location:
+            //   new OuterI.@HERE InnerI(){}
+            // are not on the anonymous class modifier, but rather on the type identifier of the
+            // newClassTree.
+            if (annos.isEmpty()) {
+                Tree node = newClassTree.getIdentifier();
+                if (node instanceof ParameterizedTypeTree) {
+                    node = ((ParameterizedTypeTree) node).getType();
+                }
+
+                if (node instanceof AnnotatedTypeTree) {
+                    annos = ((AnnotatedTypeTree) node).getAnnotations();
+                }
+            }
+
             type.addAnnotations(TreeUtils.annotationsFromTypeAnnotationTrees(annos));
             type.setEnclosingType(enclosingType);
             return type;
@@ -3918,8 +3974,9 @@ public class AnnotatedTypeFactory implements AnnotationProvider {
                     // We should never reach here: isFunctionalInterface performs the same check
                     // and would have raised an error already.
                     throw new BugInCF(
-                            "Expected the type of a cast tree in an assignment context to contain a functional interface bound. "
-                                    + "Found type: %s for tree: %s in lambda tree: %s",
+                            "Expected the type of a cast tree in an assignment context to contain a"
+                                    + " functional interface bound. Found type: %s for tree: %s in"
+                                    + " lambda tree: %s",
                             castATM, cast, tree);
                 }
                 return castATM;
@@ -4043,8 +4100,8 @@ public class AnnotatedTypeFactory implements AnnotationProvider {
                 }
             }
             throw new BugInCF(
-                    "Expected the type of %s tree in assignment context to be a functional interface. "
-                            + "Found type: %s for tree: %s in lambda tree: %s",
+                    "Expected the type of %s tree in assignment context to be a functional"
+                            + " interface. Found type: %s for tree: %s in lambda tree: %s",
                     contextTree.getKind(), type, contextTree, tree);
         }
         return true;

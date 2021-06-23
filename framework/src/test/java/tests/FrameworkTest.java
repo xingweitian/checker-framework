@@ -1,9 +1,11 @@
 package tests;
 
-import java.io.File;
 import org.checkerframework.framework.test.FrameworkPerFileTest;
 import org.junit.runners.Parameterized.Parameters;
+
 import testlib.util.TestChecker;
+
+import java.io.File;
 
 /** JUnit tests for the Checker Framework, using the {@link TestChecker}. */
 public class FrameworkTest extends FrameworkPerFileTest {

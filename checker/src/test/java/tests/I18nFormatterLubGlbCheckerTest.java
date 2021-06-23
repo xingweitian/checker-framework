@@ -4,11 +4,13 @@ package tests;
 // https://github.com/typetools/checker-framework/issues/723
 // This exists to just run the I18nFormatterLubGlbChecker
 
-import java.io.File;
-import java.util.List;
 import org.checkerframework.framework.test.CheckerFrameworkPerDirectoryTest;
 import org.junit.runners.Parameterized.Parameters;
+
 import testlib.lubglb.I18nFormatterLubGlbChecker;
+
+import java.io.File;
+import java.util.List;
 
 public class I18nFormatterLubGlbCheckerTest extends CheckerFrameworkPerDirectoryTest {
 

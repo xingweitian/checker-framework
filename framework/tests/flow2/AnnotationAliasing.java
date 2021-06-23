@@ -1,5 +1,6 @@
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.framework.test.*;
+
 import testlib.util.*;
 
 /** Various tests for annotation aliasing. */
@@ -10,12 +11,14 @@ class AnnotationAliasing {
     @Pure
     int pure1() {
         return 1;
-    };
+    }
+    ;
 
     @org.jmlspecs.annotation.Pure
     int pure2() {
         return 1;
-    };
+    }
+    ;
 
     // a method that is not pure (no annotation)
     void nonpure() {}

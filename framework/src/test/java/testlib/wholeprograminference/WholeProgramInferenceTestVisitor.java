@@ -3,12 +3,15 @@ package testlib.wholeprograminference;
 import com.sun.source.tree.AnnotationTree;
 import com.sun.tools.javac.tree.JCTree;
 import com.sun.tools.javac.tree.TreeInfo;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
+
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.common.basetype.BaseTypeVisitor;
 import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedExecutableType;
+
 import testlib.wholeprograminference.qual.DefaultType;
+
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
 
 /** Visitor for a simple type system to test whole-program inference using .jaif files. */
 public class WholeProgramInferenceTestVisitor

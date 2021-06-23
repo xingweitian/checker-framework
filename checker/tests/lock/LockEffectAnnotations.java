@@ -1,6 +1,5 @@
 package chapter;
 
-import java.util.concurrent.locks.ReentrantLock;
 import org.checkerframework.checker.lock.qual.GuardSatisfied;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.GuardedByBottom;
@@ -10,6 +9,8 @@ import org.checkerframework.checker.lock.qual.MayReleaseLocks;
 import org.checkerframework.checker.lock.qual.ReleasesNoLocks;
 import org.checkerframework.dataflow.qual.Pure;
 import org.checkerframework.dataflow.qual.SideEffectFree;
+
+import java.util.concurrent.locks.ReentrantLock;
 
 public class LockEffectAnnotations {
     class MyClass {

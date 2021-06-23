@@ -6,7 +6,8 @@ public class Issue400 {
     final class YYPair<T, V> {
         T first;
         V second;
-    };
+    }
+    ;
 
     class YY {
         public Collection<YYPair<String, String>> getX() {

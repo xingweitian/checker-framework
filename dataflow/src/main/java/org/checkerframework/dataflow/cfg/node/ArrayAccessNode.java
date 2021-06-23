@@ -2,11 +2,13 @@ package org.checkerframework.dataflow.cfg.node;
 
 import com.sun.source.tree.ArrayAccessTree;
 import com.sun.source.tree.Tree;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.javacutil.TreeUtils;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Objects;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.javacutil.TreeUtils;
 
 /**
  * A node for an array access:

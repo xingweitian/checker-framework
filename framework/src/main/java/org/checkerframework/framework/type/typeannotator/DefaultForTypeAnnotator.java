@@ -1,13 +1,5 @@
 package org.checkerframework.framework.type.typeannotator;
 
-import java.lang.annotation.Annotation;
-import java.util.EnumMap;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Set;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeKind;
 import org.checkerframework.framework.qual.DefaultFor;
 import org.checkerframework.framework.type.AnnotatedTypeFactory;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
@@ -17,6 +9,16 @@ import org.checkerframework.framework.type.treeannotator.LiteralTreeAnnotator;
 import org.checkerframework.javacutil.AnnotationBuilder;
 import org.checkerframework.javacutil.BugInCF;
 import org.checkerframework.javacutil.TypesUtils;
+
+import java.lang.annotation.Annotation;
+import java.util.EnumMap;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
 
 /**
  * Adds annotations to a type based on the use of a type. This class applies annotations specified

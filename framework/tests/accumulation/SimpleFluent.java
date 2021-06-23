@@ -1,6 +1,7 @@
 // A simple test that the fluent API logic in the Accumulation Checker works.
 
 import org.checkerframework.common.returnsreceiver.qual.*;
+
 import testaccumulation.qual.*;
 
 /* Simple inference of a fluent builder. */

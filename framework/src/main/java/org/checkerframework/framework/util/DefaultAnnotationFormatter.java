@@ -1,16 +1,18 @@
 package org.checkerframework.framework.util;
 
+import org.checkerframework.dataflow.qual.SideEffectFree;
+import org.checkerframework.framework.qual.InvisibleQualifier;
+import org.checkerframework.javacutil.BugInCF;
+
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+
 import javax.lang.model.element.AnnotationMirror;
 import javax.lang.model.element.AnnotationValue;
 import javax.lang.model.element.ExecutableElement;
 import javax.lang.model.element.TypeElement;
 import javax.lang.model.element.VariableElement;
-import org.checkerframework.dataflow.qual.SideEffectFree;
-import org.checkerframework.framework.qual.InvisibleQualifier;
-import org.checkerframework.javacutil.BugInCF;
 
 /** A utility for converting AnnotationMirrors to Strings. */
 public class DefaultAnnotationFormatter implements AnnotationFormatter {

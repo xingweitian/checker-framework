@@ -1,5 +1,9 @@
 package org.checkerframework.checker.i18nformatter;
 
+import org.checkerframework.checker.i18nformatter.qual.I18nChecksFormat;
+import org.checkerframework.checker.i18nformatter.qual.I18nConversionCategory;
+import org.checkerframework.checker.i18nformatter.qual.I18nValidFormat;
+
 import java.text.ChoiceFormat;
 import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
@@ -11,9 +15,6 @@ import java.util.IllegalFormatException;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import org.checkerframework.checker.i18nformatter.qual.I18nChecksFormat;
-import org.checkerframework.checker.i18nformatter.qual.I18nConversionCategory;
-import org.checkerframework.checker.i18nformatter.qual.I18nValidFormat;
 
 /**
  * This class provides a collection of utilities to ease working with i18n format strings.

@@ -1,8 +1,9 @@
-import java.util.AbstractMap;
-import java.util.Map;
 import org.checkerframework.checker.initialization.qual.*;
 import org.checkerframework.checker.nullness.qual.*;
 import org.checkerframework.checker.regex.qual.*;
+
+import java.util.AbstractMap;
+import java.util.Map;
 
 // :: error: (initialization.fields.uninitialized)
 public abstract class WeakHasherMapNonNull<K, V> extends AbstractMap<K, V> implements Map<K, V> {

@@ -13,12 +13,6 @@ RUN apt-get -qqy update \
 && apt-get clean \
 && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get -qqy update \
-&& apt-get -qqy install python-pip \
-&& apt-get clean \
-&& rm -rf /var/lib/apt/lists/*
-
-RUN pip3 install --no-cache-dir lithium-reducer PyGithub pyyaml \
-&& pip install --no-cache-dir subprocess32 lithium-reducer PyGithub pyyaml
+RUN pip3 install --no-cache-dir lithium-reducer PyGithub pyyaml
 
 RUN export JAVA_TOOL_OPTIONS=-Dfile.encoding=UTF8

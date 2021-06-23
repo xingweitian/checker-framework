@@ -1,9 +1,11 @@
 package testlib.nontopdefault;
 
 import com.sun.source.tree.Tree;
+
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.common.basetype.BaseTypeVisitor;
 import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedDeclaredType;
+
 import testlib.nontopdefault.qual.NTDBottom;
 import testlib.nontopdefault.qual.NTDMiddle;
 

@@ -2,6 +2,7 @@ package org.checkerframework.checker.index;
 
 import com.sun.source.tree.MemberSelectTree;
 import com.sun.source.util.TreePath;
+
 import org.checkerframework.checker.index.upperbound.OffsetEquation;
 import org.checkerframework.dataflow.analysis.FlowExpressions;
 import org.checkerframework.framework.type.AnnotatedTypeFactory;

@@ -1,13 +1,15 @@
 // This test ensures that annotations on different component types of multidimensional arrays
 // are printed correctly.
 
-import java.util.List;
 import org.checkerframework.common.aliasing.qual.MaybeAliased;
 import org.checkerframework.common.aliasing.qual.NonLeaked;
 import org.checkerframework.common.aliasing.qual.Unique;
+
 import testlib.wholeprograminference.qual.Sibling1;
 import testlib.wholeprograminference.qual.Sibling2;
 import testlib.wholeprograminference.qual.SiblingWithFields;
+
+import java.util.List;
 
 class MultiDimensionalArrays {
 

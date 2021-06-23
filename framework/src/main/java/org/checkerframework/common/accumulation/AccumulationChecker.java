@@ -1,8 +1,9 @@
 package org.checkerframework.common.accumulation;
 
-import java.util.LinkedHashSet;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.common.returnsreceiver.ReturnsReceiverChecker;
+
+import java.util.LinkedHashSet;
 
 // TODO: This Javadoc comment should reference the Checker Framework manual, once the Accumulation
 // Checker chapter is uncommented in the manual's LaTeX source.

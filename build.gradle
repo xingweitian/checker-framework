@@ -78,8 +78,8 @@ task setLocalRepo(type:Exec) {
     commandLine 'git', 'worktree', 'list'
     standardOutput = new ByteArrayOutputStream()
     doLast {
-       String worktreeList = standardOutput.toString()
-       localRepo = worktreeList.substring(0, worktreeList.indexOf(" ")) + "/.git"
+        String worktreeList = standardOutput.toString()
+        localRepo = worktreeList.substring(0, worktreeList.indexOf(" ")) + "/.git"
     }
 }
 
@@ -270,22 +270,22 @@ def createCheckTypeTask(projectName, checker, shortName, args = []) {
                 '-processor', "${checker}",
                 '-proc:only',
                 '-Xlint:-processing',
-                ]
+        ]
         options.compilerArgs += args
 
         if (isJava8) {
             options.compilerArgs += [
-                "-source",
-                "8",
-                "-target",
-                "8"
-                ]
+                    "-source",
+                    "8",
+                    "-target",
+                    "8"
+            ]
         } else {
             options.fork = true
             options.forkOptions.jvmArgs += [
-                "--add-opens", "jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED",
-                ]
-       }
+                    "--add-opens", "jdk.compiler/com.sun.tools.javac.comp=ALL-UNNAMED",
+            ]
+        }
     }
 }
 
@@ -309,7 +309,7 @@ List<String> getJavaFilesToFormat(projectName) {
             javaFiles.add(details.file)
         }
     }
-     // Collect all java files in jtreg directory
+    // Collect all java files in jtreg directory
     fileTree("${project(projectName).projectDir}/jtreg").visit { details ->
         if (!details.path.contains("nullness-javac-errors") && details.name.endsWith('java')) {
             javaFiles.add(details.file)
@@ -468,15 +468,15 @@ task getCodeFormatScripts() {
 // This implementation is preferable to the above because it does work in Gradle rather than in bash.
 // However, it fails in the presence of worktrees: https://github.com/ajoberstar/grgit/issues/97
 task getCodeFormatScriptsInGradle {
-  description "Obtain the run-google-java-format scripts"
-  doLast {
-    if (! new File(formatScriptsHome).exists()) {
-      def rgjfGit = Grgit.clone(dir: formatScriptsHome, uri: 'https://github.com/plume-lib/run-google-java-format.git')
-    } else {
-      def rgjfGit = Grgit.open(dir: formatScriptsHome)
-      rgjfGit.pull()
+    description "Obtain the run-google-java-format scripts"
+    doLast {
+        if (! new File(formatScriptsHome).exists()) {
+            def rgjfGit = Grgit.clone(dir: formatScriptsHome, uri: 'https://github.com/plume-lib/run-google-java-format.git')
+        } else {
+            def rgjfGit = Grgit.open(dir: formatScriptsHome)
+            rgjfGit.pull()
+        }
     }
-  }
 }
 
 task getPlumeScripts() {
@@ -498,9 +498,9 @@ task getPlumeScripts() {
 }
 
 task pythonIsInstalled(type: Exec) {
-  description "Check that the python executable is installed."
-  executable = "python"
-  args "--version"
+    description "Check that the python executable is installed."
+    executable = "python3"
+    args "--version"
 }
 
 task tags {
@@ -533,7 +533,7 @@ subprojects {
         description 'Check whether the source code is properly formatted'
         // checker-qual* projects have no source, so skip
         onlyIf {!project.name.startsWith('checker-qual') }
-        executable 'python'
+        executable 'python3'
 
         doFirst {
             args += "${formatScriptsHome}/check-google-java-format.py"
@@ -552,7 +552,7 @@ subprojects {
         description 'Format the Java source code'
         // checker-qual* projects have no source, so skip
         onlyIf { !project.name.startsWith('checker-qual') }
-        executable 'python'
+        executable 'python3'
         doFirst {
             args += "${formatScriptsHome}/run-google-java-format.py"
             args += "--aosp" // 4 space indentation
@@ -669,11 +669,11 @@ subprojects {
                         if (isJava8) {
                             // Use Error Prone javac and source/target 8
                             args += [
-                                "-vmoptions:-Xbootclasspath/p:${configurations.javacJar.asPath}",
-                                "-javacoptions:-Xbootclasspath/p:${configurations.javacJar.asPath}",
-                                "-javacoptions:-source 8",
-                                "-javacoptions:-target 8"
-                                ]
+                                    "-vmoptions:-Xbootclasspath/p:${configurations.javacJar.asPath}",
+                                    "-javacoptions:-Xbootclasspath/p:${configurations.javacJar.asPath}",
+                                    "-javacoptions:-source 8",
+                                    "-javacoptions:-target 8"
+                            ]
                         } else {
                             args += [
                                     // checker/jtreg/nullness/defaultsPersist/ReferenceInfoUtil.java

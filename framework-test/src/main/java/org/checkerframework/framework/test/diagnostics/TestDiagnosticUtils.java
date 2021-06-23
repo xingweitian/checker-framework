@@ -1,5 +1,7 @@
 package org.checkerframework.framework.test.diagnostics;
 
+import org.checkerframework.javacutil.Pair;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -9,9 +11,9 @@ import java.util.List;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 import javax.tools.Diagnostic;
 import javax.tools.JavaFileObject;
-import org.checkerframework.javacutil.Pair;
 
 /** A set of utilities and factory methods useful for working with TestDiagnostics. */
 public class TestDiagnosticUtils {

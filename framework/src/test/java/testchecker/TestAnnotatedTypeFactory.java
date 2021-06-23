@@ -3,9 +3,7 @@ package testchecker;
 import com.sun.source.tree.Tree;
 import com.sun.source.tree.Tree.Kind;
 import com.sun.source.tree.VariableTree;
-import java.lang.annotation.Annotation;
-import java.util.Set;
-import javax.lang.model.element.AnnotationMirror;
+
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
@@ -13,6 +11,7 @@ import org.checkerframework.framework.type.QualifierHierarchy;
 import org.checkerframework.framework.util.MultiGraphQualifierHierarchy;
 import org.checkerframework.framework.util.MultiGraphQualifierHierarchy.MultiGraphFactory;
 import org.checkerframework.javacutil.AnnotationBuilder;
+
 import testchecker.quals.H1Bot;
 import testchecker.quals.H1Invalid;
 import testchecker.quals.H1Poly;
@@ -24,6 +23,11 @@ import testchecker.quals.H2Poly;
 import testchecker.quals.H2S1;
 import testchecker.quals.H2S2;
 import testchecker.quals.H2Top;
+
+import java.lang.annotation.Annotation;
+import java.util.Set;
+
+import javax.lang.model.element.AnnotationMirror;
 
 public class TestAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
 

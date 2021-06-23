@@ -1,4 +1,5 @@
 import org.checkerframework.framework.qual.*;
+
 import typedecldefault.quals.*;
 
 // @TypeDeclDefaultBottom is the default qualifier in hierarchy.

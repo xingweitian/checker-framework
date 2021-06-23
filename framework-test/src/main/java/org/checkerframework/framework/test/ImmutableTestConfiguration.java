@@ -1,12 +1,13 @@
 package org.checkerframework.framework.test;
 
+import org.checkerframework.javacutil.SystemUtil;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import org.checkerframework.javacutil.SystemUtil;
 
 /**
  * Represents all of the information needed to execute the Javac compiler for a given set of test

@@ -1,5 +1,8 @@
 package org.checkerframework.checker.formatter;
 
+import org.checkerframework.checker.formatter.qual.ConversionCategory;
+import org.checkerframework.checker.formatter.qual.ReturnsFormat;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.IllegalFormatConversionException;
@@ -8,8 +11,6 @@ import java.util.Map;
 import java.util.MissingFormatArgumentException;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import org.checkerframework.checker.formatter.qual.ConversionCategory;
-import org.checkerframework.checker.formatter.qual.ReturnsFormat;
 
 /** This class provides a collection of utilities to ease working with format strings. */
 public class FormatUtil {

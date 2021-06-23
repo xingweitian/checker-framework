@@ -1,12 +1,7 @@
 package org.checkerframework.checker.index.upperbound;
 
 import com.sun.source.util.TreePath;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import java.util.Set;
-import javax.lang.model.element.Element;
+
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.value.ValueAnnotatedTypeFactory;
@@ -25,6 +20,14 @@ import org.checkerframework.framework.util.FlowExpressionParseUtil.FlowExpressio
 import org.checkerframework.framework.util.dependenttypes.DependentTypesError;
 import org.checkerframework.javacutil.AnnotationProvider;
 import org.checkerframework.javacutil.TreeUtils;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
+import javax.lang.model.element.Element;
 
 /**
  * An offset equation is 2 sets of Java expression strings, one set of added terms and one set of

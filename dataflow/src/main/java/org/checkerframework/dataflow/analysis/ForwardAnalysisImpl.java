@@ -3,12 +3,7 @@ package org.checkerframework.dataflow.analysis;
 import com.sun.source.tree.LambdaExpressionTree;
 import com.sun.source.tree.MethodTree;
 import com.sun.source.tree.VariableTree;
-import java.util.ArrayList;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.lang.model.type.TypeMirror;
+
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.checker.nullness.qual.RequiresNonNull;
 import org.checkerframework.dataflow.cfg.ControlFlowGraph;
@@ -26,6 +21,14 @@ import org.checkerframework.dataflow.cfg.node.Node;
 import org.checkerframework.dataflow.cfg.node.ReturnNode;
 import org.checkerframework.javacutil.BugInCF;
 import org.checkerframework.javacutil.Pair;
+
+import java.util.ArrayList;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
+
+import javax.lang.model.type.TypeMirror;
 
 /**
  * An implementation of a forward analysis to solve a org.checkerframework.dataflow problem given a
@@ -94,7 +97,8 @@ public class ForwardAnalysisImpl<
     public void performAnalysis(ControlFlowGraph cfg) {
         if (isRunning) {
             throw new BugInCF(
-                    "ForwardAnalysisImpl::performAnalysis() shouldn't be called when the analysis is running.");
+                    "ForwardAnalysisImpl::performAnalysis() shouldn't be called when the analysis"
+                            + " is running.");
         }
         isRunning = true;
 
@@ -135,7 +139,8 @@ public class ForwardAnalysisImpl<
                     // Propagate store to successors
                     Block succ = rb.getSuccessor();
                     assert succ != null
-                            : "@AssumeAssertion(nullness): regular basic block without non-exceptional successor unexpected";
+                            : "@AssumeAssertion(nullness): regular basic block without"
+                                    + " non-exceptional successor unexpected";
                     propagateStoresTo(
                             succ, lastNode, currentInput, rb.getFlowRule(), addToWorklistAgain);
                     break;

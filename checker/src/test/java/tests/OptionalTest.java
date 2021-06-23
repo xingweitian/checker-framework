@@ -1,9 +1,10 @@
 package tests;
 
-import java.io.File;
-import java.util.List;
 import org.checkerframework.framework.test.CheckerFrameworkPerDirectoryTest;
 import org.junit.runners.Parameterized.Parameters;
+
+import java.io.File;
+import java.util.List;
 
 /** JUnit tests for the Optional Checker, which has the {@code @Present} annotation. */
 public class OptionalTest extends CheckerFrameworkPerDirectoryTest {

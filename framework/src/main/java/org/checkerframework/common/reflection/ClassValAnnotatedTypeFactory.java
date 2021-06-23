@@ -7,16 +7,7 @@ import com.sun.source.tree.MethodInvocationTree;
 import com.sun.tools.javac.code.Type;
 import com.sun.tools.javac.code.Type.ArrayType;
 import com.sun.tools.javac.code.Type.UnionClassType;
-import java.lang.annotation.Annotation;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-import java.util.TreeSet;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.type.DeclaredType;
-import javax.lang.model.type.TypeKind;
+
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.common.reflection.qual.ClassBound;
@@ -39,6 +30,18 @@ import org.checkerframework.javacutil.AnnotationUtils;
 import org.checkerframework.javacutil.BugInCF;
 import org.checkerframework.javacutil.TreeUtils;
 import org.checkerframework.javacutil.TypesUtils;
+
+import java.lang.annotation.Annotation;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.type.DeclaredType;
+import javax.lang.model.type.TypeKind;
 
 public class ClassValAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
 

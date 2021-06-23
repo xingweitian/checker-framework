@@ -1,10 +1,11 @@
 package org.checkerframework.framework.util;
 
+import org.checkerframework.javacutil.SystemUtil;
+
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.checkerframework.javacutil.SystemUtil;
 
 /**
  * The main entry point to the Checker Framework, for use by Checker Framework developers.
@@ -63,7 +64,8 @@ public class CheckerDevelMain extends CheckerMain {
 
         assert (runtimeCp != null)
                 : RUNTIME_CP_PROP
-                        + " must specify a path entry to prepend to the Java classpath when running javac"; // TODO: Fix the assert messages
+                        + " must specify a path entry to prepend to the Java classpath when"
+                        + " running javac"; // TODO: Fix the assert messages
 
         // The location that checker.jar would be in if we have built it
         final File checkersLoc = new File(binDir, "checker.jar");

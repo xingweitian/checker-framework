@@ -1,6 +1,7 @@
-import java.util.List;
 import org.checkerframework.checker.nullness.qual.*;
 import org.checkerframework.checker.nullness.qual.EnsuresNonNullIf;
+
+import java.util.List;
 
 class PptTopLevel {
     /** List of all of the splitters for this ppt. */

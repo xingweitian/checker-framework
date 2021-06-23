@@ -1,10 +1,11 @@
 package tests;
 
-import java.io.File;
-import java.util.List;
 import org.checkerframework.common.returnsreceiver.ReturnsReceiverChecker;
 import org.checkerframework.framework.test.CheckerFrameworkPerDirectoryTest;
 import org.junit.runners.Parameterized.Parameters;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * Tests the returns receiver checker's lombok integration, the test files in

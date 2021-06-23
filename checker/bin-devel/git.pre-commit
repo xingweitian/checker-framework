@@ -15,10 +15,15 @@ set -e
 CHANGED_JAVA_FILES=`git diff --staged --name-only --diff-filter=ACM | grep '\.java$' | grep -v '/jdk/' | grep -v 'stubparser/' | grep -v '/nullness-javac-errors/' ` || true
 # echo CHANGED_JAVA_FILES "'"${CHANGED_JAVA_FILES}"'"
 if [ ! -z "$CHANGED_JAVA_FILES" ]; then
+    # Only check formatting under JDK >= 11, to use consistent version of GJF.
+    JAVA_VER=`java -version 2>&1 | grep -o \"[[:digit:]]*\.[[:digit:]]*.*\" | grep \"1[1-9]\.` || true
+    if [ -z "$JAVA_VER" ]; then
+        echo "Problem in pre-commit: JDK >= 11 is required to run reformatting!" && /bin/false
+    fi
     ./gradlew getCodeFormatScripts -q
     ## For debugging:
     # echo "CHANGED_JAVA_FILES: ${CHANGED_JAVA_FILES}"
-    python checker/bin-devel/.run-google-java-format/check-google-java-format.py --aosp ${CHANGED_JAVA_FILES} || (echo "Try running: ./gradlew reformat" && /bin/false)
+    python3 checker/bin-devel/.run-google-java-format/check-google-java-format.py --aosp ${CHANGED_JAVA_FILES} || (echo "Try running: ./gradlew reformat" && /bin/false)
 
     BRANCH=$(git rev-parse --abbrev-ref HEAD)
     if [ "$BRANCH" = "master" ]; then

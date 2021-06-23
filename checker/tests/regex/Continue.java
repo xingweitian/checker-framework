@@ -1,5 +1,6 @@
-import java.util.regex.Pattern;
 import org.checkerframework.checker.regex.RegexUtil;
+
+import java.util.regex.Pattern;
 
 class Continue {
 

@@ -11,11 +11,13 @@ import com.sun.tools.classfile.Field;
 import com.sun.tools.classfile.Method;
 import com.sun.tools.classfile.RuntimeTypeAnnotations_attribute;
 import com.sun.tools.classfile.TypeAnnotation;
+
+import org.checkerframework.javacutil.Pair;
+import org.checkerframework.javacutil.PluginUtil;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.checkerframework.javacutil.Pair;
-import org.checkerframework.javacutil.PluginUtil;
 
 public class ReferenceInfoUtil {
 

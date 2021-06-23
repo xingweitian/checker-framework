@@ -1,8 +1,9 @@
 package org.checkerframework.dataflow.analysis;
 
-import java.util.Objects;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.dataflow.cfg.node.Node;
+
+import java.util.Objects;
 
 /**
  * {@code TransferInput} is used as the input type of the individual transfer functions of a {@link

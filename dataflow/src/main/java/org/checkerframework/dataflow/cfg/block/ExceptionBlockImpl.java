@@ -1,14 +1,16 @@
 package org.checkerframework.dataflow.cfg.block;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.checkerframework.dataflow.cfg.node.Node;
+import org.checkerframework.javacutil.BugInCF;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+
 import javax.lang.model.type.TypeMirror;
-import org.checkerframework.checker.nullness.qual.Nullable;
-import org.checkerframework.dataflow.cfg.node.Node;
-import org.checkerframework.javacutil.BugInCF;
 
 /** Base class of the {@link Block} implementation hierarchy. */
 public class ExceptionBlockImpl extends SingleSuccessorBlockImpl implements ExceptionBlock {

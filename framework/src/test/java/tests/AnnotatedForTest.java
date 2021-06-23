@@ -1,9 +1,10 @@
 package tests;
 
-import java.io.File;
-import java.util.List;
 import org.checkerframework.framework.test.FrameworkPerDirectoryTest;
 import org.junit.runners.Parameterized.Parameters;
+
+import java.io.File;
+import java.util.List;
 
 /** Created by jthaine on 6/25/15. */
 public class AnnotatedForTest extends FrameworkPerDirectoryTest {

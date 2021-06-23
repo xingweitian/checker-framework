@@ -1,10 +1,11 @@
 package tests;
 
-import java.io.File;
-import java.util.List;
 import org.checkerframework.common.value.ValueChecker;
 import org.checkerframework.framework.test.FrameworkPerDirectoryTest;
 import org.junit.runners.Parameterized.Parameters;
+
+import java.io.File;
+import java.util.List;
 
 public class ValueNonNullStringsConcatenationTest extends FrameworkPerDirectoryTest {
 

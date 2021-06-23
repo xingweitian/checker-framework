@@ -1,4 +1,5 @@
 import org.checkerframework.common.value.qual.IntVal;
+
 import testlib.lib.VarArgMethods;
 
 public class VarArgRe {

@@ -2,11 +2,7 @@ package org.checkerframework.checker.lock;
 
 import com.sun.source.tree.ClassTree;
 import com.sun.source.tree.MethodTree;
-import java.util.List;
-import javax.lang.model.element.ElementKind;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.Modifier;
-import javax.lang.model.type.TypeMirror;
+
 import org.checkerframework.dataflow.analysis.FlowExpressions;
 import org.checkerframework.dataflow.analysis.FlowExpressions.Receiver;
 import org.checkerframework.dataflow.analysis.TransferInput;
@@ -20,6 +16,13 @@ import org.checkerframework.dataflow.cfg.node.SynchronizedNode;
 import org.checkerframework.framework.flow.CFAbstractTransfer;
 import org.checkerframework.framework.flow.CFValue;
 import org.checkerframework.javacutil.TreeUtils;
+
+import java.util.List;
+
+import javax.lang.model.element.ElementKind;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.Modifier;
+import javax.lang.model.type.TypeMirror;
 
 /**
  * LockTransfer handles constructors, initializers, synchronized methods, and synchronized blocks.

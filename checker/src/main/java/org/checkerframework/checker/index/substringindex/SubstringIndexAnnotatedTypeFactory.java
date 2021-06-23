@@ -1,10 +1,5 @@
 package org.checkerframework.checker.index.substringindex;
 
-import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.LinkedHashSet;
-import java.util.Set;
-import javax.lang.model.element.AnnotationMirror;
 import org.checkerframework.checker.index.OffsetDependentTypesHelper;
 import org.checkerframework.checker.index.qual.SubstringIndexBottom;
 import org.checkerframework.checker.index.qual.SubstringIndexFor;
@@ -18,6 +13,13 @@ import org.checkerframework.framework.util.MultiGraphQualifierHierarchy;
 import org.checkerframework.framework.util.dependenttypes.DependentTypesHelper;
 import org.checkerframework.javacutil.AnnotationBuilder;
 import org.checkerframework.javacutil.AnnotationUtils;
+
+import java.lang.annotation.Annotation;
+import java.util.Arrays;
+import java.util.LinkedHashSet;
+import java.util.Set;
+
+import javax.lang.model.element.AnnotationMirror;
 
 /**
  * Builds types with annotations from the Substring Index checker hierarchy, which contains

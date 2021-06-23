@@ -1,15 +1,17 @@
 package testlib.defaulting;
 
-import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
+
 import testlib.defaulting.LowerBoundQual.LbBottom;
 import testlib.defaulting.LowerBoundQual.LbExplicit;
 import testlib.defaulting.LowerBoundQual.LbImplicit;
 import testlib.defaulting.LowerBoundQual.LbTop;
+
+import java.lang.annotation.Annotation;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class DefaultingLowerBoundAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
 

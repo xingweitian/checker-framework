@@ -1,10 +1,12 @@
 package tests;
 
-import java.io.File;
-import java.util.List;
 import org.checkerframework.framework.test.FrameworkPerDirectoryTest;
 import org.junit.runners.Parameterized.Parameters;
+
 import testlib.util.FlowTestChecker;
+
+import java.io.File;
+import java.util.List;
 
 /** Tests for the {@code -AsuggestPureMethods} command-line argument. */
 public class PuritySuggestionsTest extends FrameworkPerDirectoryTest {

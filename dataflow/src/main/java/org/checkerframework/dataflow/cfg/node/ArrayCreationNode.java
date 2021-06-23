@@ -2,12 +2,15 @@ package org.checkerframework.dataflow.cfg.node;
 
 import com.sun.source.tree.NewArrayTree;
 import com.sun.source.tree.Tree;
+
+import org.checkerframework.checker.nullness.qual.Nullable;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+
 import javax.lang.model.type.TypeMirror;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 /**
  * A node for new array creation.

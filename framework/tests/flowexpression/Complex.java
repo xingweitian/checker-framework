@@ -1,10 +1,11 @@
 package flowexpression;
 
+import testlib.flowexpression.qual.FlowExp;
+
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import testlib.flowexpression.qual.FlowExp;
 
 public class Complex {
     class DocCategory {

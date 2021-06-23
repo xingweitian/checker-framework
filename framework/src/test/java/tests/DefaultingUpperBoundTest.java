@@ -1,10 +1,12 @@
 package tests;
 
-import java.io.File;
-import java.util.List;
 import org.checkerframework.framework.test.FrameworkPerDirectoryTest;
 import org.junit.runners.Parameterized.Parameters;
+
 import testlib.defaulting.DefaultingUpperBoundChecker;
+
+import java.io.File;
+import java.util.List;
 
 /** Created by jburke on 9/29/14. */
 public class DefaultingUpperBoundTest extends FrameworkPerDirectoryTest {

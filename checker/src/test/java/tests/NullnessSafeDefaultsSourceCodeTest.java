@@ -1,12 +1,13 @@
 package tests;
 
+import org.checkerframework.framework.test.*;
+import org.checkerframework.framework.test.CheckerFrameworkPerDirectoryTest;
+import org.junit.runners.Parameterized.Parameters;
+
 import java.io.File;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import org.checkerframework.framework.test.*;
-import org.checkerframework.framework.test.CheckerFrameworkPerDirectoryTest;
-import org.junit.runners.Parameterized.Parameters;
 
 /** JUnit tests for the Nullness checker when using safe defaults for unannotated source code. */
 public class NullnessSafeDefaultsSourceCodeTest extends CheckerFrameworkPerDirectoryTest {

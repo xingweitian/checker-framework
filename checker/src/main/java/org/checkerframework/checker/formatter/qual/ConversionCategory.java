@@ -1,5 +1,7 @@
 package org.checkerframework.checker.formatter.qual;
 
+import org.checkerframework.dataflow.qual.Pure;
+
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.Arrays;
@@ -7,7 +9,6 @@ import java.util.Calendar;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
-import org.checkerframework.dataflow.qual.Pure;
 
 /**
  * Elements of this enumeration are used in a {@link Format Format} annotation to indicate the valid

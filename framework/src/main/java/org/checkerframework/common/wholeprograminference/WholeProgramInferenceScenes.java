@@ -7,11 +7,7 @@ import com.sun.source.tree.VariableTree;
 import com.sun.tools.javac.code.Symbol.ClassSymbol;
 import com.sun.tools.javac.code.Symbol.MethodSymbol;
 import com.sun.tools.javac.code.Symbol.VarSymbol;
-import java.util.List;
-import java.util.Map;
-import javax.lang.model.element.Element;
-import javax.lang.model.element.ExecutableElement;
-import javax.lang.model.element.VariableElement;
+
 import org.checkerframework.checker.signature.qual.BinaryName;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.dataflow.cfg.node.FieldAccessNode;
@@ -30,10 +26,18 @@ import org.checkerframework.framework.util.AnnotatedTypes;
 import org.checkerframework.javacutil.BugInCF;
 import org.checkerframework.javacutil.ElementUtils;
 import org.checkerframework.javacutil.TreeUtils;
+
 import scenelib.annotations.el.AClass;
 import scenelib.annotations.el.AField;
 import scenelib.annotations.el.AMethod;
 import scenelib.annotations.util.JVMNames;
+
+import java.util.List;
+import java.util.Map;
+
+import javax.lang.model.element.Element;
+import javax.lang.model.element.ExecutableElement;
+import javax.lang.model.element.VariableElement;
 
 /**
  * WholeProgramInferenceScenes is an implementation of {@link

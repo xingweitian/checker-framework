@@ -1,5 +1,6 @@
-import java.util.BitSet;
 import org.checkerframework.common.value.qual.*;
+
+import java.util.BitSet;
 
 class Repo {
     private BitSet bitmap;

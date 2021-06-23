@@ -1,5 +1,6 @@
-import java.util.Collection;
 import testlib.util.*;
+
+import java.util.Collection;
 
 public class Values {
 

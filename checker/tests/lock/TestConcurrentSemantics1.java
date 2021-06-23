@@ -1,8 +1,9 @@
 package chapter;
 
-import java.util.concurrent.locks.ReentrantLock;
 import org.checkerframework.checker.lock.qual.GuardedBy;
 import org.checkerframework.checker.lock.qual.GuardedByUnknown;
+
+import java.util.concurrent.locks.ReentrantLock;
 
 class TestConcurrentSemantics1 {
     /* This class tests the following critical scenario.

@@ -1,7 +1,8 @@
+import testchecker.quals.*;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import testchecker.quals.*;
 
 class InferTypeArgsPolyChecker<OUTER_SCOPE_TV> {
     // ----------------------------------------------------------

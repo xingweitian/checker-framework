@@ -1,8 +1,9 @@
 package testlib.util;
 
+import org.checkerframework.framework.qual.SubtypeOf;
+
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Target;
-import org.checkerframework.framework.qual.SubtypeOf;
 
 /** A subtype of SuperQual. */
 @SubtypeOf(SuperQual.class)

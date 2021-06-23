@@ -1,12 +1,14 @@
 package typedecldefault;
 
+import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
+import org.checkerframework.common.basetype.BaseTypeChecker;
+
+import typedecldefault.quals.*;
+
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
-import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
-import org.checkerframework.common.basetype.BaseTypeChecker;
-import typedecldefault.quals.*;
 
 public class TypeDeclDefaultAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
     public TypeDeclDefaultAnnotatedTypeFactory(BaseTypeChecker checker) {

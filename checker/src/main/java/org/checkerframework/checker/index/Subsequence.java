@@ -2,8 +2,7 @@ package org.checkerframework.checker.index;
 
 import com.sun.source.tree.Tree;
 import com.sun.source.util.TreePath;
-import javax.lang.model.element.AnnotationMirror;
-import javax.lang.model.element.Element;
+
 import org.checkerframework.checker.index.qual.HasSubsequence;
 import org.checkerframework.dataflow.analysis.FlowExpressions;
 import org.checkerframework.dataflow.analysis.FlowExpressions.FieldAccess;
@@ -15,6 +14,9 @@ import org.checkerframework.framework.util.FlowExpressionParseUtil.FlowExpressio
 import org.checkerframework.framework.util.FlowExpressionParseUtil.FlowExpressionParseException;
 import org.checkerframework.javacutil.AnnotationUtils;
 import org.checkerframework.javacutil.TreeUtils;
+
+import javax.lang.model.element.AnnotationMirror;
+import javax.lang.model.element.Element;
 
 /** Holds information from {@link HasSubsequence} annotations. */
 public class Subsequence {

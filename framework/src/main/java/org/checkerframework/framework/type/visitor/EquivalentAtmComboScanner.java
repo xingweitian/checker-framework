@@ -1,8 +1,5 @@
 package org.checkerframework.framework.type.visitor;
 
-import java.util.IdentityHashMap;
-import java.util.Iterator;
-import java.util.Map;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
 import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedArrayType;
 import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedDeclaredType;
@@ -15,6 +12,10 @@ import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedTypeVari
 import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedUnionType;
 import org.checkerframework.framework.type.AnnotatedTypeMirror.AnnotatedWildcardType;
 import org.checkerframework.framework.util.AtmCombo;
+
+import java.util.IdentityHashMap;
+import java.util.Iterator;
+import java.util.Map;
 
 /**
  * EquivalentAtmComboScanner is an AtmComboVisitor that accepts combinations that are identical in

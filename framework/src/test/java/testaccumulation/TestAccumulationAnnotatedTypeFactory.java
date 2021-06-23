@@ -1,15 +1,18 @@
 package testaccumulation;
 
 import com.sun.source.tree.MethodInvocationTree;
-import javax.lang.model.element.AnnotationMirror;
+
 import org.checkerframework.common.accumulation.AccumulationAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
 import org.checkerframework.framework.type.treeannotator.ListTreeAnnotator;
 import org.checkerframework.framework.type.treeannotator.TreeAnnotator;
 import org.checkerframework.javacutil.TreeUtils;
+
 import testaccumulation.qual.TestAccumulation;
 import testaccumulation.qual.TestAccumulationBottom;
+
+import javax.lang.model.element.AnnotationMirror;
 
 /**
  * The annotated type factory for a test accumulation checker, which implements a basic called

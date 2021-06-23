@@ -1,4 +1,5 @@
 import org.checkerframework.checker.fenum.qual.Fenum;
+
 import testlib.lib.UncheckedByteCode;
 
 public class UpperBoundsInByteCode {

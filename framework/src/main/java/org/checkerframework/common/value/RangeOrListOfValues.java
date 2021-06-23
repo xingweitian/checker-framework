@@ -1,14 +1,16 @@
 package org.checkerframework.common.value;
 
-import java.util.ArrayList;
-import java.util.List;
-import javax.lang.model.element.AnnotationMirror;
 import org.checkerframework.common.value.qual.ArrayLen;
 import org.checkerframework.common.value.qual.ArrayLenRange;
 import org.checkerframework.common.value.qual.IntVal;
 import org.checkerframework.common.value.util.Range;
 import org.checkerframework.framework.type.AnnotatedTypeMirror;
 import org.checkerframework.javacutil.SystemUtil;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import javax.lang.model.element.AnnotationMirror;
 
 /**
  * An abstraction that can be either a range or a list of values that could come from an {@link

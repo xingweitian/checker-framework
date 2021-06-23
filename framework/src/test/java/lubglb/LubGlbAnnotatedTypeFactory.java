@@ -1,9 +1,5 @@
 package lubglb;
 
-import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
 import lubglb.quals.A;
 import lubglb.quals.B;
 import lubglb.quals.C;
@@ -11,8 +7,14 @@ import lubglb.quals.D;
 import lubglb.quals.E;
 import lubglb.quals.F;
 import lubglb.quals.Poly;
+
 import org.checkerframework.common.basetype.BaseAnnotatedTypeFactory;
 import org.checkerframework.common.basetype.BaseTypeChecker;
+
+import java.lang.annotation.Annotation;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class LubGlbAnnotatedTypeFactory extends BaseAnnotatedTypeFactory {
 

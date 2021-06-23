@@ -1,11 +1,13 @@
 package org.checkerframework.common.value.util;
 
+import org.checkerframework.javacutil.TypesUtils;
+
 import java.util.ArrayList;
 import java.util.List;
+
 import javax.lang.model.type.DeclaredType;
 import javax.lang.model.type.TypeKind;
 import javax.lang.model.type.TypeMirror;
-import org.checkerframework.javacutil.TypesUtils;
 
 public class NumberUtils {
 

@@ -1,11 +1,13 @@
 package tests.wpirunners;
 
-import java.io.File;
-import java.util.List;
 import org.checkerframework.framework.test.FrameworkPerDirectoryTest;
 import org.junit.experimental.categories.Category;
 import org.junit.runners.Parameterized.Parameters;
+
 import testlib.wholeprograminference.WholeProgramInferenceTestChecker;
+
+import java.io.File;
+import java.util.List;
 
 /**
  * Tests whole-program inference with the aid of stub files. This test is the first pass on the test

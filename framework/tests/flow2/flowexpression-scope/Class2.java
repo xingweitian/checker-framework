@@ -1,6 +1,7 @@
 package pkg2;
 
 import pkg1.Class1;
+
 import testlib.util.EnsuresOdd;
 import testlib.util.Odd;
 import testlib.util.RequiresOdd;

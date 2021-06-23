@@ -1,8 +1,5 @@
 package org.checkerframework.framework.util;
 
-import java.lang.annotation.Annotation;
-import java.util.Objects;
-import javax.lang.model.element.AnnotationMirror;
 import org.checkerframework.checker.nullness.qual.Nullable;
 import org.checkerframework.framework.qual.ConditionalPostconditionAnnotation;
 import org.checkerframework.framework.qual.EnsuresQualifier;
@@ -11,6 +8,11 @@ import org.checkerframework.framework.qual.PostconditionAnnotation;
 import org.checkerframework.framework.qual.PreconditionAnnotation;
 import org.checkerframework.framework.qual.RequiresQualifier;
 import org.checkerframework.javacutil.BugInCF;
+
+import java.lang.annotation.Annotation;
+import java.util.Objects;
+
+import javax.lang.model.element.AnnotationMirror;
 
 /**
  * A contract represents an annotation on an expression. It is a precondition, postcondition, or
